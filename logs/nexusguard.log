@@ -1,0 +1,869 @@
+2026-06-17 13:59:26 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 14:00:03 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 14:06:37 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 14:14:16 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 14:15:06 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:04:11 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:04:15 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:04:15 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:04:15 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 15:04:15 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 15:04:15 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 15:04:15 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 15:04:15 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 15:04:15 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 15:04:15 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 15:04:15 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 15:04:15 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 15:04:16 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 15:04:16 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 15:04:17 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 15:04:18 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 15:04:18 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 15:04:18 | INFO     | pipeline               |   Resolved to 73 unique entities from 100 raw mentions.
+2026-06-17 15:04:18 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:04:18 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 15:04:18 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 15:04:18 | INFO     | pipeline               |   Entities   : 73
+2026-06-17 15:04:18 | INFO     | pipeline               |   Relations  : 99
+2026-06-17 15:04:18 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 15:04:18 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 15:04:18 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 15:04:18 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 15:04:18 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:04:18 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 15:04:18 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 15:04:18 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 15:04:18 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-17 15:04:18 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 15:04:18 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:04:18 | INFO     | fraud_detector         | Detection complete — 41 alerts, overall risk 0.93 (CRITICAL).
+2026-06-17 15:12:01 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:12:05 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:12:05 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:12:05 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 15:12:05 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 15:12:05 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 15:12:05 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 15:12:05 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 15:12:05 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 15:12:05 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 15:12:05 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 15:12:05 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 15:12:06 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 15:12:07 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 15:12:07 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 15:12:08 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 15:12:09 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 15:12:09 | INFO     | pipeline               |   Resolved to 73 unique entities from 100 raw mentions.
+2026-06-17 15:12:09 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:12:09 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 15:12:09 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 15:12:09 | INFO     | pipeline               |   Entities   : 73
+2026-06-17 15:12:09 | INFO     | pipeline               |   Relations  : 99
+2026-06-17 15:12:09 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 15:12:09 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 15:12:09 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 15:12:09 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 15:12:09 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:12:09 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 15:12:09 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 15:12:09 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 15:12:09 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-17 15:12:09 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 15:12:09 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:12:09 | INFO     | fraud_detector         | Detection complete — 41 alerts, overall risk 0.93 (CRITICAL).
+2026-06-17 15:17:24 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:17:28 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:17:28 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:17:28 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 15:17:28 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 15:17:28 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 15:17:28 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 15:17:28 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 15:17:28 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 15:17:28 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 15:17:28 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 15:17:28 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 15:17:29 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 15:17:30 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 15:17:31 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 15:17:32 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 15:17:33 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 15:17:33 | INFO     | pipeline               |   Resolved to 73 unique entities from 100 raw mentions.
+2026-06-17 15:17:33 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:17:33 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 15:17:33 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 15:17:33 | INFO     | pipeline               |   Entities   : 73
+2026-06-17 15:17:33 | INFO     | pipeline               |   Relations  : 99
+2026-06-17 15:17:33 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 15:17:33 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 15:17:33 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 15:17:33 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 15:17:33 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:17:33 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 15:17:33 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 15:17:33 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 15:17:33 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-17 15:17:33 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 15:17:33 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:17:33 | INFO     | fraud_detector         | Detection complete — 4 alerts, overall risk 0.90 (CRITICAL).
+2026-06-17 15:18:37 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:18:41 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:18:41 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:18:41 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 15:18:41 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 15:18:41 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 15:18:41 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 15:18:41 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 15:18:41 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 15:18:41 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 15:18:41 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 15:18:41 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 15:18:42 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 15:18:44 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 15:18:45 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 15:18:46 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 15:18:47 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 15:18:47 | INFO     | pipeline               |   Resolved to 73 unique entities from 100 raw mentions.
+2026-06-17 15:18:47 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 15:18:47 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 15:18:48 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 15:18:48 | INFO     | pipeline               |   Entities   : 73
+2026-06-17 15:18:48 | INFO     | pipeline               |   Relations  : 99
+2026-06-17 15:18:48 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 15:18:48 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 15:18:48 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 15:18:48 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 15:18:48 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:18:48 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 15:18:48 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 15:18:48 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 15:18:48 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-17 15:18:48 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 15:18:48 | INFO     | fraud_detector         |     → 19 alert(s) found.
+2026-06-17 15:18:48 | INFO     | fraud_detector         | Detection complete — 4 alerts, overall risk 0.90 (CRITICAL).
+2026-06-17 15:29:35 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:29:39 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:29:57 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 15:30:01 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 19:55:21 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 19:55:26 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 19:55:26 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 19:55:26 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 19:55:26 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 19:55:26 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 19:55:26 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 19:55:26 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 19:55:26 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 19:55:26 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 19:55:26 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 19:55:26 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 19:55:28 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 19:55:29 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 19:55:30 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 19:55:31 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 19:55:32 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 19:55:32 | INFO     | pipeline               |   Resolved to 61 unique entities from 87 raw mentions.
+2026-06-17 19:55:32 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 19:55:32 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 19:55:32 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 19:55:32 | INFO     | pipeline               |   Entities   : 61
+2026-06-17 19:55:32 | INFO     | pipeline               |   Relations  : 49
+2026-06-17 19:55:32 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 19:55:32 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 19:55:32 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 19:55:32 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 19:55:32 | INFO     | fraud_detector         |     → 13 alert(s) found.
+2026-06-17 19:55:32 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 19:55:32 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 19:55:32 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 19:55:32 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 19:55:32 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 19:55:32 | INFO     | fraud_detector         |     → 13 alert(s) found.
+2026-06-17 19:55:32 | INFO     | fraud_detector         | Detection complete — 3 alerts, overall risk 0.72 (HIGH).
+2026-06-17 20:07:43 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:07:48 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:07:48 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 20:07:48 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 20:07:48 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 20:07:48 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 20:07:48 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 20:07:48 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 20:07:48 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 20:07:48 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 20:07:48 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 20:07:48 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 20:07:52 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 20:07:54 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 20:07:55 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 20:07:57 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 20:07:59 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 20:07:59 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 20:07:59 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 20:07:59 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 20:07:59 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 20:07:59 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 20:07:59 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 20:07:59 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 20:07:59 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 20:07:59 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 20:07:59 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 20:07:59 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 20:07:59 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 20:07:59 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-17 20:07:59 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 20:07:59 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-17 20:07:59 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 20:07:59 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-17 20:07:59 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-17 20:10:17 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:10:22 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:11:18 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:11:25 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:12:23 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:12:27 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:13:05 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:13:10 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:36:03 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:36:03 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 20:36:03 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 20:36:03 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 20:36:03 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 20:36:03 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 20:36:03 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 20:36:03 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 20:36:03 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 20:36:03 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 20:36:03 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 20:36:06 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 20:36:08 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 20:36:09 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 20:36:10 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 20:36:12 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 20:36:12 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 20:36:12 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 20:36:12 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 20:36:12 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 20:36:12 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 20:36:12 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 20:36:12 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 20:36:12 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 20:36:12 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 20:36:12 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 20:36:12 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 20:36:12 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 20:36:12 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-17 20:36:12 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 20:36:12 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-17 20:36:12 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 20:36:12 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-17 20:36:12 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-17 20:36:39 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 20:36:39 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 20:36:39 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 20:36:39 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 20:36:39 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 20:36:39 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 20:36:39 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 20:36:39 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 20:36:39 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 20:36:39 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 20:36:39 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 20:36:40 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 20:36:41 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 20:36:41 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 20:36:42 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 20:36:43 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 20:36:43 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 20:36:43 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 20:36:43 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 20:36:43 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 20:36:43 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 20:36:43 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 20:36:43 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 20:36:43 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 20:36:43 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 20:36:43 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 20:36:43 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 20:36:43 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 20:36:43 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-17 20:36:43 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 20:36:43 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-17 20:36:43 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 20:36:43 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-17 20:36:43 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-17 20:40:05 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:16:15 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:16:20 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:16:43 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:16:48 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:17:33 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:17:33 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 21:17:33 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 21:17:33 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 21:17:33 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 21:17:33 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 21:17:33 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 21:17:33 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 21:17:33 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 21:17:33 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 21:17:33 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 21:17:34 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 21:17:35 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 21:17:37 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 21:17:38 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 21:17:40 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 21:17:40 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 21:17:40 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 21:17:40 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 21:17:40 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 21:17:40 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 21:17:40 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 21:59:18 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 21:59:18 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 21:59:18 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 21:59:18 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 21:59:18 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 21:59:18 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 21:59:18 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 21:59:18 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 21:59:18 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 21:59:18 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 21:59:18 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 21:59:20 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 21:59:20 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 21:59:21 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 21:59:22 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 21:59:23 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 21:59:23 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 21:59:23 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 21:59:23 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 21:59:23 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 21:59:23 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 21:59:23 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 21:59:23 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 21:59:23 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 21:59:23 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 21:59:23 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 21:59:23 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 21:59:23 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 21:59:23 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-17 21:59:23 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 21:59:23 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-17 21:59:23 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 21:59:23 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-17 21:59:23 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-17 22:01:11 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 22:01:11 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 22:01:11 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 22:01:11 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 22:01:11 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 22:01:11 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 22:01:11 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 22:01:11 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 22:01:11 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 22:01:11 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 22:01:11 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 22:01:13 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 22:01:14 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 22:01:15 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 22:01:16 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 22:01:18 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 22:01:18 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 22:01:18 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 22:01:18 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 22:01:18 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 22:01:18 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 22:01:18 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 22:01:18 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 22:01:18 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 22:01:18 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 22:01:18 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 22:01:18 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 22:01:18 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 22:01:18 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-17 22:01:18 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 22:01:18 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-17 22:01:18 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 22:01:18 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-17 22:01:18 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-17 22:01:33 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 22:36:03 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-17 22:36:03 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 22:36:03 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-17 22:36:03 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-17 22:36:03 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-17 22:36:03 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-17 22:36:03 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-17 22:36:03 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-17 22:36:03 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-17 22:36:03 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-17 22:36:03 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-17 22:36:06 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-17 22:36:08 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-17 22:36:10 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-17 22:36:12 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-17 22:36:15 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-17 22:36:15 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-17 22:36:15 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-17 22:36:15 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-17 22:36:15 | INFO     | pipeline               |   Documents  : 5
+2026-06-17 22:36:15 | INFO     | pipeline               |   Entities   : 56
+2026-06-17 22:36:15 | INFO     | pipeline               |   Relations  : 64
+2026-06-17 22:36:15 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-17 22:36:15 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-17 22:36:15 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-17 22:36:15 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-17 22:36:15 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-17 22:36:15 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-17 22:36:15 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-17 22:36:15 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-17 22:36:15 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-17 22:36:15 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-17 22:36:15 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-17 22:36:15 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 10:57:42 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 10:57:42 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 10:57:42 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 10:57:42 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 10:57:42 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 10:57:42 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 10:57:42 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 10:57:42 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 10:57:42 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 10:57:42 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 10:57:42 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 10:57:49 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 10:57:50 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 10:57:51 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 10:57:52 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 10:57:53 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 10:57:53 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 10:57:53 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 10:57:53 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 10:57:53 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 10:57:53 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 10:57:53 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 10:57:53 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 10:57:53 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 10:57:53 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 10:57:53 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 10:57:53 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-18 10:57:53 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 10:57:53 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 10:57:53 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 10:57:53 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-18 10:57:53 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 10:57:53 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 10:57:53 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 11:10:55 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:10:55 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:10:56 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 11:10:56 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 11:10:56 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 11:10:56 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 11:10:56 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 11:10:56 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 11:10:56 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 11:10:56 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 11:10:56 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 11:10:58 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 11:10:59 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 11:11:00 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 11:11:01 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 11:11:03 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 11:11:03 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 11:11:03 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:11:03 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 11:11:03 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 11:11:03 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 11:11:03 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 11:11:03 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 11:11:03 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 11:11:03 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 11:11:03 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 11:11:03 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-18 11:11:03 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 11:11:03 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 11:11:03 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 11:11:03 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-18 11:11:03 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 11:11:03 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 11:11:03 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 11:12:15 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:28:54 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:28:54 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:28:54 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 11:28:54 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 11:28:54 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 11:28:54 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 11:28:54 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 11:28:54 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 11:28:54 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 11:28:54 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 11:28:54 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 11:28:56 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 11:28:58 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 11:28:59 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 11:29:00 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 11:29:02 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 11:29:02 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 11:29:02 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:29:02 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 11:29:02 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 11:29:02 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 11:29:02 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 11:29:02 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 11:29:02 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 11:29:02 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 11:29:02 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 11:29:02 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-18 11:29:02 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 11:29:02 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 11:29:02 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 11:29:02 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-18 11:29:02 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 11:29:02 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 11:29:02 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 11:36:39 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:36:39 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:36:39 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 11:36:39 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 11:36:39 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 11:36:39 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 11:36:39 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 11:36:39 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 11:36:39 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 11:36:39 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 11:36:39 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 11:36:40 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 11:36:42 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 11:36:42 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 11:36:44 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 11:36:45 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 11:36:45 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 11:36:45 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:36:45 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 11:36:45 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 11:36:45 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 11:36:45 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 11:36:45 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 11:36:45 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 11:36:45 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 11:36:45 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 11:36:45 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-18 11:36:45 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 11:36:45 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 11:36:45 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 11:36:45 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-18 11:36:45 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 11:36:45 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 11:36:45 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 11:39:40 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:39:40 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:39:40 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 11:39:40 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 11:39:40 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 11:39:40 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 11:39:40 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 11:39:40 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 11:39:40 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 11:39:40 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 11:39:40 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 11:39:41 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 11:39:43 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 11:39:44 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 11:39:45 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 11:39:47 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 11:39:47 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 11:39:47 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 11:39:47 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 11:39:47 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 11:39:47 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 11:39:47 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 11:39:47 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 11:39:47 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 11:39:47 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 11:39:47 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 11:39:47 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-18 11:39:47 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 11:39:47 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 11:39:47 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 11:39:47 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-18 11:39:47 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 11:39:47 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 11:39:47 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 11:40:50 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:49:56 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:50:05 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:51:21 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 11:59:09 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:01:41 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:01:47 | ERROR    | graph_engine           | Query error: {neo4j_code: Neo.ClientError.Database.DatabaseNotFound} {message: Unable to get a routing table for database 'neo4j' because this database does not exist} {gql_status: 22000} {gql_status_description: error: data exception}
+Cypher: MATCH (addr:Address)<-[:REGISTERED_AT|RESIDES_AT]-(e)
+WITH addr, collect(e.name) AS names, count(e) AS cnt
+WHERE cnt >= 2
+RETURN addr.full_address, names, cnt
+2026-06-18 12:02:38 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:02:44 | ERROR    | graph_engine           | Query error: {neo4j_code: Neo.ClientError.Database.DatabaseNotFound} {message: Unable to get a routing table for database 'neo4j' because this database does not exist} {gql_status: 22000} {gql_status_description: error: data exception}
+Cypher: MATCH (p1:Person)-[:APPLIED_FOR_LOAN_WITH]->(a:Asset)
+MATCH (p2:Person)-[:APPLIED_FOR_LOAN_WITH]->(a)
+WHERE p1.entity_id <> p2.entity_id
+RETURN a.name, p1.name, p2.name
+2026-06-18 12:03:49 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:03:54 | ERROR    | graph_engine           | Query error: {neo4j_code: Neo.ClientError.Database.DatabaseNotFound} {message: Unable to get a routing table for database 'neo4j' because this database does not exist} {gql_status: 22000} {gql_status_description: error: data exception}
+Cypher: MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 100
+2026-06-18 12:04:40 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:04:44 | ERROR    | graph_engine           | Query error: {neo4j_code: Neo.ClientError.Database.DatabaseNotFound} {message: Unable to get a routing table for database 'neo4j' because this database does not exist} {gql_status: 22000} {gql_status_description: error: data exception}
+Cypher: MATCH (g:Person)-[:GUARANTOR_FOR]->(a1:Person)
+MATCH (g)-[:GUARANTOR_FOR]->(a2:Person)
+WHERE a1.entity_id <> a2.entity_id
+RETURN g.name AS guarantor, a1.name AS applicant_1, a2.name AS applicant_2
+2026-06-18 12:07:04 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:07:04 | ERROR    | graph_engine           | Query error: {neo4j_code: Neo.ClientError.Database.DatabaseNotFound} {message: Unable to get a routing table for database 'neo4j' because this database does not exist} {gql_status: 22000} {gql_status_description: error: data exception}
+Cypher: MATCH (g:Person)-[:GUARANTOR_FOR]->(a1:Person)
+MATCH (g)-[:GUARANTOR_FOR]->(a2:Person)
+WHERE a1.entity_id <> a2.entity_id
+RETURN g.name AS guarantor, a1.name AS applicant_1, a2.name AS applicant_2
+2026-06-18 12:07:53 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:07:53 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:07:53 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:07:53 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:07:54 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:07:54 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:07:54 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:07:54 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:07:54 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:07:54 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:07:54 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:07:58 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:08:00 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:08:02 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:08:04 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:08:06 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:08:06 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:08:06 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:08:06 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:08:06 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:08:06 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:08:06 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:10:02 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:10:02 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:10:02 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:10:02 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:10:02 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:10:02 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:10:02 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:10:02 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:10:02 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:10:02 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:10:02 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:10:04 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:10:06 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:10:08 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:10:14 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:10:22 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:10:22 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:10:22 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:10:22 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:10:22 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:10:22 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:10:22 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:10:54 | ERROR    | graph_engine           | Neo4j auth failed.  Check credentials (user=neo4j).
+2026-06-18 12:12:37 | ERROR    | graph_engine           | Neo4j unreachable at neo4j+s://902d1e28.databases.neo4j.i.  Is the database running?
+2026-06-18 12:12:58 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:15:01 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:15:01 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:15:01 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:15:01 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:15:01 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:15:01 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:15:01 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:15:01 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:15:01 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:15:01 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:15:01 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:15:02 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:15:03 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:15:04 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:15:04 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:15:05 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:15:05 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:15:05 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:15:05 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:15:05 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:15:05 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:15:05 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:15:32 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:15:32 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:15:32 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:15:32 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:15:32 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:15:32 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:15:32 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:15:32 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:15:32 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:15:32 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:15:32 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:15:33 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:15:34 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:15:35 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:15:36 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:15:37 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:15:37 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:15:37 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:15:37 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:15:37 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:15:37 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:15:37 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:16:17 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:16:17 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:16:17 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:16:17 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:16:17 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:16:18 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:16:18 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:16:18 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:16:18 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:16:18 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:16:18 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:17:39 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:17:43 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:18:19 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:18:25 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:18:30 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:18:30 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:18:30 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:18:30 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:18:30 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:18:30 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:18:30 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:18:30 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:18:30 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:18:30 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:18:30 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:18:32 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:18:36 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:18:37 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:18:38 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:18:39 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:18:39 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:18:39 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:18:39 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:18:39 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:18:39 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:18:39 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:18:39 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 12:18:39 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 12:18:39 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 12:18:39 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 12:18:39 | INFO     | fraud_detector         |     → 0 alert(s) found.
+2026-06-18 12:18:39 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 12:18:39 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 12:18:39 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 12:18:39 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-18 12:18:39 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 12:18:39 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 12:18:39 | INFO     | fraud_detector         | Detection complete — 5 alerts, overall risk 0.79 (HIGH).
+2026-06-18 12:19:40 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:19:49 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:26:27 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:26:42 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:26:42 | ERROR    | graph_engine           | Query error: {neo4j_code: Neo.ClientError.Database.DatabaseNotFound} {message: Unable to get a routing table for database 'neo4j' because this database does not exist} {gql_status: 22000} {gql_status_description: error: data exception}
+Cypher: MATCH (p1:Person)-[:APPLIED_FOR_LOAN_WITH]->(a:Asset)
+MATCH (p2:Person)-[:APPLIED_FOR_LOAN_WITH]->(a)
+WHERE p1.entity_id <> p2.entity_id
+RETURN a.name, p1.name, p2.name
+2026-06-18 12:28:31 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:28:35 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:28:49 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:28:53 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:29:23 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:30:12 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:30:12 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:30:12 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:30:12 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:30:12 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:30:12 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:30:12 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:30:12 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:30:12 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:30:12 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:30:12 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:30:14 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:30:15 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:30:15 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:30:16 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:30:17 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:30:17 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:30:17 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:30:17 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:30:17 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:30:17 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:30:17 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:31:05 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:31:05 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:31:05 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:31:05 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:31:05 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:31:05 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:31:05 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:31:05 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:31:05 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:31:05 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:31:05 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:31:07 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:31:08 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:31:09 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:31:10 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:31:10 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:31:10 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:31:10 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:31:10 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:31:10 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:31:10 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:31:10 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:33:29 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:37:30 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:37:34 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:37:48 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:37:52 | ERROR    | graph_engine           | Neo4j unreachable at bolt://localhost:7687.  Is the database running?
+2026-06-18 12:40:14 | INFO     | graph_engine           | Connected to Neo4j at neo4j+s://902d1e28.databases.neo4j.io
+2026-06-18 12:40:31 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:40:31 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 12:40:31 | INFO     | pipeline               | Found 5 document(s) in C:\Users\DELL\CanaraBank-Hackthon\NexusGuard_Sukaksha_hackthon\input_documents.
+2026-06-18 12:40:31 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 12:40:31 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 12:40:31 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 12:40:31 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 12:40:31 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 12:40:31 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 12:40:31 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 12:40:33 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 12:40:34 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 12:40:36 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 12:40:37 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 12:40:38 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 12:40:38 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-18 12:40:38 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 12:40:38 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 12:40:38 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 12:40:38 | INFO     | pipeline               |   Entities   : 56
+2026-06-18 12:40:38 | INFO     | pipeline               |   Relations  : 64
+2026-06-18 12:40:38 | INFO     | graph_engine           | Database cleared.
+2026-06-18 12:40:39 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-18 12:40:39 | INFO     | graph_engine           | Building graph — 56 entities, 64 relationships.
+2026-06-18 12:40:48 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 56, 'relationships_created': 64}
+2026-06-18 12:40:48 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 12:40:48 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 12:40:48 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 12:40:48 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 12:40:48 | INFO     | fraud_detector         |     → 6 alert(s) found.
+2026-06-18 12:40:48 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 12:40:48 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-18 12:40:48 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 12:40:48 | INFO     | fraud_detector         |     → 28 alert(s) found.
+2026-06-18 12:40:48 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 12:40:48 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-18 12:40:49 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).

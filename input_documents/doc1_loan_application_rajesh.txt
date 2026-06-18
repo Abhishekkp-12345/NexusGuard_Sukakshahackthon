@@ -1,0 +1,53 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              CANARA BANK — HOME LOAN APPLICATION               ║
+║                  Branch: MG Road, Bengaluru                    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Application Ref   : CB/HML/2024/BLR/00451
+Date of Application: 15/03/2024
+Branch Code        : 002145
+
+── SECTION A: APPLICANT DETAILS ──────────────────────────────────
+Full Name          : Rajesh Kumar
+Father's Name      : Suresh Kumar
+Date of Birth      : 12/07/1985
+PAN Number         : ABCPK1234F
+Aadhaar Number     : 9876 5432 1098
+Mobile             : +91 9845012345
+Email              : rajesh.kumar@email.com
+Occupation         : Senior Manager, Infosys Ltd.
+Monthly Income     : Rs. 1,85,000
+Residential Address: Flat 402, Royal Residency, MG Road, Bengaluru - 560001
+
+── SECTION B: LOAN DETAILS ───────────────────────────────────────
+Loan Type          : Home Loan (Housing Finance)
+Loan Amount Requested : Rs. 45,00,000 (Forty-Five Lakhs Only)
+Tenure             : 20 Years (240 months)
+Purpose            : Purchase of residential property
+Expected EMI       : Rs. 38,750 (approx.)
+
+── SECTION C: COLLATERAL / SECURITY DETAILS ──────────────────────
+Type of Collateral : Immovable Property — Land + Construction
+Land Survey Number : SR-504
+Village Code       : Whitefield
+SRO Code           : KA-BLR-E
+Property Location  : Whitefield, Bengaluru East Taluk, Karnataka
+Property Area      : 2400 sq. ft. (site) + 1800 sq. ft. (built-up)
+Estimated Value    : Rs. 72,00,000 (Seventy-Two Lakhs)
+Title Holder       : Rajesh Kumar (self)
+Encumbrance Status : Clear as of 01/03/2024
+
+── SECTION D: DECLARATION ────────────────────────────────────────
+I, Rajesh Kumar, hereby declare that the information furnished
+above is true and correct to the best of my knowledge.  I authorise
+Canara Bank to verify the above details from any source.
+
+Signature of Applicant: _____________________
+Date: 15/03/2024
+Place: Bengaluru
+
+── FOR BANK USE ONLY ─────────────────────────────────────────────
+Verified by        : A. K. Mehta (Loan Officer)
+Verification Date  : 18/03/2024
+Recommendation     : APPROVE — subject to title verification
+══════════════════════════════════════════════════════════════════
