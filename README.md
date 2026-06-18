@@ -363,4 +363,4 @@ MIT License — see LICENSE file.
 
 ---
 
-*Built with ❤️ by Team Sukaksha for the Canara Bank Hackathon 2024*
+*Built with ❤️ by Team Sukaksha for the Canara Bank Hackathon 2026*
