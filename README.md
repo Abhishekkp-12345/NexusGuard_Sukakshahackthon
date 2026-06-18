@@ -221,7 +221,29 @@ python generate_mock_data.py
 streamlit run app.py
 ```
 
-The dashboard will open automatically at: **http://localhost:8501**
+The dashboard will open automatically at: **http://localhost:8501** (or your Vite frontend port)
+
+---
+
+### 🔐 Guide to Enterprise Login (Hackathon Demo)
+
+To demonstrate the full Multi-Branch RBAC and Security features to the judges, use the following credentials:
+
+**Global Admin View**
+*   **Employee Code**: `CB-HQ-ADMIN`
+*   **Password**: `Nexus@2026`
+*   **2FA OTP**: `849201`
+*(Unlocks all sidebar features, including Cypher Lab)*
+
+**Branch Underwriter View**
+*   **Employee Code**: `CB-MUM-042` (or any valid branch string)
+*   **Password**: `Nexus@2026`
+*   **2FA OTP**: `849201`
+*(Shows restricted view banner, hides Cypher Lab)*
+
+**Testing Security Features**
+*   **3-Strike Lockout**: Enter any wrong password 3 times in a row.
+*   **Forgot Password**: Click the reset link and use OTP `112233`.
 
 ---
 
