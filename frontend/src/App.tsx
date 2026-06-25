@@ -788,29 +788,40 @@ export default function App() {
         {/* Navigation */}
         <header className="flex items-center justify-between px-8 py-5 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-black/40 backdrop-blur-md sticky top-0 z-50">
           <div className="flex items-center gap-3">
-            <div className="relative p-1.5 rounded-xl bg-gradient-to-tr from-[#0052cc] to-[#0ea5e9] shadow-lg overflow-hidden">
-               <Shield className="w-5 h-5 text-white" />
+            <div className={`relative p-1.5 rounded-xl bg-gradient-to-tr from-[#0052cc] via-[#0ea5e9] to-[#3b82f6] ${isDarkMode ? 'shadow-[0_0_15px_rgba(14,165,233,0.4)]' : 'shadow-lg'} overflow-hidden group`}>
+              <div className="absolute inset-0 bg-white/20 group-hover:scale-150 transition-transform duration-700 ease-out rounded-full blur-xl" />
+              <svg className="w-6 h-6 text-white relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="11" r="3" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M12 14V17M9 11H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="15" cy="8" r="1.5" fill="currentColor"/>
+                <circle cx="9" cy="8" r="1.5" fill="currentColor"/>
+              </svg>
             </div>
             <h1 className="text-lg font-black tracking-tight text-[#0052cc] dark:text-white uppercase">NexusGuard</h1>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500 dark:text-slate-400">
-            <a href="#features" className="hover:text-[#0052cc] dark:hover:text-white transition-colors">Platform Capabilities</a>
-            <a href="#workflow" className="hover:text-[#0052cc] dark:hover:text-white transition-colors">How it works</a>
-          </div>
-          <div className="flex items-center gap-4">
-             <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors cursor-pointer"
-             >
-                {isDarkMode ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.364l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                )}
-             </button>
-             <button onClick={() => setShowLanding(false)} className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0052cc] to-[#0ea5e9] text-white font-bold text-sm hover:shadow-lg transition-all cursor-pointer">
-               Secure Login
-             </button>
+          
+          <div className="flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500 dark:text-slate-400">
+              <a href="#features" className="hover:text-[#0052cc] dark:hover:text-white transition-colors">Platform Capabilities</a>
+              <a href="#workflow" className="hover:text-[#0052cc] dark:hover:text-white transition-colors">How it works</a>
+            </div>
+            <div className="w-px h-6 bg-slate-200 dark:bg-white/10 hidden md:block" />
+            <div className="flex items-center gap-4">
+               <button
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors cursor-pointer"
+               >
+                  {isDarkMode ? (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.364l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                  )}
+               </button>
+               <button onClick={() => setShowLanding(false)} className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0052cc] to-[#0ea5e9] text-white font-bold text-sm hover:shadow-lg transition-all cursor-pointer">
+                 Secure Login
+               </button>
+            </div>
           </div>
         </header>
 
@@ -1011,8 +1022,15 @@ export default function App() {
         <div className="z-10 w-full max-w-md bg-white dark:bg-[#111638] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#0052cc] to-[#d97706]" />
           <div className="flex flex-col items-center mb-8 mt-2">
-            <div className="p-3 bg-[#0052cc]/10 rounded-xl mb-4">
-              <Shield className="w-10 h-10 text-[#0052cc] dark:text-[#3b82f6]" />
+            <div className={`relative p-3 rounded-2xl bg-gradient-to-tr from-[#0052cc] via-[#0ea5e9] to-[#3b82f6] ${isDarkMode ? 'shadow-[0_0_30px_rgba(14,165,233,0.5)]' : 'shadow-xl'} overflow-hidden group mb-4`}>
+              <div className="absolute inset-0 bg-white/20 group-hover:scale-150 transition-transform duration-700 ease-out rounded-full blur-2xl" />
+              <svg className="w-12 h-12 text-white relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="11" r="3" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M12 14V17M9 11H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="15" cy="8" r="1.5" fill="currentColor"/>
+                <circle cx="9" cy="8" r="1.5" fill="currentColor"/>
+              </svg>
             </div>
             <h1 className="text-2xl font-black tracking-tight text-center text-[#0052cc] dark:text-white uppercase">NexusGuard</h1>
             <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mt-1">Enterprise Risk Portal</p>
@@ -1181,7 +1199,7 @@ export default function App() {
             {/* Logo area */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`relative p-2 rounded-xl bg-gradient-to-tr from-primary via-[#0ea5e9] to-[#3b82f6] ${isDarkMode ? 'shadow-[0_0_24px_rgba(14,165,233,0.4)]' : 'shadow-lg'} overflow-hidden group`}>
+                <div className={`relative p-2 rounded-xl bg-gradient-to-tr from-[#0052cc] via-[#0ea5e9] to-[#3b82f6] ${isDarkMode ? 'shadow-[0_0_24px_rgba(14,165,233,0.4)]' : 'shadow-lg'} overflow-hidden group`}>
                   <div className="absolute inset-0 bg-white/20 group-hover:scale-150 transition-transform duration-700 ease-out rounded-full blur-xl" />
                   <svg className="w-8 h-8 text-white relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
