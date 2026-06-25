@@ -354,12 +354,14 @@ export default function App() {
   const [data, setData] = useState<any>(null);
   const [graphKey, setGraphKey] = useState(0);
 
-  // Apply d3 forces to the graph when it's active
+  // Apply d3 forces and freeze graph after initial settle
   useEffect(() => {
     if (activeTab === "graph" && fgRef.current) {
-      fgRef.current.d3Force('collide', d3.forceCollide(45));
+      fgRef.current.d3Force('collide', d3.forceCollide(48));
       fgRef.current.d3Force('charge', d3.forceManyBody().strength(-900));
       fgRef.current.d3Force('link').distance(130);
+      fgRef.current.d3Force('center', d3.forceCenter(450, 275));
+      fgRef.current.d3ReheatSimulation();
     }
   }, [data, activeTab, graphKey]);
   
@@ -391,6 +393,7 @@ export default function App() {
   
   // Graph Selected Node Inspection
   const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [hoverNode, setHoverNode] = useState<any>(null);
 
   // Toast and Send Alert mock state
   const [toast, setToast] = useState<{ show: boolean; message: string } | null>(null);
@@ -1868,8 +1871,8 @@ export default function App() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 flex-1 min-h-0 overflow-hidden">
                   
-                  {/* Force Graph Canvas */}
-                  <div className={`lg:col-span-3 rounded-xl border overflow-hidden relative min-h-[500px] ${isDarkMode ? 'bg-[#080C1A] border-white/10' : 'bg-[#FAFBFC] border-slate-200'}`}>
+                  {/* Force Graph Canvas — always white bg to match reference */}
+                  <div className="lg:col-span-3 rounded-xl border overflow-hidden relative min-h-[500px] bg-white border-slate-200">
                     {!data || !data.graph_data || data.graph_data.nodes.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-text-muted gap-4">
                         <Network className="w-20 h-20 opacity-30" />
@@ -1893,137 +1896,131 @@ export default function App() {
                           }))
                         }}
                         nodeRelSize={5}
-                        cooldownTicks={80}
-                        d3AlphaDecay={0.02}
-                        d3VelocityDecay={0.3}
+                        cooldownTicks={150}
+                        d3AlphaDecay={0.04}
+                        d3VelocityDecay={0.5}
+                        onEngineStop={() => {
+                          if (fgRef.current) {
+                            fgRef.current.pauseAnimation();
+                          }
+                        }}
                         nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
                           const name = node.name || String(node.id);
                           const entityType = (node.label || node.entity_type || '').toUpperCase();
                           const isFlagged = node.flagged || node.is_fraud || node.risk_level === 'HIGH' || node.risk_level === 'CRITICAL';
 
-                          // Professional color palette matching legend
+                          // Color per entity type
                           let nodeColor = '#94A3B8';
-                          if (entityType === 'PERSON' || entityType === 'APPLICANT') nodeColor = '#2563EB';
-                          else if (entityType === 'COMPANY' || entityType === 'ORGANIZATION') nodeColor = '#7C3AED';
-                          else if (entityType === 'ASSET' || entityType === 'PROPERTY') nodeColor = '#059669';
-                          else if (entityType === 'ADDRESS' || entityType === 'AADHAAR') nodeColor = '#F59E0B';
-                          if (isFlagged) nodeColor = '#EF4444';
-
-                          const radius = 12;
-
-                          // ── Outer Danger Ring for Flagged Nodes ──
-                          if (isFlagged) {
-                            ctx.beginPath();
-                            ctx.arc(node.x, node.y, radius + 5, 0, 2 * Math.PI);
-                            ctx.fillStyle = 'rgba(239,68,68,0.1)';
-                            ctx.fill();
-                            ctx.beginPath();
-                            ctx.arc(node.x, node.y, radius + 5, 0, 2 * Math.PI);
-                            ctx.strokeStyle = '#EF4444';
-                            ctx.lineWidth = 1.5 / globalScale;
-                            ctx.setLineDash([4 / globalScale, 3 / globalScale]);
-                            ctx.stroke();
-                            ctx.setLineDash([]);
+                          if (entityType === 'PERSON' || entityType === 'APPLICANT') {
+                            nodeColor = isFlagged ? '#EF4444' : '#2563EB';
+                          } else if (entityType === 'ADDRESS' || entityType === 'AADHAAR') {
+                            nodeColor = '#7C3AED';
+                          } else if (entityType === 'ASSET' || entityType === 'PROPERTY') {
+                            nodeColor = '#F59E0B';
+                          } else if (entityType === 'COMPANY' || entityType === 'ORGANIZATION') {
+                            nodeColor = '#059669';
                           }
 
-                          // ── Main Crisp White Circle ──
+                          // Fixed screen-size radius — compensate for zoom so node is always 22 px on screen
+                          const radius = 22 / globalScale;
+
+                          // Red glow for flagged
+                          if (isFlagged) {
+                            ctx.beginPath();
+                            ctx.arc(node.x, node.y, radius + 8 / globalScale, 0, 2 * Math.PI);
+                            ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+                            ctx.fill();
+                          }
+
+                          // White node body
                           ctx.beginPath();
                           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-                          ctx.fillStyle = isDarkMode ? '#1E293B' : '#FFFFFF';
+                          ctx.fillStyle = '#FFFFFF';
                           ctx.fill();
 
-                          // ── Thick Colored Border ──
+                          // Colored border
                           ctx.strokeStyle = nodeColor;
                           ctx.lineWidth = 3 / globalScale;
                           ctx.stroke();
 
-                          // ── Unicode Emoji Icon Inside ──
-                          const iconFontSize = Math.max(10 / globalScale, 4);
-                          ctx.font = `${iconFontSize}px system-ui, sans-serif`;
-                          ctx.textAlign = 'center';
-                          ctx.textBaseline = 'middle';
-                          
-                          let icon = '●';
-                          if (entityType === 'PERSON' || entityType === 'APPLICANT') icon = '👤';
-                          else if (entityType === 'COMPANY' || entityType === 'ORGANIZATION') icon = '🏢';
-                          else if (entityType === 'ASSET' || entityType === 'PROPERTY') icon = '🏠';
-                          else if (entityType === 'ADDRESS' || entityType === 'AADHAAR') icon = '🪪';
-                          if (isFlagged) icon = '⚠';
-                          
-                          // Minor y-offset adjustment for emoji baseline
-                          ctx.fillText(icon, node.x, node.y + (0.5 / globalScale));
+                          // Icon inside
+                          ctx.fillStyle = nodeColor;
+                          ctx.strokeStyle = nodeColor;
+                          ctx.lineWidth = 1.5 / globalScale;
 
-                          // ── Name Label Below Node ──
-                          const labelFontSize = Math.max(9 / globalScale, 3);
-                          ctx.font = `600 ${labelFontSize}px Inter, system-ui, sans-serif`;
-                          ctx.textAlign = 'center';
-                          ctx.textBaseline = 'top';
-                          const displayName = name.length > 20 ? name.substring(0, 18) + '…' : name;
-                          const textWidth = ctx.measureText(displayName).width;
-                          const padX = 5 / globalScale;
-                          const padY = 2 / globalScale;
-                          const labelTop = node.y + radius + 3;
+                          if (entityType === 'PERSON' || entityType === 'APPLICANT') {
+                            ctx.beginPath();
+                            ctx.arc(node.x, node.y - radius * 0.22, radius * 0.28, 0, 2 * Math.PI);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(node.x, node.y + radius * 0.6, radius * 0.48, Math.PI, 2 * Math.PI);
+                            ctx.fill();
+                          } else if (entityType === 'COMPANY' || entityType === 'ORGANIZATION') {
+                            ctx.fillRect(node.x - radius * 0.38, node.y - radius * 0.48, radius * 0.76, radius * 0.96);
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(node.x - radius * 0.24, node.y - radius * 0.34, radius * 0.14, radius * 0.14);
+                            ctx.fillRect(node.x + radius * 0.10, node.y - radius * 0.34, radius * 0.14, radius * 0.14);
+                            ctx.fillRect(node.x - radius * 0.24, node.y - radius * 0.06, radius * 0.14, radius * 0.14);
+                            ctx.fillRect(node.x + radius * 0.10, node.y - radius * 0.06, radius * 0.14, radius * 0.14);
+                            ctx.fillRect(node.x - radius * 0.24, node.y + radius * 0.22, radius * 0.14, radius * 0.14);
+                            ctx.fillRect(node.x + radius * 0.10, node.y + radius * 0.22, radius * 0.14, radius * 0.14);
+                          } else if (entityType === 'ASSET' || entityType === 'PROPERTY') {
+                            ctx.beginPath();
+                            ctx.moveTo(node.x - radius * 0.52, node.y + radius * 0.04);
+                            ctx.lineTo(node.x, node.y - radius * 0.48);
+                            ctx.lineTo(node.x + radius * 0.52, node.y + radius * 0.04);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.fillRect(node.x - radius * 0.38, node.y + radius * 0.04, radius * 0.76, radius * 0.44);
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(node.x - radius * 0.11, node.y + radius * 0.20, radius * 0.22, radius * 0.28);
+                          } else if (entityType === 'ADDRESS' || entityType === 'AADHAAR') {
+                            ctx.strokeStyle = nodeColor;
+                            ctx.lineWidth = 1.5 / globalScale;
+                            ctx.beginPath();
+                            ctx.rect(node.x - radius * 0.52, node.y - radius * 0.38, radius * 1.04, radius * 0.76);
+                            ctx.stroke();
+                            ctx.fillStyle = nodeColor;
+                            ctx.fillRect(node.x - radius * 0.40, node.y - radius * 0.22, radius * 0.28, radius * 0.38);
+                            ctx.fillRect(node.x + radius * 0.00, node.y - radius * 0.18, radius * 0.38, radius * 0.07);
+                            ctx.fillRect(node.x + radius * 0.00, node.y - radius * 0.03, radius * 0.38, radius * 0.07);
+                            ctx.fillRect(node.x + radius * 0.00, node.y + radius * 0.12, radius * 0.28, radius * 0.07);
+                          }
 
-                          // Label background pill
-                          ctx.fillStyle = isDarkMode ? 'rgba(8,12,26,0.95)' : 'rgba(255,255,255,0.95)';
-                          const bR = 3 / globalScale; // border radius
-                          const bX = node.x - textWidth / 2 - padX;
-                          const bY = labelTop - padY;
-                          const bW = textWidth + padX * 2;
-                          const bH = labelFontSize + padY * 2;
-                          
-                          ctx.beginPath();
-                          ctx.moveTo(bX + bR, bY);
-                          ctx.lineTo(bX + bW - bR, bY);
-                          ctx.arcTo(bX + bW, bY, bX + bW, bY + bR, bR);
-                          ctx.lineTo(bX + bW, bY + bH - bR);
-                          ctx.arcTo(bX + bW, bY + bH, bX + bW - bR, bY + bH, bR);
-                          ctx.lineTo(bX + bR, bY + bH);
-                          ctx.arcTo(bX, bY + bH, bX, bY + bH - bR, bR);
-                          ctx.lineTo(bX, bY + bR);
-                          ctx.arcTo(bX, bY, bX + bR, bY, bR);
-                          ctx.closePath();
-                          ctx.fill();
-                          
-                          // Border for pill
-                          ctx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-                          ctx.lineWidth = 0.5 / globalScale;
-                          ctx.stroke();
+                          // Labels — always visible, fixed screen size
+                          const displayName = name.length > 20 ? name.substring(0, 18) + '\u2026' : name;
+                          const labelPx = 11; // constant screen pixels for label text
+                          const statusPx = 9.5;
 
-                          // Text inside pill
-                          ctx.fillStyle = isDarkMode ? '#E2E8F0' : '#111827';
-                          ctx.fillText(displayName, node.x, labelTop);
+                          const isAboveNode = entityType === 'ADDRESS' || entityType === 'AADHAAR' || entityType === 'ASSET' || entityType === 'PROPERTY';
+                          const gap = 5 / globalScale;
+                          const statusGap = 14 / globalScale;
 
-                          // ── Status Tag Above Node (Clean / Fraudulent) ──
-                          const tagFontSize = Math.max(7 / globalScale, 2.5);
-                          ctx.font = `800 ${tagFontSize}px Inter, system-ui, sans-serif`;
-                          ctx.textBaseline = 'bottom';
-                          ctx.textAlign = 'center';
-                          
-                          const tagText = isFlagged ? 'FRAUDULENT' : 'CLEAN';
-                          const tagColor = isFlagged ? '#EF4444' : '#059669';
-                          const tagBg = isFlagged ? 'rgba(239,68,68,0.15)' : 'rgba(5,150,105,0.15)';
-                          
-                          const tagWidth = ctx.measureText(tagText).width;
-                          const tPadX = 3 / globalScale;
-                          const tPadY = 1.5 / globalScale;
-                          const tagBottom = node.y - radius - 3;
-                          
-                          // Tag background
-                          ctx.fillStyle = tagBg;
-                          ctx.fillRect(
-                            node.x - tagWidth / 2 - tPadX,
-                            tagBottom - tagFontSize - tPadY,
-                            tagWidth + tPadX * 2,
-                            tagFontSize + tPadY * 2
-                          );
-                          // Tag text
-                          ctx.fillStyle = tagColor;
-                          ctx.fillText(tagText, node.x, tagBottom - tPadY);
+                          if (isAboveNode) {
+                            ctx.font = `600 ${labelPx / globalScale}px Inter, system-ui, sans-serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillStyle = '#334155';
+                            ctx.fillText(displayName, node.x, node.y - radius - gap);
+                            ctx.font = `bold ${statusPx / globalScale}px Inter, system-ui, sans-serif`;
+                            ctx.fillStyle = isFlagged ? '#EF4444' : '#10B981';
+                            ctx.fillText(isFlagged ? 'fraudulent' : 'clean', node.x, node.y - radius - gap - statusGap);
+                          } else {
+                            ctx.font = `600 ${labelPx / globalScale}px Inter, system-ui, sans-serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'top';
+                            ctx.fillStyle = '#334155';
+                            ctx.fillText(displayName, node.x, node.y + radius + gap);
+                            ctx.font = `bold ${statusPx / globalScale}px Inter, system-ui, sans-serif`;
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillStyle = isFlagged ? '#EF4444' : '#10B981';
+                            ctx.fillText(isFlagged ? 'fraudulent' : 'clean', node.x, node.y - radius - gap);
+                          }
                         }}
-                        nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
+                        nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D, globalScale: number) => {
+                          const radius = 22 / globalScale;
                           ctx.beginPath();
-                          ctx.arc(node.x, node.y, 18, 0, 2 * Math.PI);
+                          ctx.arc(node.x, node.y, radius + 4 / globalScale, 0, 2 * Math.PI);
                           ctx.fillStyle = color;
                           ctx.fill();
                         }}
@@ -2031,9 +2028,13 @@ export default function App() {
                           const srcFlagged = link.source?.flagged || link.source?.is_fraud || link.source?.risk_level === 'HIGH' || link.source?.risk_level === 'CRITICAL';
                           const tgtFlagged = link.target?.flagged || link.target?.is_fraud || link.target?.risk_level === 'HIGH' || link.target?.risk_level === 'CRITICAL';
                           if (srcFlagged || tgtFlagged) return '#EF4444';
-                          return isDarkMode ? 'rgba(100,140,220,0.3)' : 'rgba(37,99,235,0.25)';
+                          return 'rgba(148, 163, 184, 0.55)';
                         }}
-                        linkWidth={1.5}
+                        linkWidth={(link: any) => {
+                          const srcFlagged = link.source?.flagged || link.source?.is_fraud || link.source?.risk_level === 'HIGH' || link.source?.risk_level === 'CRITICAL';
+                          const tgtFlagged = link.target?.flagged || link.target?.is_fraud || link.target?.risk_level === 'HIGH' || link.target?.risk_level === 'CRITICAL';
+                          return (srcFlagged || tgtFlagged) ? 2 : 1.2;
+                        }}
                         linkLineDash={(link: any) => {
                           const srcFlagged = link.source?.flagged || link.source?.is_fraud || link.source?.risk_level === 'HIGH' || link.source?.risk_level === 'CRITICAL';
                           const tgtFlagged = link.target?.flagged || link.target?.is_fraud || link.target?.risk_level === 'HIGH' || link.target?.risk_level === 'CRITICAL';
@@ -2046,7 +2047,7 @@ export default function App() {
                           const srcFlagged = link.source?.flagged || link.source?.is_fraud || link.source?.risk_level === 'HIGH' || link.source?.risk_level === 'CRITICAL';
                           const tgtFlagged = link.target?.flagged || link.target?.is_fraud || link.target?.risk_level === 'HIGH' || link.target?.risk_level === 'CRITICAL';
                           if (srcFlagged || tgtFlagged) return '#EF4444';
-                          return isDarkMode ? 'rgba(100,140,220,0.5)' : 'rgba(37,99,235,0.4)';
+                          return 'rgba(37,99,235,0.4)';
                         }}
                         linkCurvature={0.15}
                         linkCanvasObjectMode={() => 'after'}
@@ -2057,8 +2058,11 @@ export default function App() {
                           const tgt = link.target;
                           if (!src || !tgt || typeof src.x !== 'number') return;
                           
-                          const srcFlagged = link.source?.flagged || link.source?.is_fraud || link.source?.risk_level === 'HIGH' || link.source?.risk_level === 'CRITICAL';
-                          const tgtFlagged = link.target?.flagged || link.target?.is_fraud || link.target?.risk_level === 'HIGH' || link.target?.risk_level === 'CRITICAL';
+                          const shouldDrawLinkLabel = globalScale > 1.1;
+                          if (!shouldDrawLinkLabel) return;
+
+                          const srcFlagged = src.flagged || src.is_fraud || src.risk_level === 'HIGH' || src.risk_level === 'CRITICAL';
+                          const tgtFlagged = tgt.is_fraud || tgt.risk_level === 'HIGH' || tgt.risk_level === 'CRITICAL';
                           const isHighRisk = srcFlagged || tgtFlagged;
 
                           const midX = (src.x + tgt.x) / 2;
@@ -2071,7 +2075,7 @@ export default function App() {
                           const ePadY = 2 / globalScale;
 
                           // Edge label background (canvas mask to avoid line-through)
-                          ctx.fillStyle = isDarkMode ? '#080C1A' : '#FAFBFC';
+                          ctx.fillStyle = isDarkMode ? '#080C1A' : '#FFFFFF';
                           ctx.fillRect(
                             midX - edgeTextWidth / 2 - ePadX,
                             midY - edgeFontSize / 2 - ePadY,
@@ -2086,6 +2090,7 @@ export default function App() {
                           ctx.fillText(edgeText, midX, midY);
                         }}
                         backgroundColor="transparent"
+                        enableNodeDrag={false}
                         onNodeClick={(node: any) => {
                           setSelectedNode(node);
                         }}
@@ -2093,7 +2098,6 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Inspector Panel */}
                   <div className={`rounded-xl border p-5 flex flex-col justify-between overflow-y-auto ${isDarkMode ? 'bg-[#0D1428]/85 border-white/10 backdrop-blur-md' : 'bg-white border-slate-200'}`}>
                     <div>
                       <span className="text-[10px] font-black text-text-muted uppercase tracking-widest block mb-4">Node Inspector</span>

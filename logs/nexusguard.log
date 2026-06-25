@@ -867,3 +867,269 @@ RETURN a.name, p1.name, p2.name
 2026-06-18 12:40:48 | INFO     | fraud_detector         |   Running: Ownership Conflict
 2026-06-18 12:40:48 | INFO     | fraud_detector         |     → 7 alert(s) found.
 2026-06-18 12:40:49 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).
+2026-06-18 14:56:01 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-18 14:56:03 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-18 14:56:08 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-18 14:56:11 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-18 15:00:35 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 15:00:35 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 15:00:35 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-18 15:00:35 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 15:00:35 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 15:00:35 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 15:00:35 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 15:00:35 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 15:00:35 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 15:00:35 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 15:00:35 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 15:00:35 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 15:00:35 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 15:00:35 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 15:00:35 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 15:00:35 | INFO     | pipeline               |   Resolved to 44 unique entities from 66 raw mentions.
+2026-06-18 15:00:35 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 15:00:35 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 15:00:35 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 15:00:35 | INFO     | pipeline               |   Entities   : 44
+2026-06-18 15:00:35 | INFO     | pipeline               |   Relations  : 50
+2026-06-18 15:00:37 | INFO     | graph_engine           | Database cleared.
+2026-06-18 15:00:38 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-18 15:00:38 | INFO     | graph_engine           | Building graph — 44 entities, 50 relationships.
+2026-06-18 15:00:50 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 44, 'relationships_created': 50}
+2026-06-18 15:00:50 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 15:00:50 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 15:00:51 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 15:00:51 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 15:00:53 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 15:00:53 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 15:00:54 | INFO     | fraud_detector         |     → 8 alert(s) found.
+2026-06-18 15:00:54 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 15:00:55 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-18 15:00:55 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 15:00:56 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 15:00:57 | INFO     | fraud_detector         | Detection complete — 7 alerts, overall risk 1.00 (CRITICAL).
+2026-06-18 15:05:19 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 15:05:19 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-18 15:05:19 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-18 15:05:19 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-18 15:05:19 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-18 15:05:19 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-18 15:05:19 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-18 15:05:19 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-18 15:05:19 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-18 15:05:19 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-18 15:05:19 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-18 15:05:19 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-18 15:05:20 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-18 15:05:20 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-18 15:05:20 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-18 15:05:20 | INFO     | pipeline               |   Resolved to 44 unique entities from 66 raw mentions.
+2026-06-18 15:05:20 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-18 15:05:20 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-18 15:05:20 | INFO     | pipeline               |   Documents  : 5
+2026-06-18 15:05:20 | INFO     | pipeline               |   Entities   : 44
+2026-06-18 15:05:20 | INFO     | pipeline               |   Relations  : 50
+2026-06-18 15:05:20 | INFO     | graph_engine           | Database cleared.
+2026-06-18 15:05:20 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-18 15:05:20 | INFO     | graph_engine           | Building graph — 44 entities, 50 relationships.
+2026-06-18 15:05:24 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 44, 'relationships_created': 50}
+2026-06-18 15:05:24 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-18 15:05:24 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-18 15:05:24 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-18 15:05:24 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-18 15:05:24 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 15:05:24 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-18 15:05:24 | INFO     | fraud_detector         |     → 8 alert(s) found.
+2026-06-18 15:05:24 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-18 15:05:24 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-18 15:05:24 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-18 15:05:24 | INFO     | fraud_detector         |     → 3 alert(s) found.
+2026-06-18 15:05:24 | INFO     | fraud_detector         | Detection complete — 7 alerts, overall risk 1.00 (CRITICAL).
+2026-06-25 07:06:20 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-25 07:06:26 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-25 07:06:28 | INFO     | graph_engine           | Connected to Neo4j at bolt://localhost:7687
+2026-06-25 07:07:18 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:07:18 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-25 07:07:18 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-25 07:07:18 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-25 07:07:18 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-25 07:07:18 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-25 07:07:18 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-25 07:07:18 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-25 07:07:18 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-25 07:07:18 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-25 07:07:19 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-25 07:07:19 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-25 07:07:20 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-25 07:07:20 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-25 07:07:20 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-25 07:07:20 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-25 07:07:20 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:07:20 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-25 07:07:20 | INFO     | pipeline               |   Documents  : 5
+2026-06-25 07:07:20 | INFO     | pipeline               |   Entities   : 56
+2026-06-25 07:07:20 | INFO     | pipeline               |   Relations  : 64
+2026-06-25 07:07:22 | INFO     | graph_engine           | Database cleared.
+2026-06-25 07:07:23 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-25 07:07:23 | INFO     | graph_engine           | Building graph — 56 entities, 64 relationships.
+2026-06-25 07:07:37 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 56, 'relationships_created': 64}
+2026-06-25 07:07:37 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-25 07:07:37 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-25 07:07:39 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-25 07:07:39 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-25 07:07:40 | INFO     | fraud_detector         |     → 6 alert(s) found.
+2026-06-25 07:07:40 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-25 07:07:43 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-25 07:07:43 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-25 07:07:44 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-25 07:07:44 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-25 07:07:44 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-25 07:07:46 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).
+2026-06-25 07:19:15 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:19:15 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-25 07:19:15 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-25 07:19:15 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-25 07:19:15 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-25 07:19:15 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-25 07:19:15 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-25 07:19:15 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-25 07:19:15 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-25 07:19:15 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-25 07:19:16 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-25 07:19:16 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-25 07:19:16 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-25 07:19:17 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-25 07:19:17 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-25 07:19:17 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-25 07:19:17 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:19:17 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-25 07:19:17 | INFO     | pipeline               |   Documents  : 5
+2026-06-25 07:19:17 | INFO     | pipeline               |   Entities   : 56
+2026-06-25 07:19:17 | INFO     | pipeline               |   Relations  : 64
+2026-06-25 07:19:17 | INFO     | graph_engine           | Database cleared.
+2026-06-25 07:19:17 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-25 07:19:17 | INFO     | graph_engine           | Building graph — 56 entities, 64 relationships.
+2026-06-25 07:19:21 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 56, 'relationships_created': 64}
+2026-06-25 07:19:21 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-25 07:19:21 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-25 07:19:21 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-25 07:19:21 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-25 07:19:21 | INFO     | fraud_detector         |     → 6 alert(s) found.
+2026-06-25 07:19:21 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-25 07:19:21 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-25 07:19:21 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-25 07:19:21 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-25 07:19:21 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-25 07:19:21 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-25 07:19:22 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).
+2026-06-25 07:36:35 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:36:35 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-25 07:36:35 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-25 07:36:35 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-25 07:36:35 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-25 07:36:35 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-25 07:36:35 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-25 07:36:35 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-25 07:36:35 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-25 07:36:35 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-25 07:36:36 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-25 07:36:36 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-25 07:36:36 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-25 07:36:37 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-25 07:36:37 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-25 07:36:37 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-25 07:36:37 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:36:37 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-25 07:36:37 | INFO     | pipeline               |   Documents  : 5
+2026-06-25 07:36:37 | INFO     | pipeline               |   Entities   : 56
+2026-06-25 07:36:37 | INFO     | pipeline               |   Relations  : 64
+2026-06-25 07:36:37 | INFO     | graph_engine           | Database cleared.
+2026-06-25 07:36:37 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-25 07:36:37 | INFO     | graph_engine           | Building graph — 56 entities, 64 relationships.
+2026-06-25 07:36:42 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 56, 'relationships_created': 64}
+2026-06-25 07:36:42 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-25 07:36:42 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-25 07:36:42 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-25 07:36:42 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-25 07:36:43 | INFO     | fraud_detector         |     → 6 alert(s) found.
+2026-06-25 07:36:43 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-25 07:36:44 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-25 07:36:44 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-25 07:36:45 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-25 07:36:45 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-25 07:36:45 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-25 07:36:45 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).
+2026-06-25 07:41:41 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:41:41 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-25 07:41:41 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-25 07:41:41 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-25 07:41:41 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-25 07:41:41 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-25 07:41:41 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-25 07:41:41 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-25 07:41:41 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-25 07:41:41 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-25 07:41:41 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-25 07:41:42 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-25 07:41:42 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-25 07:41:42 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-25 07:41:43 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-25 07:41:43 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-25 07:41:43 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:41:43 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-25 07:41:43 | INFO     | pipeline               |   Documents  : 5
+2026-06-25 07:41:43 | INFO     | pipeline               |   Entities   : 56
+2026-06-25 07:41:43 | INFO     | pipeline               |   Relations  : 64
+2026-06-25 07:41:43 | INFO     | graph_engine           | Database cleared.
+2026-06-25 07:41:43 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-25 07:41:43 | INFO     | graph_engine           | Building graph — 56 entities, 64 relationships.
+2026-06-25 07:41:47 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 56, 'relationships_created': 64}
+2026-06-25 07:41:47 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-25 07:41:47 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-25 07:41:47 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-25 07:41:47 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-25 07:41:47 | INFO     | fraud_detector         |     → 6 alert(s) found.
+2026-06-25 07:41:47 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-25 07:41:47 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-25 07:41:47 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-25 07:41:47 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-25 07:41:47 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-25 07:41:47 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-25 07:41:47 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).
+2026-06-25 07:47:29 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:47:29 | INFO     | pipeline               | STAGE 1 — Document Ingestion
+2026-06-25 07:47:29 | INFO     | pipeline               | Found 5 document(s) in E:\Canara Hack\NexusGuard_Sukakshahackthon\input_documents.
+2026-06-25 07:47:29 | INFO     | pipeline               |   Ingested: doc1_loan_application_rajesh.txt  [type=loan_application]
+2026-06-25 07:47:29 | INFO     | pipeline               |   Ingested: doc2_loan_application_amit.txt  [type=loan_application]
+2026-06-25 07:47:29 | INFO     | pipeline               |   Ingested: doc3_company_registration_apex.txt  [type=company_filing]
+2026-06-25 07:47:29 | INFO     | pipeline               |   Ingested: doc4_land_transfer_deed.txt  [type=land_registry]
+2026-06-25 07:47:29 | INFO     | pipeline               |   Ingested: doc5_property_verification_report.txt  [type=property_verification]
+2026-06-25 07:47:29 | INFO     | pipeline               | STAGE 2 — Entity & Relationship Extraction
+2026-06-25 07:47:29 | INFO     | pipeline               |   Processing [1/5]: doc1_loan_application_rajesh.txt
+2026-06-25 07:47:29 | INFO     | pipeline               |   Processing [2/5]: doc2_loan_application_amit.txt
+2026-06-25 07:47:29 | INFO     | pipeline               |   Processing [3/5]: doc3_company_registration_apex.txt
+2026-06-25 07:47:29 | INFO     | pipeline               |   Processing [4/5]: doc4_land_transfer_deed.txt
+2026-06-25 07:47:29 | INFO     | pipeline               |   Processing [5/5]: doc5_property_verification_report.txt
+2026-06-25 07:47:30 | INFO     | pipeline               | STAGE 3 — Entity Resolution
+2026-06-25 07:47:30 | INFO     | pipeline               |   Resolved to 56 unique entities from 80 raw mentions.
+2026-06-25 07:47:30 | INFO     | pipeline               | ══════════════════════════════════════════════════
+2026-06-25 07:47:30 | INFO     | pipeline               | PIPELINE COMPLETE
+2026-06-25 07:47:30 | INFO     | pipeline               |   Documents  : 5
+2026-06-25 07:47:30 | INFO     | pipeline               |   Entities   : 56
+2026-06-25 07:47:30 | INFO     | pipeline               |   Relations  : 64
+2026-06-25 07:47:30 | INFO     | graph_engine           | Database cleared.
+2026-06-25 07:47:30 | INFO     | graph_engine           | Schema constraints applied.
+2026-06-25 07:47:30 | INFO     | graph_engine           | Building graph — 56 entities, 64 relationships.
+2026-06-25 07:47:30 | INFO     | graph_engine           | Graph build complete: {'nodes_created': 56, 'relationships_created': 64}
+2026-06-25 07:47:30 | INFO     | fraud_detector         | Starting full fraud detection sweep…
+2026-06-25 07:47:30 | INFO     | fraud_detector         |   Running: Address Reuse
+2026-06-25 07:47:30 | INFO     | fraud_detector         |     → 1 alert(s) found.
+2026-06-25 07:47:30 | INFO     | fraud_detector         |   Running: Collateral Conflict
+2026-06-25 07:47:30 | INFO     | fraud_detector         |     → 6 alert(s) found.
+2026-06-25 07:47:30 | INFO     | fraud_detector         |   Running: Network Cycles
+2026-06-25 07:47:30 | INFO     | fraud_detector         |     → 2 alert(s) found.
+2026-06-25 07:47:30 | INFO     | fraud_detector         |   Running: Shell Company
+2026-06-25 07:47:30 | INFO     | fraud_detector         |     → 14 alert(s) found.
+2026-06-25 07:47:30 | INFO     | fraud_detector         |   Running: Ownership Conflict
+2026-06-25 07:47:30 | INFO     | fraud_detector         |     → 7 alert(s) found.
+2026-06-25 07:47:30 | INFO     | fraud_detector         | Detection complete — 6 alerts, overall risk 1.00 (CRITICAL).
