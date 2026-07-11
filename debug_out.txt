@@ -1,0 +1,237 @@
+
+--- ALL NODES ---
+ID: PER_5d6b003a    | Type: PERSON          | Name: ══════════════════════════════════════════════════════════════════ | Attributes: {'din': '08765432'}
+ID: PER_f0dc9546    | Type: PERSON          | Name: Full Name          :      | Attributes: {'pan': 'ABCPK1234F', 'aadhaar': '9876 5432 1098'}
+ID: PER_01af421b    | Type: PERSON          | Name: Loan Type                 | Attributes: {}
+ID: PER_65bd50ba    | Type: PERSON          | Name: Loan Amount               | Attributes: {}
+ID: PER_a97d68b9    | Type: PERSON          | Name: Whitefield                | Attributes: {}
+ID: PER_34c36a3e    | Type: PERSON          | Name: Canara Bank               | Attributes: {'type': 'public_sector_bank'}
+ID: PER_17748861    | Type: PERSON          | Name: A. K. Mehta               | Attributes: {}
+ID: ORG_16b73099    | Type: ORGANIZATION    | Name: PAN Number         : ABCPK1234F | Attributes: {}
+ID: ORG_e8e66d08    | Type: ORGANIZATION    | Name: Infosys Ltd.              | Attributes: {}
+ID: ORG_e4323393    | Type: ORGANIZATION    | Name: Royal Residency           | Attributes: {}
+ID: ORG_d5ce962d    | Type: ORGANIZATION    | Name: Home Loan (Housing Finance | Attributes: {}
+ID: ORG_84da5f15    | Type: ORGANIZATION    | Name: KA-BLR                    | Attributes: {}
+ID: ORG_126811c8    | Type: ORGANIZATION    | Name: Karnataka
+Property        | Attributes: {}
+ID: ORG_1204db47    | Type: ORGANIZATION    | Name: Verification Date         | Attributes: {}
+ID: ASS_f655e4e0    | Type: ASSET           | Name: SR-504_Whitefield         | Attributes: {'survey_number': 'SR-504', 'type': 'land', 'village_code': 'Whitefield', 'sro_code': 'KA-BLR-E', 'composite_key': 'SR-504_Whitefield'}
+ID: ADD_e2642986    | Type: ADDRESS         | Name: flat 402, royal residency, mg road, bengaluru - 560001 | Attributes: {'full_address': 'flat 402, royal residency, mg road, bengaluru - 560001', 'pincode': '560001'}
+ID: PER_380cf835    | Type: PERSON          | Name: Devendra Sharma           | Attributes: {'pan': 'BCSPS5678G', 'aadhaar': '8765 4321 0987', 'din': '09876543'}
+ID: PER_b45850c0    | Type: PERSON          | Name: Sharma Enterprises        | Attributes: {'aadhaar': '8765 4321 0987'}
+ID: PER_a04b96d9    | Type: PERSON          | Name: Jayanagar 4th Block       | Attributes: {}
+ID: PER_bda33acc    | Type: PERSON          | Name: Jayanagar
+SRO Code        | Attributes: {}
+ID: PER_cfdb343e    | Type: PERSON          | Name: P. R. Nair                | Attributes: {}
+ID: ORG_c5fa4089    | Type: ORGANIZATION    | Name: BUSINESS LOAN APPLICATION | Attributes: {}
+ID: ORG_20211d5d    | Type: ORGANIZATION    | Name: CB/BIZ/2024/BLR/00782
+Date of Application | Attributes: {}
+ID: ORG_e617ddbe    | Type: ORGANIZATION    | Name: PAN Number         : BCSPS5678G
+Aadhaar Number | Attributes: {}
+ID: ORG_dbead753    | Type: ORGANIZATION    | Name: 3rd Cross                 | Attributes: {}
+ID: ORG_53995555    | Type: ORGANIZATION    | Name: KA-BLR-S
+Property Location | Attributes: {}
+ID: ORG_036ab25e    | Type: ORGANIZATION    | Name: Mysuru South Taluk        | Attributes: {}
+ID: ORG_0f2d32f1    | Type: ORGANIZATION    | Name: Guarantor Monthly Income: Rs | Attributes: {}
+ID: ASS_210e7b8e    | Type: ASSET           | Name: SR-911_Jayanagar          | Attributes: {'survey_number': 'SR-911', 'type': 'land', 'village_code': 'Jayanagar', 'sro_code': 'KA-BLR-S', 'composite_key': 'SR-911_Jayanagar'}
+ID: ADD_2ca5d74b    | Type: ADDRESS         | Name: 12, 3rd cross, jayanagar 4th block, bengaluru - 560041 | Attributes: {'full_address': '12, 3rd cross, jayanagar 4th block, bengaluru - 560041', 'pincode': '560041'}
+ID: PER_98749eeb    | Type: PERSON          | Name: Karnataka                 | Attributes: {}
+ID: ORG_4b8cdd94    | Type: ORGANIZATION    | Name: CIN                       | Attributes: {'cin': 'U72200KA2023PTC123456'}
+ID: ORG_3ac76237    | Type: ORGANIZATION    | Name: Non-Government Company    | Attributes: {}
+ID: ORG_eec09282    | Type: ORGANIZATION    | Name: MAIN OBJECTS ────────────────────────────────────────────────── | Attributes: {}
+ID: ORG_0978d890    | Type: ORGANIZATION    | Name: Karnataka
+Digital Signature | Attributes: {}
+ID: PER_42e35d31    | Type: PERSON          | Name: K. Raghunath              | Attributes: {}
+ID: PER_8eeabce2    | Type: PERSON          | Name: Lakshmi Devi
+    West     | Attributes: {}
+ID: ORG_0536581a    | Type: ORGANIZATION    | Name: SR/BLR-E/2024/05678
+Registration Date | Attributes: {}
+ID: ORG_b8d1d49f    | Type: ORGANIZATION    | Name: SALE                      | Attributes: {}
+ID: ORG_24be50de    | Type: ORGANIZATION    | Name: HDFC Bank                 | Attributes: {}
+ID: ORG_cac97cc9    | Type: ORGANIZATION    | Name: TRANSFER DECLARATION ───────────────────────────────────────── | Attributes: {}
+ID: ORG_9e801cf3    | Type: ORGANIZATION    | Name: Transferor                | Attributes: {}
+ID: ORG_16b5ba70    | Type: ORGANIZATION    | Name: Land Survey
+Number        | Attributes: {}
+ID: ORG_31424591    | Type: ORGANIZATION    | Name: WITNESS & ATTESTATION ──────────────────────────────────────── | Attributes: {}
+ID: ORG_0e5519e7    | Type: ORGANIZATION    | Name: K. Nagaraj                | Attributes: {}
+ID: ORG_8efb44cb    | Type: ORGANIZATION    | Name: Advocate
+
+Sub-Registrar   | Attributes: {}
+ID: PER_224b3d53    | Type: PERSON          | Name: Kumar      Ancestral      | Attributes: {}
+ID: PER_d1f2a49d    | Type: PERSON          | Name: ENCUMBRANCE DETAILS       | Attributes: {}
+ID: PER_56bed2f0    | Type: PERSON          | Name: 05/02/2024                | Attributes: {}
+ID: PER_fa638731    | Type: PERSON          | Name: lien                      | Attributes: {}
+ID: PER_9c4580a4    | Type: PERSON          | Name: T. N. Prasad
+Tahsildar    | Attributes: {}
+ID: PER_ac7759bc    | Type: PERSON          | Name: S. Manjunath
+Seal         | Attributes: {}
+ID: ORG_b5abc62a    | Type: ORGANIZATION    | Name: EC                        | Attributes: {}
+ID: ORG_e99c0189    | Type: ORGANIZATION    | Name: BLR                       | Attributes: {}
+ID: ORG_b58e7347    | Type: ORGANIZATION    | Name: Karnataka
+Extent          | Attributes: {}
+ID: ORG_d83381ac    | Type: ORGANIZATION    | Name: OWNERSHIP CHRONOLOGY      | Attributes: {}
+ID: ORG_5c18bec9    | Type: ORGANIZATION    | Name: SR/BLR-E/2024/05678       | Attributes: {}
+ID: ORG_d981fdaa    | Type: ORGANIZATION    | Name: Nature           Party                 Ref | Attributes: {}
+ID: ORG_195d9bc2    | Type: ORGANIZATION    | Name: DISCREPANCY               | Attributes: {}
+ID: ORG_20270c63    | Type: ORGANIZATION    | Name: CERTIFICATION             | Attributes: {}
+ID: ORG_a7679361    | Type: ORGANIZATION    | Name: the Office of the Sub-Registrar | Attributes: {}
+
+--- ALL RELATIONSHIPS ---
+SRC: PER_5d6b003a    --[APPLIED_FOR_LOAN_WITH]--> TGT: ASS_f655e4e0    | Doc: doc1_loan_application_rajesh.txt
+SRC: PER_5d6b003a    --[RESIDES_AT]--> TGT: ADD_e2642986    | Doc: doc1_loan_application_rajesh.txt
+SRC: PER_5d6b003a    --[APPLIED_FOR_LOAN_WITH]--> TGT: ASS_210e7b8e    | Doc: doc2_loan_application_amit.txt
+SRC: PER_cfdb343e    --[GUARANTOR_FOR]--> TGT: PER_5d6b003a    | Doc: doc2_loan_application_amit.txt
+SRC: PER_cfdb343e    --[GUARANTOR_FOR]--> TGT: PER_5d6b003a    | Doc: doc2_loan_application_amit.txt
+SRC: PER_5d6b003a    --[RESIDES_AT]--> TGT: ADD_2ca5d74b    | Doc: doc2_loan_application_amit.txt
+SRC: PER_5d6b003a    --[DIRECTOR_OF]--> TGT: ORG_4b8cdd94    | Doc: doc3_company_registration_apex.txt
+SRC: PER_98749eeb    --[DIRECTOR_OF]--> TGT: ORG_4b8cdd94    | Doc: doc3_company_registration_apex.txt
+SRC: PER_380cf835    --[DIRECTOR_OF]--> TGT: ORG_4b8cdd94    | Doc: doc3_company_registration_apex.txt
+SRC: ORG_4b8cdd94    --[REGISTERED_AT]--> TGT: ADD_e2642986    | Doc: doc3_company_registration_apex.txt
+SRC: PER_5d6b003a    --[DIRECTOR_OF]--> TGT: ORG_3ac76237    | Doc: doc3_company_registration_apex.txt
+SRC: PER_98749eeb    --[DIRECTOR_OF]--> TGT: ORG_3ac76237    | Doc: doc3_company_registration_apex.txt
+SRC: PER_380cf835    --[DIRECTOR_OF]--> TGT: ORG_3ac76237    | Doc: doc3_company_registration_apex.txt
+SRC: ORG_3ac76237    --[REGISTERED_AT]--> TGT: ADD_e2642986    | Doc: doc3_company_registration_apex.txt
+SRC: PER_5d6b003a    --[DIRECTOR_OF]--> TGT: ORG_e4323393    | Doc: doc3_company_registration_apex.txt
+SRC: PER_98749eeb    --[DIRECTOR_OF]--> TGT: ORG_e4323393    | Doc: doc3_company_registration_apex.txt
+SRC: PER_380cf835    --[DIRECTOR_OF]--> TGT: ORG_e4323393    | Doc: doc3_company_registration_apex.txt
+SRC: ORG_e4323393    --[REGISTERED_AT]--> TGT: ADD_e2642986    | Doc: doc3_company_registration_apex.txt
+SRC: PER_5d6b003a    --[DIRECTOR_OF]--> TGT: ORG_eec09282    | Doc: doc3_company_registration_apex.txt
+SRC: PER_98749eeb    --[DIRECTOR_OF]--> TGT: ORG_eec09282    | Doc: doc3_company_registration_apex.txt
+SRC: PER_380cf835    --[DIRECTOR_OF]--> TGT: ORG_eec09282    | Doc: doc3_company_registration_apex.txt
+SRC: ORG_eec09282    --[REGISTERED_AT]--> TGT: ADD_e2642986    | Doc: doc3_company_registration_apex.txt
+SRC: PER_5d6b003a    --[DIRECTOR_OF]--> TGT: ORG_0978d890    | Doc: doc3_company_registration_apex.txt
+SRC: PER_98749eeb    --[DIRECTOR_OF]--> TGT: ORG_0978d890    | Doc: doc3_company_registration_apex.txt
+SRC: PER_380cf835    --[DIRECTOR_OF]--> TGT: ORG_0978d890    | Doc: doc3_company_registration_apex.txt
+SRC: ORG_0978d890    --[REGISTERED_AT]--> TGT: ADD_e2642986    | Doc: doc3_company_registration_apex.txt
+SRC: PER_5d6b003a    --[TRANSFERRED_TO]--> TGT: ORG_4b8cdd94    | Doc: doc4_land_transfer_deed.txt
+SRC: ORG_4b8cdd94    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc4_land_transfer_deed.txt
+SRC: PER_5d6b003a    --[TRANSFERRED_TO]--> TGT: ORG_9e801cf3    | Doc: doc4_land_transfer_deed.txt
+SRC: ORG_9e801cf3    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc4_land_transfer_deed.txt
+SRC: PER_5d6b003a    --[TRANSFERRED_TO]--> TGT: ORG_16b5ba70    | Doc: doc4_land_transfer_deed.txt
+SRC: ORG_16b5ba70    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc4_land_transfer_deed.txt
+SRC: PER_5d6b003a    --[TRANSFERRED_TO]--> TGT: ORG_16b5ba70    | Doc: doc4_land_transfer_deed.txt
+SRC: ORG_16b5ba70    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc4_land_transfer_deed.txt
+SRC: ASS_f655e4e0    --[HAS_LIEN_BY]--> TGT: PER_34c36a3e    | Doc: doc5_property_verification_report.txt
+SRC: ASS_f655e4e0    --[HAS_LIEN_BY]--> TGT: PER_34c36a3e    | Doc: doc5_property_verification_report.txt
+SRC: ASS_f655e4e0    --[HAS_LIEN_BY]--> TGT: PER_34c36a3e    | Doc: doc5_property_verification_report.txt
+SRC: ORG_b5abc62a    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_e99c0189    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_84da5f15    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_b58e7347    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_d83381ac    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_4b8cdd94    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_5c18bec9    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_d981fdaa    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_195d9bc2    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_16b5ba70    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_20270c63    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+SRC: ORG_a7679361    --[OWNS_ASSET]--> TGT: ASS_f655e4e0    | Doc: doc5_property_verification_report.txt
+
+--- DETECTOR NODES ---
+Node: PER_5d6b003a    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_5d6b003a', 'name': '══════════════════════════════════════════════════════════════════', 'canonical_name': '══════════════════════════════════════════════════════════════════', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': '08765432'}
+Node: PER_f0dc9546    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_f0dc9546', 'name': 'Full Name          :', 'canonical_name': 'full name :', 'entity_type': 'PERSON', 'pan': 'ABCPK1234F', 'aadhaar': '9876 5432 1098', 'din': ''}
+Node: PER_01af421b    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_01af421b', 'name': 'Loan Type', 'canonical_name': 'loan type', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_65bd50ba    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_65bd50ba', 'name': 'Loan Amount', 'canonical_name': 'loan amount', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_a97d68b9    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_a97d68b9', 'name': 'Whitefield', 'canonical_name': 'whitefield', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_34c36a3e    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_34c36a3e', 'name': 'Canara Bank', 'canonical_name': 'canara bank', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_17748861    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_17748861', 'name': 'A. K. Mehta', 'canonical_name': 'a. k. mehta', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: ORG_16b73099    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_16b73099', 'name': 'PAN Number         : ABCPK1234F', 'canonical_name': 'pan number : abcpk1234f', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_e8e66d08    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_e8e66d08', 'name': 'Infosys Ltd.', 'canonical_name': 'infosys ltd.', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_e4323393    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_e4323393', 'name': 'Royal Residency', 'canonical_name': 'royal residency', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_d5ce962d    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_d5ce962d', 'name': 'Home Loan (Housing Finance', 'canonical_name': 'home loan (housing finance', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_84da5f15    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_84da5f15', 'name': 'KA-BLR', 'canonical_name': 'ka-blr', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_126811c8    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_126811c8', 'name': 'Karnataka\nProperty', 'canonical_name': 'karnataka property', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_1204db47    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_1204db47', 'name': 'Verification Date', 'canonical_name': 'verification date', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ASS_f655e4e0    | Data: {'labels': ['ASSET'], 'entity_id': 'ASS_f655e4e0', 'name': 'SR-504_Whitefield', 'canonical_name': 'sr-504_whitefield', 'entity_type': 'ASSET', 'survey_number': 'SR-504', 'composite_key': 'SR-504_Whitefield', 'asset_type': 'land', 'village_code': 'Whitefield', 'sro_code': 'KA-BLR-E', 'plot_number': ''}
+Node: ADD_e2642986    | Data: {'labels': ['ADDRESS'], 'entity_id': 'ADD_e2642986', 'name': 'flat 402, royal residency, mg road, bengaluru - 560001', 'canonical_name': 'flat 402, royal residency, mg road, bengaluru - 560001', 'entity_type': 'ADDRESS', 'full_address': 'flat 402, royal residency, mg road, bengaluru - 560001', 'pincode': '560001'}
+Node: PER_380cf835    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_380cf835', 'name': 'Devendra Sharma', 'canonical_name': 'devendra sharma', 'entity_type': 'PERSON', 'pan': 'BCSPS5678G', 'aadhaar': '8765 4321 0987', 'din': '09876543'}
+Node: PER_b45850c0    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_b45850c0', 'name': 'Sharma Enterprises', 'canonical_name': 'sharma enterprises', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '8765 4321 0987', 'din': ''}
+Node: PER_a04b96d9    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_a04b96d9', 'name': 'Jayanagar 4th Block', 'canonical_name': 'jayanagar 4th block', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_bda33acc    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_bda33acc', 'name': 'Jayanagar\nSRO Code', 'canonical_name': 'jayanagar sro code', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_cfdb343e    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_cfdb343e', 'name': 'P. R. Nair', 'canonical_name': 'p. r. nair', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: ORG_c5fa4089    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_c5fa4089', 'name': 'BUSINESS LOAN APPLICATION', 'canonical_name': 'business loan application', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_20211d5d    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_20211d5d', 'name': 'CB/BIZ/2024/BLR/00782\nDate of Application', 'canonical_name': 'cb/biz/2024/blr/00782 date of application', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_e617ddbe    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_e617ddbe', 'name': 'PAN Number         : BCSPS5678G\nAadhaar Number', 'canonical_name': 'pan number : bcsps5678g aadhaar number', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_dbead753    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_dbead753', 'name': '3rd Cross', 'canonical_name': '3rd cross', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_53995555    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_53995555', 'name': 'KA-BLR-S\nProperty Location', 'canonical_name': 'ka-blr-s property location', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_036ab25e    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_036ab25e', 'name': 'Mysuru South Taluk', 'canonical_name': 'mysuru south taluk', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_0f2d32f1    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_0f2d32f1', 'name': 'Guarantor Monthly Income: Rs', 'canonical_name': 'guarantor monthly income: rs', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ASS_210e7b8e    | Data: {'labels': ['ASSET'], 'entity_id': 'ASS_210e7b8e', 'name': 'SR-911_Jayanagar', 'canonical_name': 'sr-911_jayanagar', 'entity_type': 'ASSET', 'survey_number': 'SR-911', 'composite_key': 'SR-911_Jayanagar', 'asset_type': 'land', 'village_code': 'Jayanagar', 'sro_code': 'KA-BLR-S', 'plot_number': ''}
+Node: ADD_2ca5d74b    | Data: {'labels': ['ADDRESS'], 'entity_id': 'ADD_2ca5d74b', 'name': '12, 3rd cross, jayanagar 4th block, bengaluru - 560041', 'canonical_name': '12, 3rd cross, jayanagar 4th block, bengaluru - 560041', 'entity_type': 'ADDRESS', 'full_address': '12, 3rd cross, jayanagar 4th block, bengaluru - 560041', 'pincode': '560041'}
+Node: PER_98749eeb    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_98749eeb', 'name': 'Karnataka', 'canonical_name': 'karnataka', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: ORG_4b8cdd94    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_4b8cdd94', 'name': 'CIN', 'canonical_name': 'cin', 'entity_type': 'ORGANIZATION', 'cin': 'U72200KA2023PTC123456'}
+Node: ORG_3ac76237    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_3ac76237', 'name': 'Non-Government Company', 'canonical_name': 'non-government company', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_eec09282    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_eec09282', 'name': 'MAIN OBJECTS ──────────────────────────────────────────────────', 'canonical_name': 'main objects ──────────────────────────────────────────────────', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_0978d890    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_0978d890', 'name': 'Karnataka\nDigital Signature', 'canonical_name': 'karnataka digital signature', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: PER_42e35d31    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_42e35d31', 'name': 'K. Raghunath', 'canonical_name': 'k. raghunath', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_8eeabce2    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_8eeabce2', 'name': 'Lakshmi Devi\n    West', 'canonical_name': 'lakshmi devi west', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: ORG_0536581a    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_0536581a', 'name': 'SR/BLR-E/2024/05678\nRegistration Date', 'canonical_name': 'sr/blr-e/2024/05678 registration date', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_b8d1d49f    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_b8d1d49f', 'name': 'SALE', 'canonical_name': 'sale', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_24be50de    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_24be50de', 'name': 'HDFC Bank', 'canonical_name': 'hdfc bank', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_cac97cc9    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_cac97cc9', 'name': 'TRANSFER DECLARATION ─────────────────────────────────────────', 'canonical_name': 'transfer declaration ─────────────────────────────────────────', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_9e801cf3    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_9e801cf3', 'name': 'Transferor', 'canonical_name': 'transferor', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_16b5ba70    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_16b5ba70', 'name': 'Land Survey\nNumber', 'canonical_name': 'land survey number', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_31424591    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_31424591', 'name': 'WITNESS & ATTESTATION ────────────────────────────────────────', 'canonical_name': 'witness & attestation ────────────────────────────────────────', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_0e5519e7    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_0e5519e7', 'name': 'K. Nagaraj', 'canonical_name': 'k. nagaraj', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_8efb44cb    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_8efb44cb', 'name': 'Advocate\n\nSub-Registrar', 'canonical_name': 'advocate sub-registrar', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: PER_224b3d53    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_224b3d53', 'name': 'Kumar      Ancestral', 'canonical_name': 'kumar ancestral', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_d1f2a49d    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_d1f2a49d', 'name': 'ENCUMBRANCE DETAILS', 'canonical_name': 'encumbrance details', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_56bed2f0    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_56bed2f0', 'name': '05/02/2024', 'canonical_name': '05/02/2024', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_fa638731    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_fa638731', 'name': 'lien', 'canonical_name': 'lien', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_9c4580a4    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_9c4580a4', 'name': 'T. N. Prasad\nTahsildar', 'canonical_name': 't. n. prasad tahsildar', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: PER_ac7759bc    | Data: {'labels': ['PERSON'], 'entity_id': 'PER_ac7759bc', 'name': 'S. Manjunath\nSeal', 'canonical_name': 's. manjunath seal', 'entity_type': 'PERSON', 'pan': '', 'aadhaar': '', 'din': ''}
+Node: ORG_b5abc62a    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_b5abc62a', 'name': 'EC', 'canonical_name': 'ec', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_e99c0189    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_e99c0189', 'name': 'BLR', 'canonical_name': 'blr', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_b58e7347    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_b58e7347', 'name': 'Karnataka\nExtent', 'canonical_name': 'karnataka extent', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_d83381ac    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_d83381ac', 'name': 'OWNERSHIP CHRONOLOGY', 'canonical_name': 'ownership chronology', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_5c18bec9    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_5c18bec9', 'name': 'SR/BLR-E/2024/05678', 'canonical_name': 'sr/blr-e/2024/05678', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_d981fdaa    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_d981fdaa', 'name': 'Nature           Party                 Ref', 'canonical_name': 'nature party ref', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_195d9bc2    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_195d9bc2', 'name': 'DISCREPANCY', 'canonical_name': 'discrepancy', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_20270c63    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_20270c63', 'name': 'CERTIFICATION', 'canonical_name': 'certification', 'entity_type': 'ORGANIZATION', 'cin': ''}
+Node: ORG_a7679361    | Data: {'labels': ['ORGANIZATION'], 'entity_id': 'ORG_a7679361', 'name': 'the Office of the Sub-Registrar', 'canonical_name': 'the office of the sub-registrar', 'entity_type': 'ORGANIZATION', 'cin': ''}
+
+--- DETECTOR EDGES ---
+Edge: PER_5d6b003a    --[APPLIED_FOR_LOAN_WITH]--> ASS_f655e4e0   
+Edge: PER_5d6b003a    --[RESIDES_AT]--> ADD_e2642986   
+Edge: PER_5d6b003a    --[APPLIED_FOR_LOAN_WITH]--> ASS_210e7b8e   
+Edge: PER_5d6b003a    --[RESIDES_AT]--> ADD_2ca5d74b   
+Edge: PER_5d6b003a    --[TRANSFERRED_TO]--> ORG_4b8cdd94   
+Edge: PER_5d6b003a    --[DIRECTOR_OF]--> ORG_3ac76237   
+Edge: PER_5d6b003a    --[DIRECTOR_OF]--> ORG_e4323393   
+Edge: PER_5d6b003a    --[DIRECTOR_OF]--> ORG_eec09282   
+Edge: PER_5d6b003a    --[DIRECTOR_OF]--> ORG_0978d890   
+Edge: PER_5d6b003a    --[TRANSFERRED_TO]--> ORG_9e801cf3   
+Edge: PER_5d6b003a    --[TRANSFERRED_TO]--> ORG_16b5ba70   
+Edge: ORG_e4323393    --[REGISTERED_AT]--> ADD_e2642986   
+Edge: ORG_84da5f15    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ASS_f655e4e0    --[HAS_LIEN_BY]--> PER_34c36a3e   
+Edge: PER_380cf835    --[DIRECTOR_OF]--> ORG_4b8cdd94   
+Edge: PER_380cf835    --[DIRECTOR_OF]--> ORG_3ac76237   
+Edge: PER_380cf835    --[DIRECTOR_OF]--> ORG_e4323393   
+Edge: PER_380cf835    --[DIRECTOR_OF]--> ORG_eec09282   
+Edge: PER_380cf835    --[DIRECTOR_OF]--> ORG_0978d890   
+Edge: PER_cfdb343e    --[GUARANTOR_FOR]--> PER_5d6b003a   
+Edge: PER_98749eeb    --[DIRECTOR_OF]--> ORG_4b8cdd94   
+Edge: PER_98749eeb    --[DIRECTOR_OF]--> ORG_3ac76237   
+Edge: PER_98749eeb    --[DIRECTOR_OF]--> ORG_e4323393   
+Edge: PER_98749eeb    --[DIRECTOR_OF]--> ORG_eec09282   
+Edge: PER_98749eeb    --[DIRECTOR_OF]--> ORG_0978d890   
+Edge: ORG_4b8cdd94    --[REGISTERED_AT]--> ADD_e2642986   
+Edge: ORG_4b8cdd94    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_3ac76237    --[REGISTERED_AT]--> ADD_e2642986   
+Edge: ORG_eec09282    --[REGISTERED_AT]--> ADD_e2642986   
+Edge: ORG_0978d890    --[REGISTERED_AT]--> ADD_e2642986   
+Edge: ORG_9e801cf3    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_16b5ba70    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_b5abc62a    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_e99c0189    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_b58e7347    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_d83381ac    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_5c18bec9    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_d981fdaa    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_195d9bc2    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_20270c63    --[OWNS_ASSET]--> ASS_f655e4e0   
+Edge: ORG_a7679361    --[OWNS_ASSET]--> ASS_f655e4e0   
+
+--- SHELL COMPANY CHECK ---
+Found Company: ORG_e8e66d08 (Infosys Ltd.)

@@ -1,0 +1,63 @@
+╔══════════════════════════════════════════════════════════════════╗
+║            CANARA BANK — BUSINESS LOAN APPLICATION             ║
+║                 Branch: Jayanagar, Bengaluru                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Application Ref   : CB/BIZ/2024/BLR/00782
+Date of Application: 22/04/2024
+Branch Code        : 002198
+
+── SECTION A: APPLICANT DETAILS ──────────────────────────────────
+Full Name          : Amit Sharma
+Father's Name      : Devendra Sharma
+Date of Birth      : 03/11/1990
+PAN Number         : BCSPS5678G
+Aadhaar Number     : 8765 4321 0987
+Mobile             : +91 8867054321
+Email              : amit.sharma@email.com
+Occupation         : Proprietor, Sharma Enterprises
+Monthly Income     : Rs. 2,10,000
+Residential Address: 12, 3rd Cross, Jayanagar 4th Block, Bengaluru - 560041
+
+── SECTION B: LOAN DETAILS ───────────────────────────────────────
+Loan Type          : Secured Business Loan
+Loan Amount Requested : Rs. 32,00,000 (Thirty-Two Lakhs Only)
+Tenure             : 10 Years (120 months)
+Purpose            : Working capital for trading business
+Expected EMI       : Rs. 42,200 (approx.)
+
+── SECTION C: COLLATERAL / SECURITY DETAILS ──────────────────────
+Type of Collateral : Immovable Property — Agricultural Land
+Land Survey Number : SR-911
+Village Code       : Jayanagar
+SRO Code           : KA-BLR-S
+Property Location  : Mysuru South Taluk, Karnataka
+Property Area      : 1.5 Acres
+Estimated Value    : Rs. 55,00,000 (Fifty-Five Lakhs)
+Title Holder       : Amit Sharma (self)
+Encumbrance Status : Clear as of 10/04/2024
+
+── SECTION D: GUARANTOR DETAILS ──────────────────────────────────
+Guarantor Name     : Rajesh Kumar
+Guarantor PAN      : ABCPK1234F
+Guarantor Aadhaar  : 9876 5432 1098
+Guarantor Address  : Flat 402, Royal Residency, MG Road, Bengaluru - 560001
+Guarantor Occupation: Senior Manager, Infosys Ltd.
+Guarantor Monthly Income: Rs. 1,85,000
+Relationship with Applicant: Business Associate
+
+── SECTION E: DECLARATION ────────────────────────────────────────
+I, Amit Sharma, hereby declare that the above information is true,
+complete, and correct.  I further confirm that the guarantor,
+Rajesh Kumar, has voluntarily agreed to guarantee this loan.
+
+Signature of Applicant : _____________________
+Signature of Guarantor : _____________________
+Date: 22/04/2024
+Place: Bengaluru
+
+── FOR BANK USE ONLY ─────────────────────────────────────────────
+Verified by        : P. R. Nair (Loan Officer)
+Verification Date  : 25/04/2024
+Recommendation     : APPROVE — guarantor credentials verified
+══════════════════════════════════════════════════════════════════

@@ -1,0 +1,68 @@
+╔══════════════════════════════════════════════════════════════════╗
+║       GOVERNMENT OF KARNATAKA — REVENUE DEPARTMENT             ║
+║          PROPERTY ENCUMBRANCE & VERIFICATION REPORT            ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Report Ref         : EC/BLR-E/2024/09123
+Date of Issue      : 20/05/2024
+Requested by       : Canara Bank, MG Road Branch (Ref: CB/HML/2024/BLR/00451)
+
+── PROPERTY IDENTIFICATION ───────────────────────────────────────
+Land Survey Number : SR-504
+Village Code       : Whitefield
+SRO Code           : KA-BLR-E
+Taluk              : Bengaluru East
+District           : Bengaluru Urban
+State              : Karnataka
+Extent             : 2400 sq. ft.
+
+── OWNERSHIP CHRONOLOGY ──────────────────────────────────────────
+Period               Owner                      Basis
+─────────────────    ───────────────────────    ─────────────────
+Before 2015          Late Sri Suresh Kumar      Ancestral property
+2015 – Feb 2024      Rajesh Kumar               Gift deed (2015)
+Feb 2024 – Present   Apex Holdings Pvt. Ltd.    Sale deed SR/BLR-E/2024/05678
+
+── ENCUMBRANCE DETAILS ───────────────────────────────────────────
+Sl.  Nature           Party                 Ref. / Date
+──   ──────────       ─────────────────     ─────────────────────
+1    Mortgage Lien    Canara Bank           CB/HML/2024/BLR/00451
+                                            Created: 18/03/2024
+                                            Amount : Rs. 45,00,000
+                                            Status : ACTIVE / SUBSISTING
+
+2    Sale Transfer    Apex Holdings Pvt Ltd Sale deed dt. 05/02/2024
+                      (CIN U72200KA2023PTC123456)
+                                            Consideration: Rs. 68,00,000
+                                            Status : REGISTERED
+
+── DISCREPANCY NOTICE ────────────────────────────────────────────
+*** IMPORTANT: This report highlights a material discrepancy. ***
+
+The property bearing Land Survey Number SR-504 was transferred
+to Apex Holdings Pvt. Ltd. via Sale Deed dated 05/02/2024.
+However, a mortgage lien in favour of Canara Bank was created
+on 18/03/2024 — AFTER the ownership had already been transferred.
+
+The current registered owner (Apex Holdings Pvt. Ltd.) did NOT
+create the said mortgage lien.  The lien was executed by the
+previous owner, Rajesh Kumar, who no longer holds title to the
+property at the date of lien creation.
+
+This constitutes a potential case of:
+  (a) Fraudulent mortgage using property not owned by mortgagor.
+  (b) Failure to update title records before lien creation.
+
+Recommended Action : Immediate verification by the lending
+                     institution (Canara Bank).
+
+── CERTIFICATION ─────────────────────────────────────────────────
+Certified that the above details have been extracted from the
+records maintained in the Office of the Sub-Registrar, Bengaluru
+East District, and are true to the best of our knowledge.
+
+Revenue Inspector   : T. N. Prasad
+Tahsildar           : S. Manjunath
+Seal                : [OFFICIAL SEAL — REVENUE DEPARTMENT]
+Date                : 20/05/2024
+══════════════════════════════════════════════════════════════════
