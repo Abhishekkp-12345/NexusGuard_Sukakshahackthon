@@ -174,14 +174,42 @@ function AIRecommendation({ text, verdict }: { text: string; verdict: string }) 
 }
 
 // ── Audit Timeline ────────────────────────────────────────────────────
-function AuditTimeline({ analysis }: { analysis: AnalysisResult }) {
+function AuditTimeline({ 
+  analysis, 
+  caseData, 
+  onUpdateVerdict 
+}: { 
+  analysis: AnalysisResult; 
+  caseData: Case; 
+  onUpdateVerdict: (verdict: string, notes: string) => Promise<void>; 
+}) {
+  const isReviewed = caseData.status === "REVIEWED";
+  const finalVerdict = caseData.verdict || analysis.verdict;
+  const [note, setNote] = useState(caseData.verdict_notes || "");
+
+  // Update note when caseData changes
+  useEffect(() => {
+    setNote(caseData.verdict_notes || "");
+  }, [caseData.verdict_notes]);
+
+  const reviewDetail = isReviewed
+    ? `Verdict updated to ${finalVerdict} (Notes: "${caseData.verdict_notes || 'Confirmed by Underwriter'}")`
+    : "Awaiting human decision";
+
   const steps = [
     { label: "Documents Uploaded", detail: `${analysis.document_reports.length} document(s)`, done: true, color: "var(--approve)" },
     { label: "Layer 1: Document Forensics", detail: `Authenticity: ${analysis.authenticity_score.toFixed(1)}%`, done: true, color: analysis.authenticity_score > 70 ? "var(--approve)" : "var(--hold)" },
     { label: "Layer 2: Cross-Document Validation", detail: `Consistency: ${analysis.consistency_score.toFixed(1)}%`, done: true, color: analysis.consistency_score > 70 ? "var(--approve)" : "var(--hold)" },
     { label: "Layer 3: Relationship Intelligence", detail: `Relationship Risk: ${analysis.relationship_risk_score.toFixed(1)}%`, done: true, color: analysis.relationship_risk_score < 30 ? "var(--approve)" : "var(--hold)" },
     { label: "Layer 4: AI Risk Engine", detail: `Overall: ${analysis.overall_score.toFixed(1)}% — ${analysis.verdict}`, done: true, color: analysis.verdict === "APPROVE" ? "var(--approve)" : analysis.verdict === "HOLD" ? "var(--hold)" : "var(--reject)" },
-    { label: "Underwriter Review Required", detail: "Awaiting human decision", done: false, color: "var(--indigo)" },
+    { 
+      label: "Underwriter Review Required", 
+      detail: reviewDetail, 
+      done: isReviewed, 
+      color: isReviewed
+        ? (finalVerdict === "APPROVE" ? "var(--approve)" : finalVerdict === "HOLD" ? "var(--hold)" : "var(--reject)")
+        : "var(--indigo)" 
+    },
   ];
 
   return (
@@ -203,9 +231,79 @@ function AuditTimeline({ analysis }: { analysis: AnalysisResult }) {
               <div style={{ width: 2, flex: 1, background: "var(--border-subtle)", minHeight: 24, margin: "4px 0" }} />
             )}
           </div>
-          <div style={{ paddingBottom: i < steps.length - 1 ? 16 : 0 }}>
+          <div style={{ paddingBottom: i < steps.length - 1 ? 16 : 0, flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 13 }}>{step.label}</div>
             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{step.detail}</div>
+            {i === 5 && (
+              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10, maxWidth: 450 }}>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Add underwriting decision notes..."
+                  style={{
+                    width: "100%",
+                    minHeight: 60,
+                    padding: "8px 12px",
+                    fontSize: 12,
+                    borderRadius: 6,
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-primary)",
+                    resize: "vertical"
+                  }}
+                />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button 
+                    onClick={() => onUpdateVerdict("APPROVE", note || "Approved by Underwriter")}
+                    className="btn btn-sm"
+                    style={{ 
+                      fontSize: 11, 
+                      padding: "5px 12px", 
+                      borderRadius: "6px",
+                      background: caseData.verdict === "APPROVE" && isReviewed ? "var(--approve)" : "rgba(16,185,129,0.06)",
+                      color: caseData.verdict === "APPROVE" && isReviewed ? "white" : "var(--approve)",
+                      border: "1px solid rgba(16,185,129,0.3)",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    🟢 Approve
+                  </button>
+                  <button 
+                    onClick={() => onUpdateVerdict("HOLD", note || "Placed on Hold by Underwriter")}
+                    className="btn btn-sm"
+                    style={{ 
+                      fontSize: 11, 
+                      padding: "5px 12px", 
+                      borderRadius: "6px",
+                      background: caseData.verdict === "HOLD" && isReviewed ? "var(--hold)" : "rgba(245,158,11,0.06)",
+                      color: caseData.verdict === "HOLD" && isReviewed ? "white" : "var(--hold)",
+                      border: "1px solid rgba(245,158,11,0.3)",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    🟡 Hold
+                  </button>
+                  <button 
+                    onClick={() => onUpdateVerdict("REJECT", note || "Rejected by Underwriter")}
+                    className="btn btn-sm"
+                    style={{ 
+                      fontSize: 11, 
+                      padding: "5px 12px", 
+                      borderRadius: "6px",
+                      background: caseData.verdict === "REJECT" && isReviewed ? "var(--reject)" : "rgba(239,68,68,0.06)",
+                      color: caseData.verdict === "REJECT" && isReviewed ? "white" : "var(--reject)",
+                      border: "1px solid rgba(239,68,68,0.3)",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    🔴 Reject
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -240,6 +338,15 @@ export default function CaseReport({ caseId, onBack }: Props) {
     finally { setDownloading(false); }
   };
 
+  const handleUpdateVerdict = async (verdict: string, notes: string) => {
+    try {
+      const updated = await casesApi.updateVerdict(caseId, verdict, notes);
+      setCaseData(updated);
+    } catch (e) {
+      console.error("Failed to update verdict:", e);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: 100 }}>
@@ -252,7 +359,7 @@ export default function CaseReport({ caseId, onBack }: Props) {
   if (!caseData) return <div>Case not found.</div>;
 
   const analysis = caseData.analysis;
-  const verdict = analysis?.verdict || caseData.verdict;
+  const verdict = caseData.status === "REVIEWED" ? caseData.verdict : (analysis?.verdict || caseData.verdict);
   const verdictColors: Record<string, string> = {
     APPROVE: "var(--approve)", HOLD: "var(--hold)", REJECT: "var(--reject)"
   };
@@ -415,72 +522,89 @@ export default function CaseReport({ caseId, onBack }: Props) {
           {/* Findings tab */}
           {activeTab === "findings" && (
             <div>
-              <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-                {["HIGH", "MEDIUM", "LOW", "INFO"].map(s => {
-                  const count = analysis.all_findings.filter(f => f.severity === s).length;
-                  return count > 0 ? (
-                    <span key={s} className={`severity-badge ${s.toLowerCase()}`} style={{ fontSize: 12, padding: "4px 10px" }}>
-                      {s}: {count}
-                    </span>
-                  ) : null;
-                })}
-              </div>
-              {analysis.all_findings.map((f, i) => (
-                <FindingCard key={i} finding={f} />
-              ))}
+              {analysis.all_findings.length === 0 ? (
+                <div className="card" style={{ textAlign: "center", padding: 48 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, color: "var(--approve)" }}>🟢 No Risk Findings</div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 13 }}>This application has clean document metrics and no flags.</div>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                    {["HIGH", "MEDIUM", "LOW", "INFO"].map(s => {
+                      const count = analysis.all_findings.filter(f => f.severity === s).length;
+                      return count > 0 ? (
+                        <span key={s} className={`severity-badge ${s.toLowerCase()}`} style={{ fontSize: 12, padding: "4px 10px" }}>
+                          {s}: {count}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                  {analysis.all_findings.map((f, i) => (
+                    <FindingCard key={i} finding={f} />
+                  ))}
+                </>
+              )}
             </div>
           )}
 
           {/* Documents tab */}
           {activeTab === "documents" && (
             <div>
-              {analysis.document_reports.map((doc, i) => (
-                <div key={i} className="card" style={{ marginBottom: 16 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                    <FileText size={20} color="var(--indigo-light)" />
-                    <div>
-                      <div style={{ fontWeight: 700 }}>{doc.filename}</div>
-                      <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                        Type: {doc.type.replace(/_/g, " ").toUpperCase()} · Auth Score: {doc.authenticity_score.toFixed(1)}%
-                      </div>
-                    </div>
-                    <div style={{ marginLeft: "auto" }}>
-                      <div className={`verdict-badge ${doc.authenticity_score > 70 ? "approve" : "hold"}`}>
-                        {doc.authenticity_score > 70 ? "CLEAN" : "SUSPECT"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ELA heatmap */}
-                  {doc.ela_result?.heatmap_b64 && (
-                    <ELAHeatmap
-                      heatmap_b64={doc.ela_result.heatmap_b64}
-                      tamper_score={doc.ela_result.tamper_score}
-                      filename={doc.filename}
-                    />
-                  )}
-
-                  {/* PDF Metadata */}
-                  {doc.pdf_forensics?.metadata && (
-                    <div style={{
-                      padding: 14, borderRadius: "var(--radius-md)",
-                      background: "var(--bg-surface)", marginTop: 12,
-                    }}>
-                      <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 10 }}>📋 PDF Metadata</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
-                        {Object.entries(doc.pdf_forensics.metadata).map(([k, v]) =>
-                          v && typeof v === "string" ? (
-                            <div key={k} style={{ fontSize: 12 }}>
-                              <span style={{ color: "var(--text-muted)" }}>{k}: </span>
-                              <span className="text-mono">{String(v).slice(0, 50)}</span>
-                            </div>
-                          ) : null
-                        )}
-                      </div>
-                    </div>
-                  )}
+              {analysis.document_reports.length === 0 ? (
+                <div className="card" style={{ textAlign: "center", padding: 48 }}>
+                  <FileText size={32} color="var(--text-muted)" style={{ margin: "0 auto 12px" }} />
+                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>No Document Reports</div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 13 }}>No document analysis records are available for this case.</div>
                 </div>
-              ))}
+              ) : (
+                analysis.document_reports.map((doc, i) => (
+                  <div key={i} className="card" style={{ marginBottom: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                      <FileText size={20} color="var(--indigo-light)" />
+                      <div>
+                        <div style={{ fontWeight: 700 }}>{doc.filename}</div>
+                        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                          Type: {doc.type.replace(/_/g, " ").toUpperCase()} · Auth Score: {doc.authenticity_score.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div style={{ marginLeft: "auto" }}>
+                        <div className={`verdict-badge ${doc.authenticity_score > 70 ? "approve" : "hold"}`}>
+                          {doc.authenticity_score > 70 ? "CLEAN" : "SUSPECT"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ELA heatmap */}
+                    {doc.ela_result?.heatmap_b64 && (
+                      <ELAHeatmap
+                        heatmap_b64={doc.ela_result.heatmap_b64}
+                        tamper_score={doc.ela_result.tamper_score}
+                        filename={doc.filename}
+                      />
+                    )}
+
+                    {/* PDF Metadata */}
+                    {doc.pdf_forensics?.metadata && (
+                      <div style={{
+                        padding: 14, borderRadius: "var(--radius-md)",
+                        background: "var(--bg-surface)", marginTop: 12,
+                      }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 10 }}>📋 PDF Metadata</div>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
+                          {Object.entries(doc.pdf_forensics.metadata).map(([k, v]) =>
+                            v && typeof v === "string" ? (
+                              <div key={k} style={{ fontSize: 12 }}>
+                                <span style={{ color: "var(--text-muted)" }}>{k}: </span>
+                                <span className="text-mono">{String(v).slice(0, 50)}</span>
+                              </div>
+                            ) : null
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           )}
 
@@ -488,7 +612,11 @@ export default function CaseReport({ caseId, onBack }: Props) {
           {activeTab === "timeline" && (
             <div className="card">
               <div className="section-title">🕐 Investigation Timeline</div>
-              <AuditTimeline analysis={analysis} />
+              <AuditTimeline 
+                analysis={analysis} 
+                caseData={caseData} 
+                onUpdateVerdict={handleUpdateVerdict} 
+              />
             </div>
           )}
         </>

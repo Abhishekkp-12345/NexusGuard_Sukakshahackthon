@@ -28,10 +28,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("forgeshield")
 
+from mock_data.prepopulated_cases import get_prepopulated_cases
 
 # ── In-memory case store (replace with DB in production) ──────────────
 # Structure: { case_id: { ...case data... } }
-CASES: dict[str, dict[str, Any]] = {}
+CASES: dict[str, dict[str, Any]] = get_prepopulated_cases()
 
 
 # ── Application lifespan ──────────────────────────────────────────────
