@@ -1,0 +1,32 @@
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
+
+# Document forensics
+Pillow>=10.0.0
+pypdf>=4.0.0
+pdfminer.six>=20221105
+pytesseract>=0.3.10
+opencv-python-headless>=4.9.0
+
+# NLP / OCR
+spacy>=3.7.0
+
+# Graph engine
+networkx>=3.3
+
+# AI
+ollama>=0.2.0
+
+# Report generation
+fpdf2>=2.7.9
+
+# Data
+pandas>=2.2.0
+numpy>=1.26.0
+
+# Utilities
+python-dateutil>=2.9.0
+aiofiles>=23.2.1
