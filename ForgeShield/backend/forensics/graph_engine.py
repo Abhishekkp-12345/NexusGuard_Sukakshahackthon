@@ -71,6 +71,14 @@ def add_case_to_graph(case_id: str, entities: dict[str, Any]) -> None:
         _GRAPH.add_node(guar_node, type="applicant", **guar)
         _GRAPH.add_edge(applicant_node, guar_node, rel="GUARANTEED_BY", case_id=case_id)
 
+    # ── Conflict nodes (identity mismatches) ──────────────────────────
+    conflicts = entities.get("conflicts", [])
+    for conf in conflicts:
+        conf_name = conf.get("name", "UNK")
+        conf_node = f"APPLICANT:{conf_name.upper()}"
+        _GRAPH.add_node(conf_node, type="applicant", name=conf_name)
+        _GRAPH.add_edge(applicant_node, conf_node, rel="IDENTITY_MISMATCH", case_id=case_id)
+
     logger.info(f"Graph updated for case {case_id}. Nodes: {_GRAPH.number_of_nodes()}, Edges: {_GRAPH.number_of_edges()}")
 
 

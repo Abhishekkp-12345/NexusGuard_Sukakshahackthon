@@ -146,8 +146,12 @@ export default function GraphView() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    
+    // Scale client click coordinates to internal canvas 800x600 dimensions
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     for (const node of nodes) {
       if (!node.x || !node.y) continue;

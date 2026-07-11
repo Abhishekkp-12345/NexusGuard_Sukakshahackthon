@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     MOCK_DATA_DIR: Path = BASE_DIR / "mock_data" / "samples"
 
     # ── Ollama (Local LLM) ────────────────────────────────────────────
-    OLLAMA_MODEL: str = "gemma4:latest"
+    OLLAMA_MODEL: str = "qwen2.5-coder:1.5b"
     OLLAMA_HOST: str = "http://localhost:11434"
     OLLAMA_TIMEOUT: int = 120  # seconds
 

@@ -17,6 +17,10 @@ const DOC_TYPES = [
   { value: "bank_statement", label: "Bank Statement" },
   { value: "itr", label: "ITR / Form 16" },
   { value: "land_record", label: "Land Record / Property Deed" },
+  { value: "aadhaar_card", label: "Aadhaar Card" },
+  { value: "pan_card", label: "PAN Card" },
+  { value: "driving_license", label: "Driving License" },
+  { value: "bank_passbook", label: "Bank Passbook" },
   { value: "legal_document", label: "Legal Document" },
   { value: "unknown", label: "Auto-detect" },
 ];
@@ -77,14 +81,28 @@ export default function NewCase({ onCaseCreated }: Props) {
   }, []);
 
   const addFiles = (newFiles: File[]) => {
-    const uploadable: UploadedFile[] = newFiles
-      .filter(f => /\.(pdf|jpg|jpeg|png|tiff|bmp)$/i.test(f.name))
-      .map(file => ({
-        file,
-        docType: "unknown",
-        id: Math.random().toString(36).slice(2),
-      }));
-    setFiles(prev => [...prev, ...uploadable]);
+    const validFiles: UploadedFile[] = [];
+    const invalidNames: string[] = [];
+
+    newFiles.forEach(f => {
+      if (/\.(pdf|jpg|jpeg|png|tiff|bmp)$/i.test(f.name)) {
+        validFiles.push({
+          file: f,
+          docType: "unknown",
+          id: Math.random().toString(36).slice(2),
+        });
+      } else {
+        invalidNames.push(f.name);
+      }
+    });
+
+    if (invalidNames.length > 0) {
+      setError(`Unsupported file types ignored: ${invalidNames.join(", ")}. Only PDF, JPG, PNG, and TIFF are supported.`);
+    } else {
+      setError("");
+    }
+
+    setFiles(prev => [...prev, ...validFiles]);
   };
 
   const removeFile = (id: string) => setFiles(prev => prev.filter(f => f.id !== id));
@@ -117,7 +135,8 @@ export default function NewCase({ onCaseCreated }: Props) {
     let stepIdx = 0;
     const progressInterval = setInterval(() => {
       if (stepIdx < steps.length) {
-        setAnalysisProgress(prev => [...prev, steps[stepIdx]]);
+        const currentMsg = steps[stepIdx]; // Capture inside block to avoid React state batch closure bug
+        setAnalysisProgress(prev => [...prev, currentMsg]);
         stepIdx++;
       }
     }, 2000);
@@ -339,7 +358,7 @@ export default function NewCase({ onCaseCreated }: Props) {
           )}
 
           <div style={{ marginTop: 24, display: "flex", gap: 12, justifyContent: "flex-end" }}>
-            <button className="btn btn-ghost" onClick={() => addFiles([])}>
+            <button className="btn btn-ghost" onClick={() => document.getElementById("file-input")?.click()}>
               <Plus size={16} /> Add More
             </button>
             <button className="btn btn-primary btn-lg" onClick={handleAnalyze} disabled={files.length === 0}>
@@ -377,7 +396,7 @@ export default function NewCase({ onCaseCreated }: Props) {
             Analyzing documents with ForgeShield AI + Ollama (gemma4)
           </p>
           <div style={{ textAlign: "left", maxWidth: 440, margin: "0 auto" }}>
-            {analysisProgress.map((msg, i) => (
+            {analysisProgress.filter(Boolean).map((msg, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: -10 }}

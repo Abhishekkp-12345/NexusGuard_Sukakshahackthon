@@ -43,7 +43,7 @@ def extract_salary_fields(ocr_fields: dict[str, Any]) -> dict[str, Any]:
         "tds_deduction": None,
         "employer": ocr_fields.get("employer"),
         "employee_name": None,
-        "pan": ocr_fields.get("pans", [None])[0],
+        "pan": ocr_fields.get("pans")[0] if ocr_fields.get("pans") else None,
         "pay_period": None,
         "employment_date": None,
     }

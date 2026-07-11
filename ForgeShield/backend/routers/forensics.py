@@ -191,15 +191,15 @@ async def _run_full_analysis(
 
         # ── OCR / Text Extraction ─────────────────────────────────────
         if ext in PDF_EXTENSIONS:
-            raw_text = extract_text_from_pdf(path)
+            raw_text = extract_text_from_pdf(path, original_name)
         else:
-            raw_text = extract_text_from_image(path)
-
-        ocr_fields = extract_key_fields(raw_text, doc_report["type"])
+            raw_text = extract_text_from_image(path, original_name)
 
         # ── Auto-classify if type unknown ─────────────────────────────
         if doc_report["type"] == "unknown" and raw_text.strip():
-            doc_report["type"] = classify_document(raw_text[:500])
+            doc_report["type"] = classify_document(raw_text[:500], original_name)
+
+        ocr_fields = extract_key_fields(raw_text, doc_report["type"])
 
         # ── Type-specific field extraction ────────────────────────────
         doc_type = doc_report["type"]
@@ -213,6 +213,29 @@ async def _run_full_analysis(
             fields = ocr_fields
 
         doc_report["extracted_fields"] = fields
+        
+        # Name matching check
+        applicant_name = case.get("applicant_name", "").strip()
+        if applicant_name and doc_type in {"salary_slip", "bank_statement", "itr", "land_record", "aadhaar_card", "pan_card", "driving_license", "bank_passbook"}:
+            import re
+            name_tokens = [w.lower() for w in re.findall(r"\w+", applicant_name) if len(w) >= 3]
+            text_content = raw_text.lower()
+            if name_tokens and len(text_content) > 50:
+                matches = [token for token in name_tokens if token in text_content]
+                if not matches:
+                    doc_report["authenticity_score"] = 10.0
+                    auth_scores[-1] = 10.0
+                    all_findings.append({
+                        "type": "IDENTITY_MISMATCH",
+                        "severity": "HIGH",
+                        "detail": (
+                            f"Identity mismatch in '{original_name}': "
+                            f"The document does not contain the applicant's name '{applicant_name}'. "
+                            f"This indicates the document may belong to another individual or is forged/stolen."
+                        ),
+                        "document": original_name,
+                    })
+
         processed_docs.append({"type": doc_type, "fields": fields})
         document_reports.append(doc_report)
 
@@ -220,6 +243,19 @@ async def _run_full_analysis(
     # LAYER 2: Cross-Document Validation
     # ══════════════════════════════════════════════════════════════════
     consistency_result = check_cross_document_consistency(processed_docs)
+    
+    # Check if there are any recognized underwriting documents
+    underwriting_types = {"salary_slip", "bank_statement", "itr", "land_record"}
+    underwriting_count = sum(1 for doc in processed_docs if doc["type"] in underwriting_types)
+    
+    if underwriting_count == 0:
+        consistency_result["consistency_score"] = 0.0
+        all_findings.append({
+            "type": "NO_UNDERWRITING_DOCUMENTS",
+            "severity": "HIGH",
+            "detail": "No recognized underwriting documents (Salary Slip, Bank Statement, ITR, or Land Record) were found. Automated consistency checks cannot be verified, resulting in a zero consistency rating.",
+        })
+    
     all_findings.extend(consistency_result.get("findings", []))
 
     # ══════════════════════════════════════════════════════════════════
@@ -239,6 +275,12 @@ async def _run_full_analysis(
         consistency_score=consistency_result["consistency_score"],
         relationship_risk_score=graph_result["relationship_risk_score"],
     )
+
+    # Force REJECT on identity mismatch
+    if any(f.get("type") == "IDENTITY_MISMATCH" for f in all_findings):
+        risk_scores["verdict"] = "REJECT"
+        risk_scores["verdict_color"] = "#EF4444"
+        risk_scores["overall_score"] = min(risk_scores["overall_score"], 30.0)
 
     # Generate AI recommendation (may take 10-30s with Ollama)
     ai_recommendation = generate_ai_recommendation(case, all_findings, risk_scores)
@@ -303,6 +345,7 @@ def _build_entities_from_docs(case: dict, processed_docs: list[dict]) -> dict:
         "employer": {},
         "asset": {},
         "guarantors": [],
+        "conflicts": [],
     }
 
     for doc in processed_docs:
@@ -317,5 +360,22 @@ def _build_entities_from_docs(case: dict, processed_docs: list[dict]) -> dict:
                 entities["asset"]["value"] = fields["declared_value"]
             if fields.get("location"):
                 entities["asset"]["address"] = fields["location"][:100]
+
+    # Find mismatched document owners to show in the relationship graph
+    applicant_name = case.get("applicant_name", "Unknown").lower()
+    import re
+    app_tokens = [w for w in re.findall(r"\w+", applicant_name) if len(w) >= 3]
+    
+    seen_mismatches = set()
+    for doc in processed_docs:
+        fields = doc.get("fields", {})
+        owner = fields.get("owner_name") or fields.get("account_holder_name")
+        if owner:
+            owner_clean = owner.strip()
+            owner_lower = owner_clean.lower()
+            if app_tokens and not any(t in owner_lower for t in app_tokens):
+                if owner_clean.upper() not in seen_mismatches:
+                    seen_mismatches.add(owner_clean.upper())
+                    entities["conflicts"].append({"name": owner_clean})
 
     return entities

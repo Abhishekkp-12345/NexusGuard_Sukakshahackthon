@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Download,
@@ -120,7 +120,125 @@ function ELAHeatmap({ heatmap_b64, tamper_score, filename }: { heatmap_b64: stri
   );
 }
 
-// ── AI Recommendation Panel ───────────────────────────────────────────
+// ── AI Recommendation Parser & Panel ───────────────────────────────────
+function parseBold(text: string): React.ReactNode[] {
+  const regex = /\*\*(.*?)\*\*/g;
+  const result: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      result.push(text.slice(lastIndex, match.index));
+    }
+    result.push(
+      <strong key={match.index} style={{ fontWeight: 700, color: "var(--text-primary)" }}>
+        {match[1]}
+      </strong>
+    );
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    result.push(text.slice(lastIndex));
+  }
+
+  return result.length > 0 ? result : [text];
+}
+
+function renderMarkdown(text: string) {
+  const lines = text.split("\n");
+  return lines.map((line, idx) => {
+    // Check for headings
+    if (line.startsWith("### ")) {
+      return (
+        <h4 key={idx} style={{
+          fontSize: 13,
+          fontWeight: 700,
+          marginTop: 18,
+          marginBottom: 8,
+          color: "var(--text-primary)",
+          letterSpacing: "0.05em",
+          textTransform: "uppercase",
+          opacity: 0.9,
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          paddingBottom: 4
+        }}>
+          {parseBold(line.slice(4))}
+        </h4>
+      );
+    } else if (line.startsWith("## ")) {
+      return (
+        <h3 key={idx} style={{
+          fontSize: 14,
+          fontWeight: 700,
+          marginTop: 20,
+          marginBottom: 8,
+          color: "var(--text-primary)"
+        }}>
+          {parseBold(line.slice(3))}
+        </h3>
+      );
+    } else if (line.startsWith("# ")) {
+      return (
+        <h2 key={idx} style={{
+          fontSize: 16,
+          fontWeight: 700,
+          marginTop: 22,
+          marginBottom: 10,
+          color: "var(--text-primary)"
+        }}>
+          {parseBold(line.slice(2))}
+        </h2>
+      );
+    }
+
+    // Check for list items (like "1. Item" or "1. **Item**")
+    const matchNumbered = line.match(/^(\d+)\.\s(.*)/);
+    if (matchNumbered) {
+      const num = matchNumbered[1];
+      const rest = matchNumbered[2];
+      return (
+        <div key={idx} style={{ display: "flex", gap: 8, marginLeft: 8, marginBottom: 8, alignItems: "flex-start" }}>
+          <span style={{ fontWeight: 700, color: "var(--indigo-light)", minWidth: 16 }}>{num}.</span>
+          <div style={{ flex: 1, fontSize: 13.5, lineHeight: 1.6, color: "var(--text-secondary)" }}>
+            {parseBold(rest)}
+          </div>
+        </div>
+      );
+    }
+
+    const matchBullet = line.match(/^([*\-•])\s(.*)/);
+    if (matchBullet) {
+      const rest = matchBullet[2];
+      return (
+        <div key={idx} style={{ display: "flex", gap: 8, marginLeft: 8, marginBottom: 8, alignItems: "flex-start" }}>
+          <span style={{ color: "var(--indigo-light)", fontWeight: 700, minWidth: 16 }}>•</span>
+          <div style={{ flex: 1, fontSize: 13.5, lineHeight: 1.6, color: "var(--text-secondary)" }}>
+            {parseBold(rest)}
+          </div>
+        </div>
+      );
+    }
+
+    // Regular line
+    if (line.trim() === "") {
+      return <div key={idx} style={{ height: 10 }} />;
+    }
+
+    return (
+      <div key={idx} style={{
+        fontSize: 13.5,
+        lineHeight: 1.6,
+        color: "var(--text-secondary)",
+        marginBottom: 8
+      }}>
+        {parseBold(line)}
+      </div>
+    );
+  });
+}
+
 function AIRecommendation({ text, verdict }: { text: string; verdict: string }) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
@@ -164,10 +282,9 @@ function AIRecommendation({ text, verdict }: { text: string; verdict: string }) 
         </div>
       </div>
       <div style={{
-        fontSize: 14, lineHeight: 1.8, color: "var(--text-secondary)",
-        fontStyle: "italic",
+        lineHeight: 1.8,
       }} className={!done ? "typing-cursor" : ""}>
-        "{displayed}"
+        {renderMarkdown(displayed)}
       </div>
     </div>
   );
@@ -584,21 +701,70 @@ export default function CaseReport({ caseId, onBack }: Props) {
                     )}
 
                     {/* PDF Metadata */}
-                    {doc.pdf_forensics?.metadata && (
+                    {doc.pdf_forensics?.metadata && 
+                     Object.values(doc.pdf_forensics.metadata).some(v => v !== null && v !== undefined && (!Array.isArray(v) || v.length > 0)) && (
                       <div style={{
                         padding: 14, borderRadius: "var(--radius-md)",
                         background: "var(--bg-surface)", marginTop: 12,
                       }}>
                         <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 10 }}>📋 PDF Metadata</div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
-                          {Object.entries(doc.pdf_forensics.metadata).map(([k, v]) =>
-                            v && typeof v === "string" ? (
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+                          {Object.entries(doc.pdf_forensics.metadata).map(([k, v]) => {
+                            if (v === null || v === undefined) return null;
+                            if (Array.isArray(v) && v.length === 0) return null;
+                            
+                            const label = k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                            let valStr = "";
+                            if (Array.isArray(v)) {
+                              valStr = v.join(", ");
+                            } else {
+                              valStr = String(v);
+                            }
+                            
+                            return (
                               <div key={k} style={{ fontSize: 12 }}>
-                                <span style={{ color: "var(--text-muted)" }}>{k}: </span>
-                                <span className="text-mono">{String(v).slice(0, 50)}</span>
+                                <span style={{ color: "var(--text-muted)" }}>{label}: </span>
+                                <span className="text-mono">{valStr.slice(0, 50)}</span>
                               </div>
-                            ) : null
-                          )}
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Extracted Predictions */}
+                    {doc.extracted_fields && Object.keys(doc.extracted_fields).length > 0 && (
+                      <div style={{
+                        padding: 14, borderRadius: "var(--radius-md)",
+                        background: "var(--bg-surface)", marginTop: 12,
+                      }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 10 }}>🔍 Extracted Predictions</div>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+                          {Object.entries(doc.extracted_fields).map(([k, v]) => {
+                            if (v === null || v === undefined || (Array.isArray(v) && v.length === 0)) return null;
+                            
+                            const label = k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                            let valStr = "";
+                            if (Array.isArray(v)) {
+                              valStr = v.slice(0, 5).join(", ");
+                            } else if (typeof v === "object") {
+                              valStr = JSON.stringify(v);
+                            } else if (typeof v === "number" && k.toLowerCase().includes("income")) {
+                              valStr = `₹${v.toLocaleString("en-IN")}`;
+                            } else {
+                              valStr = String(v);
+                            }
+                            
+                            // Skip raw dumps like raw_lines or full_text
+                            if (k === "raw_lines" || k === "full_text" || valStr.length > 100) return null;
+                            
+                            return (
+                              <div key={k} style={{ fontSize: 12 }}>
+                                <span style={{ color: "var(--text-muted)" }}>{label}: </span>
+                                <span className="text-mono">{valStr}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

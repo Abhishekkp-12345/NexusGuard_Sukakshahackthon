@@ -70,16 +70,56 @@ def generate_text(prompt: str, model: str | None = None, timeout: int | None = N
         return _fallback_recommendation(str(e))
 
 
-def classify_document(text_sample: str) -> str:
+def classify_document(text_sample: str, filename: str = "") -> str:
     """
-    Use Ollama to classify a document type from extracted text.
-    Returns one of: salary_slip, bank_statement, itr, land_record, legal_document, unknown
+    Classify document type using filename and text heuristics first, falling back to Ollama if needed.
     """
+    # 1. Filename Heuristic Check
+    if filename:
+        fn = filename.lower()
+        if any(k in fn for k in ["aadhar", "addhar", "uidai"]):
+            return "aadhaar_card"
+        if "pan" in fn and "panti" not in fn:
+            return "pan_card"
+        if any(k in fn for k in ["license", "licence", "dl"]):
+            return "driving_license"
+        if "passbook" in fn:
+            return "bank_passbook"
+        if any(k in fn for k in ["salary", "payslip", "pay_slip"]):
+            return "salary_slip"
+        if any(k in fn for k in ["statement", "bank_stmt"]):
+            return "bank_statement"
+        if any(k in fn for k in ["itr", "tax", "form_16", "form16"]):
+            return "itr"
+        if any(k in fn for k in ["land", "deed", "property", "patta"]):
+            return "land_record"
+
+    text_lower = text_sample.lower()
+
+    # 2. Text Content Heuristic Checks
+    if any(k in text_lower for k in ["unique identification", "authority of india", "aadhaar", "aadhar"]):
+        return "aadhaar_card"
+    if any(k in text_lower for k in ["permanent account number", "income tax department", "pan card"]):
+        return "pan_card"
+    if any(k in text_lower for k in ["driving licence", "driving license", "dl no", "licence no"]):
+        return "driving_license"
+    if "passbook" in text_lower:
+        return "bank_passbook"
+    if any(k in text_lower for k in ["salary slip", "payslip", "pay slip"]):
+        return "salary_slip"
+    if any(k in text_lower for k in ["bank statement", "account statement", "statement of account"]):
+        return "bank_statement"
+    if any(k in text_lower for k in ["form 16", "income tax return", "itr-v"]):
+        return "itr"
+    if any(k in text_lower for k in ["land record", "survey number", "survey no"]):
+        return "land_record"
+
+    # 3. LLM Fallback
     from ai_engine.prompt_templates import DOCUMENT_CLASSIFICATION_TEMPLATE
     prompt = DOCUMENT_CLASSIFICATION_TEMPLATE.format(text_sample=text_sample[:500])
     result = generate_text(prompt, timeout=30)
     # Normalise
-    valid_types = ["salary_slip", "bank_statement", "itr", "land_record", "legal_document", "unknown"]
+    valid_types = ["salary_slip", "bank_statement", "itr", "land_record", "legal_document", "aadhaar_card", "pan_card", "driving_license", "bank_passbook", "unknown"]
     result_clean = result.strip().lower().replace(" ", "_")
     for vt in valid_types:
         if vt in result_clean:
