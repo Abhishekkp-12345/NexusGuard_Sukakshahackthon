@@ -23,6 +23,8 @@ export interface Case {
   branch: string;
   status: "PENDING" | "ANALYZING" | "ANALYZED" | "REVIEWED" | "ERROR";
   verdict: "APPROVE" | "HOLD" | "REJECT" | null;
+  verdict_notes?: string;
+  reviewed_by?: string;
   created_at: string;
   updated_at: string;
   documents: string[];
