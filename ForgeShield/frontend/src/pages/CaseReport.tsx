@@ -290,6 +290,61 @@ function AIRecommendation({ text, verdict }: { text: string; verdict: string }) 
   );
 }
 
+function RawOcrInspector({ rawLines }: { rawLines: string[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{
+      border: "1px solid var(--border-subtle)",
+      borderRadius: "var(--radius-md)",
+      overflow: "hidden",
+      marginTop: 10
+    }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%",
+          padding: "10px 14px",
+          background: "var(--bg-surface)",
+          border: "none",
+          textAlign: "left",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontWeight: 600,
+          fontSize: 12,
+          color: "var(--text-secondary)",
+          cursor: "pointer",
+        }}
+      >
+        <span>📝 View Raw OCR Lines</span>
+        <span style={{ fontSize: 10 }}>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div style={{
+          padding: 12,
+          background: "rgba(0,0,0,0.2)",
+          maxHeight: 250,
+          overflowY: "auto",
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          lineHeight: 1.5,
+          color: "var(--text-muted)",
+          whiteSpace: "pre-wrap",
+          borderTop: "1px solid var(--border-subtle)"
+        }}>
+          {rawLines.map((line, idx) => (
+            <div key={idx} style={{ padding: "2px 0", borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+              <span style={{ color: "rgba(255,255,255,0.15)", marginRight: 8, display: "inline-block", width: 24, textAlign: "right" }}>{idx + 1}</span>
+              {line}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 // ── Audit Timeline ────────────────────────────────────────────────────
 function AuditTimeline({ 
   analysis, 
@@ -766,6 +821,10 @@ export default function CaseReport({ caseId, onBack }: Props) {
                             );
                           })}
                         </div>
+                    {/* Raw OCR Text Toggle */}
+                    {doc.extracted_fields?.raw_lines && doc.extracted_fields.raw_lines.length > 0 && (
+                      <RawOcrInspector rawLines={doc.extracted_fields.raw_lines} />
+                    )}
                       </div>
                     )}
                   </div>
@@ -776,13 +835,60 @@ export default function CaseReport({ caseId, onBack }: Props) {
 
           {/* Timeline tab */}
           {activeTab === "timeline" && (
-            <div className="card">
-              <div className="section-title">🕐 Investigation Timeline</div>
-              <AuditTimeline 
-                analysis={analysis} 
-                caseData={caseData} 
-                onUpdateVerdict={handleUpdateVerdict} 
-              />
+            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              <div className="card">
+                <div className="section-title" style={{ marginBottom: 16 }}>🕐 Investigation Pipeline</div>
+                <AuditTimeline 
+                  analysis={analysis} 
+                  caseData={caseData} 
+                  onUpdateVerdict={handleUpdateVerdict} 
+                />
+              </div>
+
+              {analysis.timeline && analysis.timeline.length > 0 && (
+                <div className="card">
+                  <div className="section-title" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                    📅 Chronological Event Timeline
+                  </div>
+                  <p style={{ color: "var(--text-secondary)", fontSize: 13, marginBottom: 24 }}>
+                    Visual verification of document issue dates relative to the applicant's Date of Birth (DOB).
+                  </p>
+                  <div style={{ position: "relative", paddingLeft: 24, borderLeft: "2px solid var(--border-subtle)", marginLeft: 8 }}>
+                    {analysis.timeline.map((event: any, i: number) => {
+                      const isDOB = event.type === "dob";
+                      const isCase = event.type === "case_created";
+                      const circleColor = isDOB ? "var(--approve)" : (isCase ? "var(--indigo)" : "var(--hold)");
+                      
+                      return (
+                        <div key={i} style={{ position: "relative", marginBottom: 24 }}>
+                          {/* Timeline Dot */}
+                          <div style={{
+                            position: "absolute",
+                            left: -31,
+                            top: 2,
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            background: "var(--bg-surface)",
+                            border: `3px solid ${circleColor}`,
+                          }} />
+                          
+                          {/* Timeline Content */}
+                          <div>
+                            <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+                              <span className="text-mono" style={{ fontWeight: 700, fontSize: 13, color: circleColor }}>{event.date}</span>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{event.label}</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
+                              Source: <span className="text-mono">{event.filename}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>

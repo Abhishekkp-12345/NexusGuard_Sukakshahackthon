@@ -253,6 +253,8 @@ def extract_key_fields(text: str, doc_type: str = "unknown") -> dict[str, Any]:
     passbook_acc = None
     passbook_ifsc = None
     owner_name = None
+    dob = None
+    doc_date = None
     
     if doc_type == "aadhaar_card":
         amounts = []
@@ -282,6 +284,15 @@ def extract_key_fields(text: str, doc_type: str = "unknown") -> dict[str, Any]:
                 if len(words) >= 2 and all(w.isalpha() for w in words):
                     owner_name = line.strip()
                     break
+        
+        # Extract Aadhaar DOB
+        dob_match = re.search(r"(?:DOB|Date of Birth|Birth|YOB)\s*[:\-]?\s*(\d{2}[/\-]\d{2}[/\-]\d{4})", text, re.IGNORECASE)
+        if dob_match:
+            dob = dob_match.group(1).strip()
+        else:
+            yob_match = re.search(r"(?:Year of Birth|YOB|Birth Year)\s*[:\-]?\s*(\d{4})", text, re.IGNORECASE)
+            if yob_match:
+                dob = f"01/01/{yob_match.group(1)}"
                 
     elif doc_type == "pan_card":
         amounts = []
@@ -310,6 +321,17 @@ def extract_key_fields(text: str, doc_type: str = "unknown") -> dict[str, Any]:
                             owner_name = line.strip()
                             break
         
+        # Extract PAN DOB
+        dob_match = re.search(r"(?:DOB|Date of Birth|Birth)\s*[:\-]?\s*(\d{2}[/\-]\d{2}[/\-]\d{4})", text, re.IGNORECASE)
+        if dob_match:
+            dob = dob_match.group(1).strip()
+        else:
+            dob_match = re.search(r"\b(\d{2})(\d{2})(\d{4})\b", text)
+            if dob_match:
+                d, m, y = dob_match.groups()
+                if 1 <= int(d) <= 31 and 1 <= int(m) <= 12 and 1920 <= int(y) <= 2026:
+                    dob = f"{d}/{m}/{y}"
+        
     elif doc_type == "driving_license":
         amounts = []
         pans = []
@@ -330,6 +352,14 @@ def extract_key_fields(text: str, doc_type: str = "unknown") -> dict[str, Any]:
         name_match = re.search(r"NAME\s*[:\-]?\s*([A-Za-z\t ]+)", text, re.IGNORECASE)
         if name_match:
             owner_name = name_match.group(1).strip()
+            
+        # Extract DL DOB & DOI
+        dob_match = re.search(r"(?:DOB|Date of Birth|Birth|D\.O\.B)\s*[:\-]?\s*(\d{2}[/\-]\d{2}[/\-]\d{4})", text, re.IGNORECASE)
+        if dob_match:
+            dob = dob_match.group(1).strip()
+        doi_match = re.search(r"(?:DOI|Issue|Date of Issue|Effective From)\s*[:\-]?\s*(\d{2}[/\-]\d{2}[/\-]\d{4})", text, re.IGNORECASE)
+        if doi_match:
+            doc_date = doi_match.group(1).strip()
                 
     elif doc_type == "bank_passbook":
         amounts = []
@@ -345,6 +375,11 @@ def extract_key_fields(text: str, doc_type: str = "unknown") -> dict[str, Any]:
             name_match = re.search(r"(?:customer|holder|name)\s*[:\-]?\s*([A-Za-z\t ]{3,30})", text, re.IGNORECASE)
             if name_match:
                 passbook_name = name_match.group(1).strip()
+                
+        # Extract Passbook Issue Date / Opening Date
+        doi_match = re.search(r"(?:Date|Opening Date|Opened On|Date of Issue|Issue Date|Date of print)\s*[:\-]?\s*(\d{2}[/\-]\d{2}[/\-]\d{4})", text, re.IGNORECASE)
+        if doi_match:
+            doc_date = doi_match.group(1).strip()
                 
         # Account Number
         acc_match = re.search(r"(?:account|accowmt|acc)\s*(?:no\.?|number)?\s*[:\-]?\s*([a-zA-Z0-9]{9,18})", text, re.IGNORECASE)
@@ -414,6 +449,10 @@ Return ONLY a JSON object with keys: "name", "account_number", "ifsc_code". Do n
         res["ifsc_code"] = passbook_ifsc
     if owner_name:
         res["owner_name"] = owner_name
+    if dob:
+        res["dob"] = dob
+    if doc_date:
+        res["doc_date"] = doc_date
         
     return res
 

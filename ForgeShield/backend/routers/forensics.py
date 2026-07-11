@@ -236,7 +236,7 @@ async def _run_full_analysis(
                         "document": original_name,
                     })
 
-        processed_docs.append({"type": doc_type, "fields": fields})
+        processed_docs.append({"type": doc_type, "fields": fields, "filename": original_name})
         document_reports.append(doc_report)
 
     # ══════════════════════════════════════════════════════════════════
@@ -257,6 +257,11 @@ async def _run_full_analysis(
         })
     
     all_findings.extend(consistency_result.get("findings", []))
+
+    # ── LAYER 2.5: Chronology & Date Anomaly Checker ──────────────────
+    from forensics.chronology_checker import check_chronology
+    chronology_result = check_chronology(processed_docs, case.get("created_at"))
+    all_findings.extend(chronology_result.get("findings", []))
 
     # ══════════════════════════════════════════════════════════════════
     # LAYER 3: Relationship Graph Analysis
@@ -325,6 +330,9 @@ async def _run_full_analysis(
 
         # Income analysis
         "income_analysis": consistency_result.get("income_analysis", {}),
+        
+        # Chronological timeline
+        "timeline": chronology_result.get("timeline", []),
     }
 
     logger.info(

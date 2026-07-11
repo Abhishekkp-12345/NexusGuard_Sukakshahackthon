@@ -152,6 +152,25 @@ export default function Dashboard({ onOpenCase, onNewCase }: Props) {
 
   useEffect(() => { load(); }, []);
 
+  // Find all double pledging alerts across all cases
+  const doublePledgingAlerts = cases.reduce((acc: any[], c) => {
+    if (c.analysis?.all_findings) {
+      const dpFindings = c.analysis.all_findings.filter((f: any) => f.type === "DOUBLE_PLEDGING");
+      dpFindings.forEach((f: any) => {
+        const isDuplicate = acc.some(a => a.detail === f.detail);
+        if (!isDuplicate) {
+          acc.push({
+            caseId: c.case_id,
+            applicantName: c.applicant_name,
+            detail: f.detail,
+            severity: f.severity,
+          });
+        }
+      });
+    }
+    return acc;
+  }, []);
+
   const filtered = filter === "ALL"
     ? cases
     : filter === "PENDING"
@@ -187,6 +206,34 @@ export default function Dashboard({ onOpenCase, onNewCase }: Props) {
           <StatCard label="Flagged Cases" value={stats.held + stats.rejected} sub={`₹${(stats.total_loan_at_risk / 100000).toFixed(1)}L at risk`} icon={AlertTriangle} color="var(--hold)" />
           <StatCard label="Approved" value={stats.approved} icon={CheckCircle} color="var(--approve)" />
           <StatCard label="Detection Rate" value={`${stats.fraud_detection_rate}%`} icon={Shield} color="var(--reject)" />
+        </div>
+      )}
+
+      {/* Double Pledging Alert Banner */}
+      {doublePledgingAlerts.length > 0 && (
+        <div style={{
+          padding: "16px 20px",
+          background: "rgba(239, 68, 68, 0.08)",
+          border: "1px solid rgba(239, 68, 68, 0.25)",
+          borderRadius: "var(--radius-lg)",
+          marginBottom: 32,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <AlertTriangle size={18} color="var(--reject)" />
+            <span style={{ fontWeight: 700, fontSize: 14, color: "var(--reject)", letterSpacing: "0.05em" }}>
+              CROSS-CASE COLLATERAL FRAUD ALERTS
+            </span>
+            <span className="verdict-badge reject" style={{ fontSize: 10, padding: "2px 8px" }}>
+              {doublePledgingAlerts.length} CRITICAL
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {doublePledgingAlerts.map((alert: any, i: number) => (
+              <div key={i} style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                • {alert.detail} (Flagged in case <span className="text-mono" style={{ color: "var(--text-primary)", fontWeight: 600 }}>{alert.caseId}</span> for applicant {alert.applicantName})
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

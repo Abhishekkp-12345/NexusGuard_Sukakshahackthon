@@ -33,6 +33,12 @@ SUSPICIOUS_PRODUCERS = [
     "edit pdf",
     "pdfelement",
     "pdf editor",
+    "canva",
+    "photoshop",
+    "illustrator",
+    "gimp",
+    "inkscape",
+    "pdfmaker",
 ]
 
 EXPECTED_PAYROLL_PRODUCERS = [
