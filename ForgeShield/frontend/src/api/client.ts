@@ -67,6 +67,13 @@ export interface AnalysisResult {
   document_reports: DocumentReport[];
   graph_data: GraphData;
   income_analysis: Record<string, unknown>;
+  gst_verification?: GSTVerificationResult;
+  timeline?: {
+    date: string;
+    label: string;
+    type: string;
+    filename: string;
+  }[];
 }
 
 export interface DocumentReport {
@@ -123,6 +130,68 @@ export interface CaseStats {
   fraud_detection_rate: number;
 }
 
+// ── Intelligence Types ─────────────────────────────────────────────────
+
+export interface GSTVerificationResult {
+  gstin: string;
+  valid_format: boolean;
+  status: "ACTIVE" | "CANCELLED" | "SUSPENDED" | "NOT_FOUND" | "API_UNAVAILABLE" | "INVALID_FORMAT";
+  legal_name: string | null;
+  trade_name: string | null;
+  state: string | null;
+  registration_date: string | null;
+  taxpayer_type: string | null;
+  annual_turnover: number | null;
+  findings: Finding[];
+  flags: string[];
+  gst_risk_score: number;
+}
+
+export interface FraudRing {
+  ring_id: string;
+  ring_type: "SHARED_EMPLOYER" | "LOAN_STACKING" | "SHARED_ADDRESS";
+  ring_type_label: string;
+  shared_entity: string;
+  description: string;
+  severity: "HIGH" | "MEDIUM";
+  case_count: number;
+  cases: { case_id: string; applicant_name: string; loan_amount: number; loan_type: string; verdict: string }[];
+  total_loan_exposure: number;
+  detected_at: string;
+}
+
+export interface FraudRingsResponse {
+  fraud_rings: FraudRing[];
+  total_rings_detected: number;
+  high_severity: number;
+  medium_severity: number;
+  generated_at: string;
+}
+
+export interface GeoStateData {
+  state: string;
+  total_cases: number;
+  approved: number;
+  hold: number;
+  rejected: number;
+  pending: number;
+  high_severity_findings: number;
+  total_loan_amount: number;
+  fraud_rate_pct: number;
+  risk_score: number;
+  risk_level: "HIGH" | "MEDIUM" | "LOW";
+  top_fraud_types: { type: string; count: number }[];
+  loan_at_risk: number;
+}
+
+export interface GeoHeatmapResponse {
+  states: GeoStateData[];
+  total_states: number;
+  national_fraud_rate: number;
+  total_loan_at_risk: number;
+  generated_at: string;
+}
+
 // ── API Functions ──────────────────────────────────────────────────────
 
 export const casesApi = {
@@ -167,4 +236,9 @@ export const reportsApi = {
         a.click();
         URL.revokeObjectURL(url);
       }),
+};
+
+export const intelligenceApi = {
+  fraudRings: () => api.get<FraudRingsResponse>("/intelligence/fraud-rings").then((r) => r.data),
+  geoHeatmap: () => api.get<GeoHeatmapResponse>("/intelligence/geo-heatmap").then((r) => r.data),
 };

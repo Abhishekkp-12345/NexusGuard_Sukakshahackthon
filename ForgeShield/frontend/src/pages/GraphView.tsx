@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Info } from "lucide-react";
-import { casesApi } from "../api/client";
+import { Info, AlertTriangle, Users, Link2 } from "lucide-react";
+import { casesApi, intelligenceApi, type FraudRing } from "../api/client";
 
 interface GraphNode { id: string; label: string; type: string; color: string; x?: number; y?: number; }
 interface GraphLink { source: string; target: string; label: string; }
@@ -12,6 +12,9 @@ export default function GraphView() {
   const [links, setLinks] = useState<GraphLink[]>([]);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fraudRings, setFraudRings] = useState<FraudRing[]>([]);
+  const [ringsLoading, setRingsLoading] = useState(true);
+  const [expandedRing, setExpandedRing] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -74,6 +77,14 @@ export default function GraphView() {
       }
     };
     load();
+  }, []);
+
+  // Load fraud rings
+  useEffect(() => {
+    intelligenceApi.fraudRings()
+      .then(data => setFraudRings(data.fraud_rings))
+      .catch(console.error)
+      .finally(() => setRingsLoading(false));
   }, []);
 
   // Simple canvas renderer
@@ -269,6 +280,83 @@ export default function GraphView() {
                   <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{label}</div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Fraud Rings Panel */}
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <div style={{
+              padding: "14px 16px",
+              borderBottom: "1px solid var(--border-subtle)",
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <AlertTriangle size={15} color="var(--reject)" />
+              <span style={{ fontWeight: 700, fontSize: 13 }}>Fraud Ring Detection</span>
+              {!ringsLoading && fraudRings.length > 0 && (
+                <span style={{
+                  marginLeft: "auto", padding: "2px 8px", borderRadius: 20,
+                  background: "rgba(239,68,68,0.15)", color: "var(--reject)",
+                  fontSize: 11, fontWeight: 700,
+                }}>
+                  {fraudRings.length} RING{fraudRings.length > 1 ? "S" : ""}
+                </span>
+              )}
+            </div>
+            <div style={{ padding: "10px 16px 14px" }}>
+              {ringsLoading ? (
+                <div style={{ color: "var(--text-muted)", fontSize: 12, padding: "8px 0" }}>Scanning for fraud rings…</div>
+              ) : fraudRings.length === 0 ? (
+                <div style={{ fontSize: 12, color: "var(--text-muted)", padding: "8px 0", lineHeight: 1.6 }}>
+                  No cross-case fraud rings detected. Analyze more cases to enable network-level detection.
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {fraudRings.slice(0, 5).map((ring) => (
+                    <div
+                      key={ring.ring_id}
+                      onClick={() => setExpandedRing(expandedRing === ring.ring_id ? null : ring.ring_id)}
+                      style={{
+                        borderRadius: 8, cursor: "pointer", overflow: "hidden",
+                        border: `1px solid ${ring.severity === "HIGH" ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+                        background: ring.severity === "HIGH" ? "rgba(239,68,68,0.05)" : "rgba(245,158,11,0.05)",
+                      }}
+                    >
+                      <div style={{ padding: "8px 10px", display: "flex", alignItems: "center", gap: 8 }}>
+                        {ring.ring_type === "SHARED_EMPLOYER" ? <Users size={12} color={ring.severity === "HIGH" ? "var(--reject)" : "var(--hold)"} /> :
+                          ring.ring_type === "LOAN_STACKING" ? <Link2 size={12} color="var(--reject)" /> :
+                          <AlertTriangle size={12} color="var(--hold)" />}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {ring.ring_type_label}
+                          </div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                            {ring.case_count} cases · {ring.shared_entity.slice(0, 22)}
+                          </div>
+                        </div>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 10,
+                          background: ring.severity === "HIGH" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)",
+                          color: ring.severity === "HIGH" ? "var(--reject)" : "var(--hold)",
+                        }}>{ring.severity}</span>
+                      </div>
+                      {expandedRing === ring.ring_id && (
+                        <div style={{ padding: "0 10px 10px", borderTop: "1px solid var(--border-subtle)" }}>
+                          <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.5, margin: "8px 0" }}>
+                            {ring.description}
+                          </div>
+                          <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 4 }}>LINKED CASES</div>
+                          {ring.cases.slice(0, 3).map(c => (
+                            <div key={c.case_id} style={{ fontSize: 11, display: "flex", justifyContent: "space-between", padding: "3px 0" }}>
+                              <span className="text-mono" style={{ color: "var(--text-primary)" }}>{c.case_id}</span>
+                              <span style={{ color: "var(--text-muted)" }}>{c.applicant_name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

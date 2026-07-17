@@ -688,6 +688,79 @@ export default function CaseReport({ caseId, onBack }: Props) {
                   )}
                 </div>
               )}
+
+              {/* GST Verification Card */}
+              {analysis.gst_verification && (
+                <div className="card" style={{ marginTop: 24 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      background: "rgba(99,102,241,0.15)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 16,
+                    }}>🧾</div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14 }}>GST GSTIN Verification</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)" }}>India-exclusive fraud signal layer</div>
+                    </div>
+                    <div style={{
+                      marginLeft: "auto", padding: "4px 12px", borderRadius: 20,
+                      fontSize: 12, fontWeight: 700,
+                      background: analysis.gst_verification.status === "ACTIVE"
+                        ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
+                      color: analysis.gst_verification.status === "ACTIVE"
+                        ? "var(--approve)" : "var(--reject)",
+                      border: `1px solid ${analysis.gst_verification.status === "ACTIVE" ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
+                    }}>
+                      {analysis.gst_verification.status}
+                    </div>
+                  </div>
+
+                  {/* Ghost firm warning */}
+                  {analysis.gst_verification.flags.includes("ghost_firm") && (
+                    <div style={{
+                      padding: "10px 14px", borderRadius: 8, marginBottom: 14,
+                      background: "rgba(239,68,68,0.08)",
+                      border: "1px solid rgba(239,68,68,0.25)",
+                      fontSize: 13, color: "var(--reject)", fontWeight: 600,
+                    }}>
+                      ⚠️ GHOST FIRM DETECTED — GSTIN registered less than 6 months before this application
+                    </div>
+                  )}
+
+                  {/* GST info grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+                    {[
+                      { label: "GSTIN", value: analysis.gst_verification.gstin },
+                      { label: "Legal Name", value: analysis.gst_verification.legal_name || "—" },
+                      { label: "State", value: analysis.gst_verification.state || "—" },
+                      { label: "Reg. Date", value: analysis.gst_verification.registration_date || "—" },
+                      { label: "Taxpayer Type", value: analysis.gst_verification.taxpayer_type || "—" },
+                      { label: "GST Risk Score", value: `${analysis.gst_verification.gst_risk_score}/100` },
+                    ].map(({ label, value }) => (
+                      <div key={label} style={{ background: "var(--bg-surface)", borderRadius: 8, padding: "8px 10px" }}>
+                        <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 2 }}>{label}</div>
+                        <div style={{ fontSize: 12, fontWeight: 600, fontFamily: "monospace" }}>{value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* GST finding flags */}
+                  {analysis.gst_verification.flags.length > 0 && (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {analysis.gst_verification.flags.map((flag, i) => (
+                        <span key={i} style={{
+                          padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
+                          background: "rgba(239,68,68,0.1)", color: "var(--reject)",
+                          border: "1px solid rgba(239,68,68,0.2)",
+                        }}>
+                          {flag.replace(/_/g, " ").toUpperCase()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -822,9 +895,13 @@ export default function CaseReport({ caseId, onBack }: Props) {
                           })}
                         </div>
                     {/* Raw OCR Text Toggle */}
-                    {doc.extracted_fields?.raw_lines && doc.extracted_fields.raw_lines.length > 0 && (
-                      <RawOcrInspector rawLines={doc.extracted_fields.raw_lines} />
-                    )}
+                    {(() => {
+                      const rawLines = doc.extracted_fields?.raw_lines;
+                      if (Array.isArray(rawLines) && rawLines.length > 0) {
+                        return <RawOcrInspector rawLines={rawLines as string[]} />;
+                      }
+                      return null;
+                    })()}
                       </div>
                     )}
                   </div>

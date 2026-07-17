@@ -258,6 +258,41 @@ async def _run_full_analysis(
     
     all_findings.extend(consistency_result.get("findings", []))
 
+    # ══════════════════════════════════════════════════════════════════
+    # LAYER 2.2: GST GSTIN Verification (India-exclusive)
+    # ══════════════════════════════════════════════════════════════════
+    from forensics.gst_verifier import verify_gstin, extract_gstin_from_text
+
+    gst_verification: dict | None = None
+    # Try to find a GSTIN from any extracted field or raw text across all docs
+    for doc in processed_docs:
+        fields = doc.get("fields", {})
+        # Check if GSTIN was extracted into a field
+        gstin_val = fields.get("gstin") or fields.get("gst_number")
+        if not gstin_val:
+            # Try OCR raw text scan
+            raw = fields.get("full_text", "")
+            if raw:
+                gstin_val = extract_gstin_from_text(str(raw))
+        if gstin_val:
+            # Get declared income from salary slip if available
+            declared_income = None
+            for d2 in processed_docs:
+                if d2["type"] == "salary_slip":
+                    declared_income = d2["fields"].get("income") or d2["fields"].get("monthly_income")
+                    break
+            gst_verification = verify_gstin(
+                gstin=gstin_val,
+                declared_monthly_income=float(declared_income) if declared_income else None,
+                application_date=case.get("created_at"),
+                applicant_name=case.get("applicant_name"),
+            )
+            # High/medium GST findings go into all_findings
+            for f in gst_verification.get("findings", []):
+                if f.get("severity") in ("HIGH", "MEDIUM"):
+                    all_findings.append({**f, "layer": "GST_VERIFICATION"})
+            break  # Only verify one GSTIN per case
+
     # ── LAYER 2.5: Chronology & Date Anomaly Checker ──────────────────
     from forensics.chronology_checker import check_chronology
     chronology_result = check_chronology(processed_docs, case.get("created_at"))
@@ -333,6 +368,9 @@ async def _run_full_analysis(
         
         # Chronological timeline
         "timeline": chronology_result.get("timeline", []),
+
+        # GST Verification
+        "gst_verification": gst_verification,
     }
 
     logger.info(

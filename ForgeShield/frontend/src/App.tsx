@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   LayoutDashboard, Plus, BarChart3,
-  Shield, Network
+  Shield, Network, MapPin
 } from "lucide-react";
 import "./index.css";
 
@@ -10,13 +10,15 @@ import NewCase from "./pages/NewCase.tsx";
 import CaseReport from "./pages/CaseReport.tsx";
 import GraphView from "./pages/GraphView.tsx";
 import ExecutiveView from "./pages/ExecutiveView.tsx";
+import GeoIntelligence from "./pages/GeoIntelligence.tsx";
 
 type Page =
   | { name: "dashboard" }
   | { name: "new-case" }
   | { name: "case-report"; caseId: string }
   | { name: "graph" }
-  | { name: "executive" };
+  | { name: "executive" }
+  | { name: "geo" };
 
 export default function App() {
   const [page, setPage] = useState<Page>({ name: "dashboard" });
@@ -27,6 +29,7 @@ export default function App() {
     { name: "new-case", label: "New Case", icon: Plus },
     { name: "graph", label: "Relationship Graph", icon: Network },
     { name: "executive", label: "Executive View", icon: BarChart3 },
+    { name: "geo", label: "Geo Intelligence", icon: MapPin },
   ] as const;
 
   const isActive = (name: string) => page.name === name;
@@ -131,6 +134,7 @@ export default function App() {
         )}
         {page.name === "graph" && <GraphView />}
         {page.name === "executive" && <ExecutiveView />}
+        {page.name === "geo" && <GeoIntelligence />}
       </main>
     </div>
   );

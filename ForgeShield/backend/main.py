@@ -70,11 +70,12 @@ app.mount("/output", StaticFiles(directory=str(settings.OUTPUT_DIR)), name="outp
 
 
 # ── Routers ───────────────────────────────────────────────────────────
-from routers import cases, forensics, reports  # noqa: E402
+from routers import cases, forensics, reports, intelligence  # noqa: E402
 
 app.include_router(cases.router, prefix="/api/cases", tags=["Cases"])
 app.include_router(forensics.router, prefix="/api/forensics", tags=["Forensics"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
+app.include_router(intelligence.router, prefix="/api/intelligence", tags=["Intelligence"])
 
 
 # ── Health check ──────────────────────────────────────────────────────

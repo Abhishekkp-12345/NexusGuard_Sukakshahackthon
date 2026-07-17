@@ -77,6 +77,14 @@ ACCOUNT_PATTERN = re.compile(r"\b\d{9,18}\b")
 
 IFSC_PATTERN = re.compile(r"\b[A-Z]{4}0[A-Z0-9]{6}\b")
 
+# GSTIN format: 2-digit state code + PAN(5A+4N+1A) + 1 entity type + Z + checksum
+GSTIN_PATTERN = re.compile(
+    r"\b(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1})\b"
+)
+
+# GST / GSTIN related keywords
+GSTIN_KEYWORDS = ["gstin", "gst no", "gst number", "gstin no", "gst registration", "gst id"]
+
 INCOME_KEYWORDS = [
     "gross salary", "net salary", "basic pay", "total earnings",
     "net pay", "take home", "monthly income", "gross pay",
@@ -245,6 +253,12 @@ def extract_key_fields(text: str, doc_type: str = "unknown") -> dict[str, Any]:
 
     # Try to extract employer name
     employer = _extract_employer(text)
+
+    # Extract GSTIN if present
+    gstin = None
+    gstin_match = GSTIN_PATTERN.search(text.upper())
+    if gstin_match:
+        gstin = gstin_match.group(1)
 
     # Filter/clean fields based on document type to reduce false positives
     aadhaar_no = None
@@ -453,6 +467,8 @@ Return ONLY a JSON object with keys: "name", "account_number", "ifsc_code". Do n
         res["dob"] = dob
     if doc_date:
         res["doc_date"] = doc_date
+    if gstin:
+        res["gstin"] = gstin
         
     return res
 
