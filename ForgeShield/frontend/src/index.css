@@ -2,16 +2,19 @@
 
 /* ══════════════════════════════════════════════════════════════════
    FORGESHIELD AI — DESIGN SYSTEM
-   Premium dark theme with glassmorphism and cyberpunk accents
+   Dual theme (dark/light) with glassmorphism and cyberpunk accents
    ══════════════════════════════════════════════════════════════════ */
 
-:root {
+/* ── DARK THEME (default) ───────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
   /* Color palette */
   --bg-base: #020817;
   --bg-surface: #0f172a;
   --bg-card: #1e293b;
   --bg-card-hover: #263347;
   --bg-glass: rgba(30, 41, 59, 0.7);
+  --bg-glass-header: rgba(2, 8, 23, 0.85);
 
   --border-subtle: rgba(99, 102, 241, 0.15);
   --border-default: rgba(99, 102, 241, 0.3);
@@ -59,6 +62,54 @@
   --shadow-approve: 0 0 20px rgba(16, 185, 129, 0.25);
   --shadow-hold: 0 0 20px rgba(245, 158, 11, 0.25);
   --shadow-reject: 0 0 20px rgba(239, 68, 68, 0.25);
+}
+
+/* ── LIGHT THEME ────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  /* Color palette */
+  --bg-base: #f8fafc;
+  --bg-surface: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-glass-header: rgba(248, 250, 252, 0.92);
+
+  --border-subtle: rgba(99, 102, 241, 0.12);
+  --border-default: rgba(99, 102, 241, 0.25);
+  --border-strong: rgba(99, 102, 241, 0.5);
+
+  /* Brand colors */
+  --indigo: #6366f1;
+  --indigo-light: #4f46e5;
+  --indigo-dark: #3730a3;
+  --cyan: #0891b2;
+  --cyan-dark: #0e7490;
+
+  /* Status colors */
+  --approve: #059669;
+  --approve-bg: rgba(5, 150, 105, 0.08);
+  --hold: #d97706;
+  --hold-bg: rgba(217, 119, 6, 0.08);
+  --reject: #dc2626;
+  --reject-bg: rgba(220, 38, 38, 0.08);
+
+  /* Severity */
+  --severity-high: #dc2626;
+  --severity-medium: #d97706;
+  --severity-low: #2563eb;
+  --severity-info: #6b7280;
+
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+  --shadow-approve: 0 0 20px rgba(5, 150, 105, 0.15);
+  --shadow-hold: 0 0 20px rgba(217, 119, 6, 0.15);
+  --shadow-reject: 0 0 20px rgba(220, 38, 38, 0.15);
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────── */
