@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Plus, BarChart3,
-  Shield, Network, MapPin, Sun, Moon, LogOut, User
+  Shield, Network, MapPin, Sun, Moon, LogOut, User,
+  ShieldAlert, AlertTriangle, Clock, RefreshCw, Lock
 } from "lucide-react";
 import "./index.css";
 
-import { initAuthStore, getSession, logout, type Session } from "./auth/AuthService";
+import {
+  initAuthStore, getSession, logout, extendSession,
+  logActivity, type Session
+} from "./auth/AuthService";
 
 import LoginPage from "./pages/LoginPage.tsx";
 import LandingPage from "./pages/LandingPage.tsx";
@@ -15,6 +19,7 @@ import CaseReport from "./pages/CaseReport.tsx";
 import GraphView from "./pages/GraphView.tsx";
 import ExecutiveView from "./pages/ExecutiveView.tsx";
 import GeoIntelligence from "./pages/GeoIntelligence.tsx";
+import AuditLogsView from "./pages/AuditLogsView.tsx";
 
 type AppPage =
   | { name: "landing" }
@@ -24,7 +29,8 @@ type AppPage =
   | { name: "case-report"; caseId: string }
   | { name: "graph" }
   | { name: "executive" }
-  | { name: "geo" };
+  | { name: "geo" }
+  | { name: "admin-logs" };
 
 export default function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -32,7 +38,11 @@ export default function App() {
   const [page, setPage] = useState<AppPage>({ name: "landing" });
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
-  /* ── Initialise auth store on first mount ──────────────────── */
+  /* Session state */
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(900); // 15 min default
+  const [showSessionWarning, setShowSessionWarning] = useState(false);
+
+  /* ── Initialise auth store on mount ────────────────────────── */
   useEffect(() => {
     initAuthStore().then(() => {
       const existing = getSession();
@@ -41,36 +51,126 @@ export default function App() {
     });
   }, []);
 
-  /* ── Apply theme to root element ───────────────────────────── */
+  /* ── Apply theme to root ───────────────────────────────────── */
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
+  /* ── Session monitoring countdown loop ─────────────────────── */
+  useEffect(() => {
+    if (!session) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diffMs = session.expiresAt - now;
+      const secs = Math.ceil(diffMs / 1000);
+
+      if (secs <= 0) {
+        clearInterval(interval);
+        handleAutoLogout();
+      } else {
+        setSecondsRemaining(secs);
+        // Show warning if 5 minutes or less (300 seconds)
+        if (secs <= 300) {
+          setShowSessionWarning(true);
+        } else {
+          setShowSessionWarning(false);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [session, page]);
+
+  /* ── User Inactivity Extension (throttle to 10s) ───────────── */
+  useEffect(() => {
+    if (!session) return;
+
+    let lastInteraction = Date.now();
+
+    const handleInteraction = () => {
+      const now = Date.now();
+      if (now - lastInteraction > 10000) { // 10s throttle
+        lastInteraction = now;
+        extendSession();
+        // Update local session reference to trigger state updates for countdown
+        const updated = getSession();
+        if (updated) setSession(updated);
+      }
+    };
+
+    window.addEventListener("mousemove", handleInteraction);
+    window.addEventListener("keydown", handleInteraction);
+    window.addEventListener("click", handleInteraction);
+
+    return () => {
+      window.removeEventListener("mousemove", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+      window.removeEventListener("click", handleInteraction);
+    };
+  }, [session]);
+
   const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
-  const navigate = (p: AppPage) => setPage(p);
+
+  const navigate = (p: AppPage) => {
+    if (session) {
+      // Log activities when switching views
+      if (p.name === "dashboard") logActivity("NAVIGATE_DASHBOARD", "Navigated to underwriting dashboard.");
+      else if (p.name === "new-case") logActivity("NAVIGATE_NEW_CASE", "Navigated to new loan case intake form.");
+      else if (p.name === "graph") logActivity("NAVIGATE_GRAPH", "Accessed NetworkX entity relationship graph.");
+      else if (p.name === "executive") logActivity("NAVIGATE_EXECUTIVE", "Accessed executive analytics panel.");
+      else if (p.name === "geo") logActivity("NAVIGATE_GEO", "Accessed regional geo-intelligence heatmap.");
+      else if (p.name === "admin-logs") logActivity("VIEW_AUDIT_LOGS", "Accessed system security audit logs.");
+      else if (p.name === "case-report") logActivity("VIEW_CASE_REPORT", `Accessed forensic report for Case ID: ${p.caseId}`);
+    }
+    setPage(p);
+  };
+
   const isActive = (name: string) => page.name === name;
 
   const handleAuthenticated = (s: Session) => {
     setSession(s);
-    setPage({ name: "dashboard" });  // after login → go straight to dashboard
+    setPage({ name: "dashboard" });
+    logActivity("LOGIN_SUCCESS", `Authorized employee ${s.name} logged in successfully via 2FA.`, s);
   };
 
   const handleLogout = () => {
     logout();
     setSession(null);
-    setPage({ name: "landing" });  // after logout → back to landing
+    setPage({ name: "landing" });
   };
 
-  // Called when user clicks "Enter Dashboard" on the landing page
-  const handleLandingEnter = () => {
-    if (session) {
-      setPage({ name: "dashboard" }); // already logged in → skip login
-    } else {
-      setPage({ name: "login" });     // not logged in → show login
+  const handleAutoLogout = () => {
+    logout();
+    setSession(null);
+    setShowSessionWarning(false);
+    setPage({ name: "landing" });
+    alert("Your security session has expired due to 15 minutes of inactivity. Please sign in again.");
+  };
+
+  const handleExtendSession = () => {
+    extendSession();
+    const updated = getSession();
+    if (updated) {
+      setSession(updated);
+      setShowSessionWarning(false);
+      logActivity("SESSION_EXTENSION", "Inactivity session timer extended by employee.");
     }
   };
 
-  /* ── Loading state while initialising ─────────────────────── */
+  const handleLandingEnter = () => {
+    if (session) navigate({ name: "dashboard" });
+    else setPage({ name: "login" });
+  };
+
+  /* Format seconds left to MM:SS */
+  const formatTimeRemaining = (totalSecs: number) => {
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  /* ── Loading state ─────────────────────────────────────────── */
   if (!authReady) {
     return (
       <div style={{
@@ -94,20 +194,14 @@ export default function App() {
             <Shield size={28} color="white" />
           </div>
           <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-secondary)" }}>
-            Initialising ForgeShield…
+            Initialising ForgeShield Security Gate…
           </div>
         </div>
-        <style>{`
-          @keyframes pulse-init {
-            0%, 100% { box-shadow: 0 8px 32px rgba(99,102,241,0.4); }
-            50% { box-shadow: 0 8px 60px rgba(99,102,241,0.7); }
-          }
-        `}</style>
       </div>
     );
   }
 
-  /* ── Step 1: Landing page — always shown first, publicly ──── */
+  /* ── Landing Page (Public) ─────────────────────────────────── */
   if (page.name === "landing") {
     return (
       <LandingPage
@@ -118,7 +212,7 @@ export default function App() {
     );
   }
 
-  /* ── Step 2: Login page — shown after clicking Enter ────────── */
+  /* ── Login Gate ────────────────────────────────────────────── */
   if (page.name === "login" || !session) {
     return (
       <LoginPage
@@ -129,17 +223,41 @@ export default function App() {
     );
   }
 
-  /* ── Authenticated: Dashboard layout ───────────────────────── */
-  const navItems = [
-    { name: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { name: "new-case", label: "New Case", icon: Plus },
-    { name: "graph", label: "Relationship Graph", icon: Network },
-    { name: "executive", label: "Executive View", icon: BarChart3 },
-    { name: "geo", label: "Geo Intelligence", icon: MapPin },
-  ] as const;
+  /* ── Dynamic Nav items based on RBAC ───────────────────────── */
+  const isAuditor = session.role === "auditor";
+  const isAdmin = session.role === "admin";
 
   return (
     <div className="layout">
+      {/* ── SESSION EXPIRY BANNER ───────────────────────────────── */}
+      {showSessionWarning && (
+        <div style={{
+          position: "fixed", top: 12, left: "50%", transform: "translateX(-50%)",
+          zIndex: 9999, width: "90%", maxWidth: 520, padding: "12px 18px",
+          borderRadius: 12, background: "rgba(245, 158, 11, 0.95)", color: "white",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.3)", backdropFilter: "blur(8px)",
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+          animation: "slide-down 0.4s ease both"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <AlertTriangle size={18} />
+            <span style={{ fontSize: 13, fontWeight: 600 }}>
+              Session expiring in {formatTimeRemaining(secondsRemaining)} due to inactivity.
+            </span>
+          </div>
+          <button
+            onClick={handleExtendSession}
+            style={{
+              marginLeft: "auto", padding: "6px 14px", borderRadius: 8, border: "none",
+              background: "white", color: "#d97706", fontSize: 12, fontWeight: 700,
+              cursor: "pointer", display: "flex", alignItems: "center", gap: 4
+            }}
+          >
+            <RefreshCw size={12} /> Keep Connected
+          </button>
+        </div>
+      )}
+
       {/* ── Sidebar ──────────────────────────────────────────────── */}
       <aside className="sidebar">
         {/* Logo */}
@@ -173,7 +291,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Logged-in user */}
+        {/* User Identity Panel */}
         <div style={{
           padding: "12px 16px",
           margin: "12px 12px 0",
@@ -194,14 +312,17 @@ export default function App() {
               <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {session.name}
               </div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
-                {session.role.charAt(0).toUpperCase() + session.role.slice(1)} · {session.employeeId}
+              <div style={{ fontSize: 10, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{
+                  padding: "1px 4px", borderRadius: 4, background: "rgba(99,102,241,0.15)", color: "var(--indigo-light)", fontWeight: 700, fontSize: 9
+                }}>{session.role.toUpperCase()}</span>
+                <span>{session.employeeId}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Nav */}
+        {/* Nav list */}
         <nav style={{ padding: "16px 12px", flex: 1 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", padding: "0 8px 8px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
             Navigation
@@ -210,53 +331,150 @@ export default function App() {
           <button
             onClick={() => navigate({ name: "landing" })}
             style={{
-              width: "100%",
-              display: "flex", alignItems: "center", gap: "12px",
-              padding: "9px 12px",
-              borderRadius: "8px", border: "none",
+              width: "100%", display: "flex", alignItems: "center", gap: "12px",
+              padding: "9px 12px", borderRadius: "8px", border: "none",
               cursor: "pointer", fontSize: "13px", fontWeight: 400,
-              marginBottom: "2px", transition: "all 0.15s",
-              background: "transparent", color: "var(--text-muted)",
+              marginBottom: "4px", background: "transparent", color: "var(--text-muted)",
               borderLeft: "2px solid transparent",
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = "rgba(99,102,241,0.08)";
-              e.currentTarget.style.color = "var(--indigo-light)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "var(--text-muted)";
             }}
           >
             ← Home
           </button>
 
-          {navItems.map(({ name, label, icon: Icon }) => (
+          {/* Standard menu items */}
+          <button
+            onClick={() => navigate({ name: "dashboard" })}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", gap: "12px",
+              padding: "10px 12px", borderRadius: "8px", border: "none",
+              cursor: "pointer", fontSize: "14px",
+              fontWeight: isActive("dashboard") ? 600 : 400,
+              marginBottom: "4px",
+              background: isActive("dashboard") ? "rgba(99,102,241,0.12)" : "transparent",
+              color: isActive("dashboard") ? "var(--indigo-light)" : "var(--text-secondary)",
+              borderLeft: isActive("dashboard") ? "2px solid var(--indigo)" : "2px solid transparent",
+            }}
+          >
+            <LayoutDashboard size={18} />
+            Dashboard
+          </button>
+
+          {/* New Case (Enforce RBAC Auditor Block) */}
+          <button
+            onClick={() => navigate({ name: "new-case" })}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", gap: "12px",
+              padding: "10px 12px", borderRadius: "8px", border: "none",
+              cursor: isAuditor ? "not-allowed" : "pointer", fontSize: "14px",
+              fontWeight: isActive("new-case") ? 600 : 400,
+              marginBottom: "4px",
+              background: isActive("new-case") ? "rgba(99,102,241,0.12)" : "transparent",
+              color: isAuditor ? "var(--text-muted)" : isActive("new-case") ? "var(--indigo-light)" : "var(--text-secondary)",
+              borderLeft: isActive("new-case") ? "2px solid var(--indigo)" : "2px solid transparent",
+              opacity: isAuditor ? 0.6 : 1,
+            }}
+            title={isAuditor ? "New case uploads are blocked for Read-Only Auditors" : "Open case entry form"}
+          >
+            {isAuditor ? <Lock size={18} /> : <Plus size={18} />}
+            <span>New Case</span>
+            {isAuditor && (
+              <span style={{
+                marginLeft: "auto", fontSize: 9, fontWeight: 700, padding: "1px 6px",
+                borderRadius: 4, background: "#ef444415", color: "#ef4444"
+              }}>RO</span>
+            )}
+          </button>
+
+          <button
+            onClick={() => navigate({ name: "graph" })}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", gap: "12px",
+              padding: "10px 12px", borderRadius: "8px", border: "none",
+              cursor: "pointer", fontSize: "14px",
+              fontWeight: isActive("graph") ? 600 : 400,
+              marginBottom: "4px",
+              background: isActive("graph") ? "rgba(99,102,241,0.12)" : "transparent",
+              color: isActive("graph") ? "var(--indigo-light)" : "var(--text-secondary)",
+              borderLeft: isActive("graph") ? "2px solid var(--indigo)" : "2px solid transparent",
+            }}
+          >
+            <Network size={18} />
+            Relationship Graph
+          </button>
+
+          <button
+            onClick={() => navigate({ name: "executive" })}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", gap: "12px",
+              padding: "10px 12px", borderRadius: "8px", border: "none",
+              cursor: "pointer", fontSize: "14px",
+              fontWeight: isActive("executive") ? 600 : 400,
+              marginBottom: "4px",
+              background: isActive("executive") ? "rgba(99,102,241,0.12)" : "transparent",
+              color: isActive("executive") ? "var(--indigo-light)" : "var(--text-secondary)",
+              borderLeft: isActive("executive") ? "2px solid var(--indigo)" : "2px solid transparent",
+            }}
+          >
+            <BarChart3 size={18} />
+            Executive View
+          </button>
+
+          <button
+            onClick={() => navigate({ name: "geo" })}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", gap: "12px",
+              padding: "10px 12px", borderRadius: "8px", border: "none",
+              cursor: "pointer", fontSize: "14px",
+              fontWeight: isActive("geo") ? 600 : 400,
+              marginBottom: "4px",
+              background: isActive("geo") ? "rgba(99,102,241,0.12)" : "transparent",
+              color: isActive("geo") ? "var(--indigo-light)" : "var(--text-secondary)",
+              borderLeft: isActive("geo") ? "2px solid var(--indigo)" : "2px solid transparent",
+            }}
+          >
+            <MapPin size={18} />
+            Geo Intelligence
+          </button>
+
+          {/* Admin logs route */}
+          {isAdmin && (
             <button
-              key={name}
-              onClick={() => navigate({ name } as AppPage)}
+              onClick={() => navigate({ name: "admin-logs" })}
               style={{
-                width: "100%",
-                display: "flex", alignItems: "center", gap: "12px",
-                padding: "10px 12px",
-                borderRadius: "8px", border: "none",
+                width: "100%", display: "flex", alignItems: "center", gap: "12px",
+                padding: "10px 12px", borderRadius: "8px", border: "none",
                 cursor: "pointer", fontSize: "14px",
-                fontWeight: isActive(name) ? 600 : 400,
-                marginBottom: "4px", transition: "all 0.15s",
-                background: isActive(name) ? "rgba(99,102,241,0.15)" : "transparent",
-                color: isActive(name) ? "var(--indigo-light)" : "var(--text-secondary)",
-                borderLeft: isActive(name) ? "2px solid var(--indigo)" : "2px solid transparent",
+                fontWeight: isActive("admin-logs") ? 600 : 400,
+                marginBottom: "4px",
+                background: isActive("admin-logs") ? "rgba(239,68,68,0.08)" : "transparent",
+                color: isActive("admin-logs") ? "#fca5a5" : "var(--text-secondary)",
+                borderLeft: isActive("admin-logs") ? "2px solid #ef4444" : "2px solid transparent",
               }}
             >
-              <Icon size={18} />
-              {label}
+              <ShieldAlert size={18} color="#ef4444" />
+              <span style={{ color: isActive("admin-logs") ? "#ef4444" : "var(--text-secondary)" }}>Audit Logs</span>
             </button>
-          ))}
+          )}
         </nav>
 
-        {/* Footer */}
+        {/* Footer Panel */}
         <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border-subtle)" }}>
-          {/* Theme toggle */}
+          {/* Expiry Countdown Widget */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 6,
+            background: secondsRemaining <= 300 ? "#ef444410" : "rgba(99,102,241,0.06)",
+            border: `1px solid ${secondsRemaining <= 300 ? "#ef444430" : "var(--border-subtle)"}`,
+            padding: "8px 10px", borderRadius: 8, marginBottom: 12
+          }}>
+            <Clock size={12} color={secondsRemaining <= 300 ? "#ef4444" : "var(--indigo-light)"} />
+            <span style={{
+              fontSize: 11, fontWeight: 700,
+              color: secondsRemaining <= 300 ? "#ef4444" : "var(--text-secondary)"
+            }}>
+              Session Expiry: {formatTimeRemaining(secondsRemaining)}
+            </span>
+          </div>
+
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
             <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
               {theme === "dark" ? "Dark Mode" : "Light Mode"}
@@ -287,18 +505,13 @@ export default function App() {
             </button>
           </div>
 
-          {/* Logout */}
           <button
             onClick={handleLogout}
             style={{
-              width: "100%",
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "9px 10px",
-              borderRadius: 8, border: "1px solid var(--border-subtle)",
-              background: "transparent",
-              color: "var(--text-muted)",
-              fontSize: 12, fontWeight: 500,
-              cursor: "pointer", transition: "all 0.2s",
+              width: "100%", display: "flex", alignItems: "center", gap: 8,
+              padding: "9px 10px", borderRadius: 8, border: "1px solid var(--border-subtle)",
+              background: "transparent", color: "var(--text-muted)",
+              fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.2s",
               marginBottom: 10,
             }}
             onMouseEnter={e => {
@@ -328,18 +541,59 @@ export default function App() {
 
       {/* ── Main content ─────────────────────────────────────────── */}
       <main className="main-content">
-        {page.name === "dashboard" && (
-          <Dashboard onOpenCase={(id) => navigate({ name: "case-report", caseId: id })} onNewCase={() => navigate({ name: "new-case" })} />
+        {/* Enforce RBAC block for Auditor in Case Creator page */}
+        {page.name === "new-case" && isAuditor ? (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            height: "100%", padding: "40px"
+          }}>
+            <div style={{
+              background: "var(--bg-card)", border: "1px solid #ef444440",
+              padding: "40px", borderRadius: 16, maxWidth: 480, textAlign: "center",
+              boxShadow: "0 10px 30px rgba(239, 68, 68, 0.05)"
+            }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: "50%", background: "#ef444415",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 20px"
+              }}>
+                <Lock size={32} color="#ef4444" />
+              </div>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>
+                Access Restricted
+              </h2>
+              <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 24 }}>
+                Your account is registered as a **Read-Only Auditor**. You do not have sufficient permissions to create new loan cases or submit document packages.
+              </p>
+              <button
+                onClick={() => navigate({ name: "dashboard" })}
+                style={{
+                  padding: "10px 24px", borderRadius: 10, border: "none",
+                  background: "linear-gradient(135deg, #6366f1, #22d3ee)", color: "white",
+                  fontSize: 14, fontWeight: 700, cursor: "pointer"
+                }}
+              >
+                Return to Dashboard
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {page.name === "dashboard" && (
+              <Dashboard onOpenCase={(id) => navigate({ name: "case-report", caseId: id })} onNewCase={() => navigate({ name: "new-case" })} />
+            )}
+            {page.name === "new-case" && (
+              <NewCase onCaseCreated={(id) => navigate({ name: "case-report", caseId: id })} />
+            )}
+            {page.name === "case-report" && (
+              <CaseReport caseId={page.caseId} onBack={() => navigate({ name: "dashboard" })} />
+            )}
+            {page.name === "graph" && <GraphView />}
+            {page.name === "executive" && <ExecutiveView />}
+            {page.name === "geo" && <GeoIntelligence />}
+            {page.name === "admin-logs" && <AuditLogsView />}
+          </>
         )}
-        {page.name === "new-case" && (
-          <NewCase onCaseCreated={(id) => navigate({ name: "case-report", caseId: id })} />
-        )}
-        {page.name === "case-report" && (
-          <CaseReport caseId={page.caseId} onBack={() => navigate({ name: "dashboard" })} />
-        )}
-        {page.name === "graph" && <GraphView />}
-        {page.name === "executive" && <ExecutiveView />}
-        {page.name === "geo" && <GeoIntelligence />}
       </main>
     </div>
   );

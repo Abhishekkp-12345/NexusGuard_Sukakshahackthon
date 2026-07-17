@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  Shield, FileSearch, GitBranch, Brain, BarChart3,
+  Shield, FileSearch, Brain,
   ChevronRight, ArrowRight, CheckCircle, AlertTriangle,
   Cpu, Lock, Network, Zap, Eye, Globe, Sun, Moon,
   Activity, TrendingUp, Database, Layers
