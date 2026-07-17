@@ -18,6 +18,7 @@ import GeoIntelligence from "./pages/GeoIntelligence.tsx";
 
 type AppPage =
   | { name: "landing" }
+  | { name: "login" }
   | { name: "dashboard" }
   | { name: "new-case" }
   | { name: "case-report"; caseId: string }
@@ -51,13 +52,22 @@ export default function App() {
 
   const handleAuthenticated = (s: Session) => {
     setSession(s);
-    setPage({ name: "landing" });
+    setPage({ name: "dashboard" });  // after login → go straight to dashboard
   };
 
   const handleLogout = () => {
     logout();
     setSession(null);
-    setPage({ name: "landing" });
+    setPage({ name: "landing" });  // after logout → back to landing
+  };
+
+  // Called when user clicks "Enter Dashboard" on the landing page
+  const handleLandingEnter = () => {
+    if (session) {
+      setPage({ name: "dashboard" }); // already logged in → skip login
+    } else {
+      setPage({ name: "login" });     // not logged in → show login
+    }
   };
 
   /* ── Loading state while initialising ─────────────────────── */
@@ -97,22 +107,22 @@ export default function App() {
     );
   }
 
-  /* ── Not authenticated → show login ───────────────────────── */
-  if (!session) {
+  /* ── Step 1: Landing page — always shown first, publicly ──── */
+  if (page.name === "landing") {
     return (
-      <LoginPage
-        onAuthenticated={handleAuthenticated}
+      <LandingPage
+        onEnter={handleLandingEnter}
         theme={theme}
         onToggleTheme={toggleTheme}
       />
     );
   }
 
-  /* ── Authenticated: Landing page ───────────────────────────── */
-  if (page.name === "landing") {
+  /* ── Step 2: Login page — shown after clicking Enter ────────── */
+  if (page.name === "login" || !session) {
     return (
-      <LandingPage
-        onEnter={() => navigate({ name: "dashboard" })}
+      <LoginPage
+        onAuthenticated={handleAuthenticated}
         theme={theme}
         onToggleTheme={toggleTheme}
       />
