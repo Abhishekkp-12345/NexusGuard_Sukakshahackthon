@@ -23,22 +23,29 @@ const DOC_TYPES = [
   { value: "financial_statement", label: "Financial Statement / ITR" },
   { value: "land_record", label: "Land Record / Property Deed" },
   { value: "legal_document", label: "Legal & Litigation Documents" },
-  { value: "salary_slip", label: "Promoter Salary Slips" },
-  { value: "partnership_deed", label: "Partnership Deed / MoA" },
-  { value: "utility_bill", label: "Utility Bill (Address Proof)" },
-  { value: "board_resolution", label: "Board Resolution Document" },
+  { value: "salary_slip", label: "Salary Slips / Income Proof" },
+  { value: "kcc", label: "Kisan Credit Card (KCC)" },
+  { value: "soil_health", label: "Soil Health Card" },
+  { value: "crop_insurance", label: "Crop Insurance / Inspection Report" },
+  { value: "labor_certificate", label: "Labor Certificate / Worker ID" },
   { value: "unknown", label: "Other / Auto-detect Type" },
 ];
 
-const LOAN_TYPES = ["Business Expansion Loan", "Working Capital Loan", "Home Loan", "Personal Loan", "Education Loan", "Mortgage Loan"];
+const LOAN_TYPES = [
+  "Agricultural KCC Loan", "Crop Loan", "Farming Machinery Loan",
+  "Salaried Personal Loan", "Small Worker Loan", "Vehicle Loan",
+  "Business Expansion Loan", "Working Capital Loan", "Home Loan"
+];
+
 const BRANCHES = ["Bengaluru Main", "Mumbai Fort", "Delhi Connaught Place", "Chennai Anna Salai", "Hyderabad HITEC City"];
-const INDUSTRIES = ["Manufacturing", "Real Estate", "Trading & Retail", "IT & Technology Services", "Agriculture & Food Processing", "Healthcare & Pharma", "Construction & Infrastructure", "Hospitality & Tourism"];
+const INDUSTRIES = ["Manufacturing", "Real Estate", "Trading & Retail", "IT & Technology Services", "Agriculture & Farming", "Healthcare & Pharma", "Construction & Infrastructure"];
 
 interface Props {
   onCaseCreated: (caseId: string) => void;
 }
 
 type Step = "info" | "upload" | "analyzing";
+type ApplicantType = "corporate" | "salaried" | "farmer";
 
 export default function NewCase({ onCaseCreated }: Props) {
   const [step, setStep] = useState<Step>("info");
@@ -47,21 +54,36 @@ export default function NewCase({ onCaseCreated }: Props) {
   const [dragOver, setDragOver] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
+  const [applicantType, setApplicantType] = useState<ApplicantType>("corporate");
 
-  // Step 1 Form state
+  // Form states
   const [form, setForm] = useState({
+    // Corporate Specific
     company_name: "",
     cin: "",
     gst_number: "",
-    applicant_name: "", // Promoter Name
-    applicant_pan: "",  // PAN Number
-    aadhaar_promoter: "",
-    industry_type: "Manufacturing",
-    years_in_business: "",
-    registered_address: "",
     annual_turnover: "",
+    // Worker / Salaried Specific
+    employer_name: "",
+    job_title: "",
+    years_at_job: "",
+    monthly_salary: "",
+    // Farmer / Landowner Specific
+    land_area_acres: "",
+    survey_numbers: "",
+    land_location: "",
+    land_rtc_pahani: "",
+    soil_health_id: "",
+    kcc_number: "",
+    crop_type: "Rice",
+    // Common Fields
+    applicant_name: "", // Promoter, Worker, or Farmer Name
+    applicant_pan: "",
+    aadhaar_promoter: "",
+    industry_type: "Agriculture & Farming",
+    registered_address: "",
     loan_amount: "",
-    loan_type: "Business Expansion Loan",
+    loan_type: "Agricultural KCC Loan",
     loan_purpose: "",
     branch: "Bengaluru Main"
   });
@@ -89,24 +111,42 @@ export default function NewCase({ onCaseCreated }: Props) {
   };
 
   const handleCreateCase = async () => {
-    if (!form.company_name || !form.applicant_name || !form.loan_amount) {
-      setError("Company Name, Promoter Name, and Loan Amount are required.");
-      return;
+    // Dynamic Validation
+    let name = "";
+    if (applicantType === "corporate") {
+      name = form.company_name;
+      if (!form.company_name || !form.applicant_name || !form.loan_amount) {
+        setError("Company Name, Promoter Name, and Loan Amount are required.");
+        return;
+      }
+    } else if (applicantType === "salaried") {
+      name = form.applicant_name;
+      if (!form.applicant_name || !form.employer_name || !form.loan_amount) {
+        setError("Worker Name, Employer Name, and Loan Amount are required.");
+        return;
+      }
+    } else if (applicantType === "farmer") {
+      name = form.applicant_name;
+      if (!form.applicant_name || !form.land_area_acres || !form.loan_amount) {
+        setError("Farmer Name, Land Area, and Loan Amount are required.");
+        return;
+      }
     }
     setError("");
+
     try {
-      // Backend case creation
       const c = await casesApi.create({
-        applicant_name: form.company_name, // Map company name as applicant name to fit backend schema
+        applicant_name: name,
         applicant_pan: form.applicant_pan,
         loan_type: form.loan_type,
         loan_amount: parseFloat(form.loan_amount),
         branch: form.branch,
       });
 
-      // Save complete details locally (to be passed or matched in memory/reports)
       const fullDetails = {
         ...form,
+        applicant_name: name,
+        applicant_type: applicantType,
         directors: directors.filter(Boolean),
         case_id: c.case_id,
         created_at: new Date().toISOString()
@@ -115,7 +155,7 @@ export default function NewCase({ onCaseCreated }: Props) {
 
       setCaseId(c.case_id);
       setStep("upload");
-      logActivity("CREATE_CASE", `Created new underwriting case for ${form.company_name} (Case ID: ${c.case_id}, Amount: ₹${parseFloat(form.loan_amount).toLocaleString()})`);
+      logActivity("CREATE_CASE", `Created new underwriting case for ${name} [${applicantType.toUpperCase()}] (Case ID: ${c.case_id}, Amount: ₹${parseFloat(form.loan_amount).toLocaleString()})`);
     } catch (e: any) {
       setError(e?.response?.data?.detail || "Failed to create case. Ensure the server is online.");
     }
@@ -126,7 +166,7 @@ export default function NewCase({ onCaseCreated }: Props) {
     setDragOver(false);
     const dropped = Array.from(e.dataTransfer.files);
     addFiles(dropped);
-  }, []);
+  }, [applicantType]);
 
   const addFiles = (newFiles: File[]) => {
     const validFiles: UploadedFile[] = [];
@@ -134,7 +174,6 @@ export default function NewCase({ onCaseCreated }: Props) {
 
     newFiles.forEach(f => {
       if (/\.(pdf|jpg|jpeg|png|tiff|bmp)$/i.test(f.name)) {
-        // Auto-detect docType from file name patterns
         let docType = "unknown";
         const name = f.name.toLowerCase();
         if (name.includes("pan")) docType = "pan";
@@ -142,14 +181,19 @@ export default function NewCase({ onCaseCreated }: Props) {
         else if (name.includes("gst")) docType = "gst";
         else if (name.includes("statement") || name.includes("bank")) docType = "bank_statement";
         else if (name.includes("financial") || name.includes("itr") || name.includes("tax")) docType = "financial_statement";
-        else if (name.includes("land") || name.includes("property")) docType = "land_record";
+        else if (name.includes("land") || name.includes("property") || name.includes("pahani") || name.includes("rtc")) docType = "land_record";
         else if (name.includes("legal") || name.includes("deed") || name.includes("court")) docType = "legal_document";
+        else if (name.includes("salary") || name.includes("slip") || name.includes("payslip")) docType = "salary_slip";
+        else if (name.includes("kcc") || name.includes("kisan")) docType = "kcc";
+        else if (name.includes("soil") || name.includes("nutrient")) docType = "soil_health";
+        else if (name.includes("insurance") || name.includes("crop")) docType = "crop_insurance";
+        else if (name.includes("labor") || name.includes("worker") || name.includes("card")) docType = "labor_certificate";
 
         validFiles.push({
           file: f,
           docType,
           id: Math.random().toString(36).slice(2),
-          progress: 100, // Pre-load simulator
+          progress: 100,
           status: "idle"
         });
       } else {
@@ -158,7 +202,7 @@ export default function NewCase({ onCaseCreated }: Props) {
     });
 
     if (invalidNames.length > 0) {
-      setError(`Unsupported files ignored: ${invalidNames.join(", ")}. Upload PDF, Images (JPG, PNG) or TIFF.`);
+      setError(`Unsupported files ignored: ${invalidNames.join(", ")}.`);
     } else {
       setError("");
     }
@@ -185,7 +229,7 @@ export default function NewCase({ onCaseCreated }: Props) {
       "Analyzing document authenticity (metadata, headers, fonts)...",
       "Running Error Level Analysis (ELA) for image tampering...",
       "OCR Extraction and semantic parsing of critical fields...",
-      "GSTIN registry lookup and compliance filing checks...",
+      "Registry lookup (MCA/GSTIN/KCC / Land Registry)...",
       "Cross-document consistency validation (Identity & Address matching)...",
       "Network Graph mapping (identifying related party relationships)...",
       "Running 5 credit intelligence engines...",
@@ -225,7 +269,7 @@ export default function NewCase({ onCaseCreated }: Props) {
       <div style={{ marginBottom: 28 }}>
         <h1 className="page-title">New Loan Case Intake</h1>
         <p style={{ color: "var(--text-secondary)", marginTop: 6, fontSize: 13 }}>
-          Automated SME Credit Underwriting & Forensic Verification Portal
+          Automated SME Credit Underwriting & Dynamic Worker/Farmer Forensic Verification Portal
         </p>
       </div>
 
@@ -248,7 +292,7 @@ export default function NewCase({ onCaseCreated }: Props) {
                 fontSize: 13, fontWeight: step === s ? 600 : 400,
                 color: step === s ? "var(--text-primary)" : "var(--text-muted)",
               }}>
-                {s === "info" ? "Company Details" : s === "upload" ? "Document Intake" : "AI Verification"}
+                {s === "info" ? "Profile Details" : s === "upload" ? "Document Intake" : "AI Verification"}
               </span>
             </div>
             {i < 2 && <ChevronRight size={14} color="var(--text-muted)" />}
@@ -270,7 +314,7 @@ export default function NewCase({ onCaseCreated }: Props) {
       )}
 
       <AnimatePresence mode="wait">
-        {/* Step 1: Company Info */}
+        {/* Step 1: Profile Info */}
         {step === "info" && (
           <motion.div
             key="info"
@@ -280,155 +324,413 @@ export default function NewCase({ onCaseCreated }: Props) {
             exit={{ opacity: 0, x: 15 }}
             transition={{ duration: 0.2 }}
           >
-            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: "var(--indigo-light)" }}>Company & Promoter Profile</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              
-              <div className="form-group">
-                <label className="form-label">Company Legal Name *</label>
-                <input
-                  className="form-input"
-                  placeholder="e.g. Acme Tech Solutions Private Limited"
-                  value={form.company_name}
-                  onChange={e => handleFormChange("company_name", e.target.value)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Corporate Identification Number (CIN)</label>
-                <input
-                  className="form-input text-mono"
-                  placeholder="e.g. U72200KA2021PTC145678"
-                  value={form.cin}
-                  onChange={e => handleFormChange("cin", e.target.value.toUpperCase())}
-                  maxLength={21}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">GSTIN / Tax Number</label>
-                <input
-                  className="form-input text-mono"
-                  placeholder="e.g. 29ABCDE1234F1Z5"
-                  value={form.gst_number}
-                  onChange={e => handleFormChange("gst_number", e.target.value.toUpperCase())}
-                  maxLength={15}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Company PAN</label>
-                <input
-                  className="form-input text-mono"
-                  placeholder="e.g. ABCDE1234F"
-                  value={form.applicant_pan}
-                  onChange={e => handleFormChange("applicant_pan", e.target.value.toUpperCase())}
-                  maxLength={10}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Promoter Name (Primary Applicant) *</label>
-                <input
-                  className="form-input"
-                  placeholder="e.g. Rajesh Kumar"
-                  value={form.applicant_name}
-                  onChange={e => handleFormChange("applicant_name", e.target.value)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Aadhaar of Promoter</label>
-                <input
-                  className="form-input text-mono"
-                  placeholder="e.g. 1234 5678 9012"
-                  value={form.aadhaar_promoter}
-                  onChange={e => handleFormChange("aadhaar_promoter", e.target.value)}
-                  maxLength={14}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Industry Sector</label>
-                <select
-                  className="form-select"
-                  value={form.industry_type}
-                  onChange={e => handleFormChange("industry_type", e.target.value)}
+            {/* Applicant Type Selection Tabs */}
+            <div style={{ display: "flex", gap: 10, marginBottom: 24, borderBottom: "1px solid var(--border-subtle)", paddingBottom: 16 }}>
+              {[
+                { id: "corporate", label: "SME / Corporate Loan" },
+                { id: "salaried", label: "Individual / Salaried Worker" },
+                { id: "farmer", label: "Farmer / Agricultural Landowner" }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    setApplicantType(tab.id as ApplicantType);
+                    // Match default loan types based on selection
+                    if (tab.id === "farmer") {
+                      handleFormChange("loan_type", "Agricultural KCC Loan");
+                      handleFormChange("industry_type", "Agriculture & Farming");
+                    } else if (tab.id === "salaried") {
+                      handleFormChange("loan_type", "Salaried Personal Loan");
+                      handleFormChange("industry_type", "Healthcare & Pharma"); // worker industry
+                    } else {
+                      handleFormChange("loan_type", "Business Expansion Loan");
+                      handleFormChange("industry_type", "Manufacturing");
+                    }
+                  }}
+                  className={`btn ${applicantType === tab.id ? "btn-primary" : "btn-ghost"}`}
+                  style={{ flex: 1, fontSize: 12, padding: "8px 12px" }}
                 >
-                  {INDUSTRIES.map(ind => <option key={ind} value={ind}>{ind}</option>)}
-                </select>
-              </div>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-              <div className="form-group">
-                <label className="form-label">Years in Business</label>
-                <input
-                  className="form-input"
-                  type="number"
-                  placeholder="e.g. 5"
-                  value={form.years_in_business}
-                  onChange={e => handleFormChange("years_in_business", e.target.value)}
-                />
-              </div>
+            <h2 style={{ fontSize: 15, fontWeight: 700, marginBottom: 20, color: "var(--indigo-light)" }}>
+              {applicantType === "corporate" && "SME Company & Promoter Profile"}
+              {applicantType === "salaried" && "Salaried Individual & Worker Profile"}
+              {applicantType === "farmer" && "Farmer & Agricultural Landownership Profile"}
+            </h2>
 
-              <div className="form-group" style={{ gridColumn: "1 / -1" }}>
-                <label className="form-label">Registered Office Address</label>
-                <textarea
-                  className="form-input"
-                  rows={2}
-                  placeholder="Street, City, State, ZIP code..."
-                  value={form.registered_address}
-                  onChange={e => handleFormChange("registered_address", e.target.value)}
-                  style={{ resize: "vertical" }}
-                />
-              </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {/* Dynamic form inputs based on profile type */}
+              
+              {/* CORPORATE PROFILE */}
+              {applicantType === "corporate" && (
+                <>
+                  <div className="form-group">
+                    <label className="form-label">Company Legal Name *</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Acme Tech Solutions Private Limited"
+                      value={form.company_name}
+                      onChange={e => handleFormChange("company_name", e.target.value)}
+                    />
+                  </div>
 
-              {/* Directors Section */}
-              <div style={{ gridColumn: "1 / -1", marginTop: 8 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                  <label className="form-label" style={{ margin: 0 }}>List of Directors / Partners</label>
-                  <button className="btn btn-ghost btn-sm" onClick={handleAddDirector} style={{ padding: "4px 8px", fontSize: 11 }}>
-                    <Plus size={12} /> Add Director
-                  </button>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {directors.map((dir, index) => (
-                    <div key={index} style={{ display: "flex", gap: 10 }}>
-                      <input
-                        className="form-input"
-                        placeholder={`Director #${index + 1} Name`}
-                        value={dir}
-                        onChange={(e) => handleDirectorChange(index, e.target.value)}
-                      />
-                      {directors.length > 1 && (
-                        <button className="btn btn-ghost" onClick={() => handleRemoveDirector(index)} style={{ padding: "6px 10px" }}>
-                          <Trash2 size={14} color="var(--reject)" />
-                        </button>
-                      )}
+                  <div className="form-group">
+                    <label className="form-label">Corporate Identification Number (CIN)</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. U72200KA2021PTC145678"
+                      value={form.cin}
+                      onChange={e => handleFormChange("cin", e.target.value.toUpperCase())}
+                      maxLength={21}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">GSTIN / Tax Number</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. 29ABCDE1234F1Z5"
+                      value={form.gst_number}
+                      onChange={e => handleFormChange("gst_number", e.target.value.toUpperCase())}
+                      maxLength={15}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Company PAN</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. ABCDE1234F"
+                      value={form.applicant_pan}
+                      onChange={e => handleFormChange("applicant_pan", e.target.value.toUpperCase())}
+                      maxLength={10}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Promoter Name (Primary Applicant) *</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Rajesh Kumar"
+                      value={form.applicant_name}
+                      onChange={e => handleFormChange("applicant_name", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Aadhaar of Promoter</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. 1234 5678 9012"
+                      value={form.aadhaar_promoter}
+                      onChange={e => handleFormChange("aadhaar_promoter", e.target.value)}
+                      maxLength={14}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Industry Sector</label>
+                    <select
+                      className="form-select"
+                      value={form.industry_type}
+                      onChange={e => handleFormChange("industry_type", e.target.value)}
+                    >
+                      {INDUSTRIES.map(ind => <option key={ind} value={ind}>{ind}</option>)}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Years in Business</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      placeholder="e.g. 5"
+                      value={form.years_at_job}
+                      onChange={e => handleFormChange("years_at_job", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+                    <label className="form-label">Registered Office Address</label>
+                    <textarea
+                      className="form-input"
+                      rows={2}
+                      placeholder="Street, City, State, ZIP code..."
+                      value={form.registered_address}
+                      onChange={e => handleFormChange("registered_address", e.target.value)}
+                      style={{ resize: "vertical" }}
+                    />
+                  </div>
+
+                  {/* Directors list */}
+                  <div style={{ gridColumn: "1 / -1", marginTop: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <label className="form-label" style={{ margin: 0 }}>List of Directors / Partners</label>
+                      <button className="btn btn-ghost btn-sm" onClick={handleAddDirector} style={{ padding: "4px 8px", fontSize: 11 }}>
+                        <Plus size={12} /> Add Director
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {directors.map((dir, index) => (
+                        <div key={index} style={{ display: "flex", gap: 10 }}>
+                          <input
+                            className="form-input"
+                            placeholder={`Director #${index + 1} Name`}
+                            value={dir}
+                            onChange={(e) => handleDirectorChange(index, e.target.value)}
+                          />
+                          {directors.length > 1 && (
+                            <button className="btn btn-ghost" onClick={() => handleRemoveDirector(index)} style={{ padding: "6px 10px" }}>
+                              <Trash2 size={14} color="var(--reject)" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-              <div className="form-group" style={{ marginTop: 8 }}>
-                <label className="form-label">Annual Turnover (₹ Lakhs)</label>
-                <input
-                  className="form-input"
-                  type="number"
-                  placeholder="e.g. 250"
-                  value={form.annual_turnover}
-                  onChange={e => handleFormChange("annual_turnover", e.target.value)}
-                />
-              </div>
+                  <div className="form-group" style={{ marginTop: 8 }}>
+                    <label className="form-label">Annual Turnover (₹ Lakhs)</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      placeholder="e.g. 250"
+                      value={form.annual_turnover}
+                      onChange={e => handleFormChange("annual_turnover", e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
 
-              <div className="form-group" style={{ marginTop: 8 }}>
-                <label className="form-label">Loan Amount Requested (₹) *</label>
-                <input
-                  className="form-input"
-                  type="number"
-                  placeholder="e.g. 5000000"
-                  value={form.loan_amount}
-                  onChange={e => handleFormChange("loan_amount", e.target.value)}
-                />
-              </div>
+              {/* SALARIED / WORKER PROFILE */}
+              {applicantType === "salaried" && (
+                <>
+                  <div className="form-group">
+                    <label className="form-label">Worker / Employee Name *</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Ramesh Chandra"
+                      value={form.applicant_name}
+                      onChange={e => handleFormChange("applicant_name", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Employer Name / Firm Name *</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Reliance Retail Limited"
+                      value={form.employer_name}
+                      onChange={e => handleFormChange("employer_name", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Employee ID / Worker Card ID</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. EMP-94819"
+                      value={form.cin}
+                      onChange={e => handleFormChange("cin", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">PAN Number</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. ABCDE1234F"
+                      value={form.applicant_pan}
+                      onChange={e => handleFormChange("applicant_pan", e.target.value.toUpperCase())}
+                      maxLength={10}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Aadhaar Number</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. 9876 5432 1098"
+                      value={form.aadhaar_promoter}
+                      onChange={e => handleFormChange("aadhaar_promoter", e.target.value)}
+                      maxLength={14}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Job Title / Designation</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Store Executive / Factory Operator"
+                      value={form.job_title}
+                      onChange={e => handleFormChange("job_title", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Years of Service (at current workplace)</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      placeholder="e.g. 3"
+                      value={form.years_at_job}
+                      onChange={e => handleFormChange("years_at_job", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Net Monthly Salary (₹)</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      placeholder="e.g. 28000"
+                      value={form.monthly_salary}
+                      onChange={e => handleFormChange("monthly_salary", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+                    <label className="form-label">Workplace Physical Address</label>
+                    <textarea
+                      className="form-input"
+                      rows={2}
+                      placeholder="Work address for physical checks..."
+                      value={form.registered_address}
+                      onChange={e => handleFormChange("registered_address", e.target.value)}
+                      style={{ resize: "vertical" }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* FARMER / LANDOWNER PROFILE */}
+              {applicantType === "farmer" && (
+                <>
+                  <div className="form-group">
+                    <label className="form-label">Farmer / Landowner Name *</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Siddappa Gowda"
+                      value={form.applicant_name}
+                      onChange={e => handleFormChange("applicant_name", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Total Land Area (in Acres) *</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      step="0.01"
+                      placeholder="e.g. 4.5"
+                      value={form.land_area_acres}
+                      onChange={e => handleFormChange("land_area_acres", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Land Survey Numbers *</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. 142/3A, 204/B"
+                      value={form.survey_numbers}
+                      onChange={e => handleFormChange("survey_numbers", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Land RTC / Pahani Number *</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. RTC-29384-2026"
+                      value={form.land_rtc_pahani}
+                      onChange={e => handleFormChange("land_rtc_pahani", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Primary Crop Cultivated</label>
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Rice, Sugar Cane, Cotton"
+                      value={form.crop_type}
+                      onChange={e => handleFormChange("crop_type", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Kisan Credit Card (KCC) Number (if active)</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. KCC-9284-8294"
+                      value={form.kcc_number}
+                      onChange={e => handleFormChange("kcc_number", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Aadhaar Number</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. 9876 5432 1098"
+                      value={form.aadhaar_promoter}
+                      onChange={e => handleFormChange("aadhaar_promoter", e.target.value)}
+                      maxLength={14}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">PAN Number</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. ABCDE1234F"
+                      value={form.applicant_pan}
+                      onChange={e => handleFormChange("applicant_pan", e.target.value.toUpperCase())}
+                      maxLength={10}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Soil Health Card ID</label>
+                    <input
+                      className="form-input text-mono"
+                      placeholder="e.g. SHC-9283-84"
+                      value={form.soil_health_id}
+                      onChange={e => handleFormChange("soil_health_id", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Annual Agricultural Income (₹ Lakhs)</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      placeholder="e.g. 3.2"
+                      value={form.annual_turnover}
+                      onChange={e => handleFormChange("annual_turnover", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+                    <label className="form-label">Agricultural Land Location (Village, Taluk, District)</label>
+                    <textarea
+                      className="form-input"
+                      rows={2}
+                      placeholder="e.g. Haradanahalli Village, Chamarajanagar Taluk & District..."
+                      value={form.registered_address}
+                      onChange={e => handleFormChange("registered_address", e.target.value)}
+                      style={{ resize: "vertical" }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* COMMON LOAN DETAILS */}
+              <div style={{ gridColumn: "1 / -1", height: 1, background: "var(--border-subtle)", margin: "10px 0" }} />
 
               <div className="form-group">
                 <label className="form-label">Loan Facility Type</label>
@@ -442,10 +744,21 @@ export default function NewCase({ onCaseCreated }: Props) {
               </div>
 
               <div className="form-group">
+                <label className="form-label">Loan Amount Requested (₹) *</label>
+                <input
+                  className="form-input"
+                  type="number"
+                  placeholder="e.g. 500000"
+                  value={form.loan_amount}
+                  onChange={e => handleFormChange("loan_amount", e.target.value)}
+                />
+              </div>
+
+              <div className="form-group" style={{ gridColumn: "1 / -1" }}>
                 <label className="form-label">Loan Purpose / Utilization Plan</label>
                 <input
                   className="form-input"
-                  placeholder="e.g. Purchase of machinery, inventory..."
+                  placeholder="e.g. Purchase of seeds, fertilizers, tractor lease, worker wages..."
                   value={form.loan_purpose}
                   onChange={e => handleFormChange("loan_purpose", e.target.value)}
                 />
@@ -487,7 +800,7 @@ export default function NewCase({ onCaseCreated }: Props) {
               marginBottom: 20, fontSize: 13, color: "var(--text-secondary)",
               display: "flex", justifyContent: "space-between", alignItems: "center"
             }}>
-              <span>Case ID: <span className="text-mono" style={{ color: "var(--indigo-light)", fontWeight: 700 }}>{caseId}</span> ({form.company_name})</span>
+              <span>Case ID: <span className="text-mono" style={{ color: "var(--indigo-light)", fontWeight: 700 }}>{caseId}</span> ({form.applicant_name})</span>
               <button className="btn btn-ghost btn-sm" onClick={() => setStep("info")} style={{ fontSize: 11, padding: "4px 8px" }}>
                 <ChevronLeft size={12} /> Edit Details
               </button>
@@ -515,6 +828,22 @@ export default function NewCase({ onCaseCreated }: Props) {
               </div>
               <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
                 PDF, JPG, PNG, or TIFF files. ForgeShield will automatically run Layer-1 pixel and font integrity scans.
+              </div>
+            </div>
+
+            {/* Recommended items list based on Applicant Type */}
+            <div style={{ margin: "20px 0 10px", padding: 12, background: "rgba(255,255,255,0.01)", border: "1px solid var(--border-subtle)", borderRadius: 10 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>Recommended Documents to Upload:</span>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+                {applicantType === "corporate" && ["Company PAN", "GST Certificate", "Audited Financials", "Board Resolution"].map(d => (
+                  <span key={d} style={{ fontSize: 10, padding: "3px 8px", background: "rgba(99,102,241,0.1)", color: "var(--indigo-light)", borderRadius: 6 }}>{d}</span>
+                ))}
+                {applicantType === "salaried" && ["Salary Slips (3m)", "Form 16 / ITR", "Worker ID Card", "Bank Statement"].map(d => (
+                  <span key={d} style={{ fontSize: 10, padding: "3px 8px", background: "rgba(34,211,238,0.1)", color: "var(--cyan)", borderRadius: 6 }}>{d}</span>
+                ))}
+                {applicantType === "farmer" && ["RTC / Pahani Deed", "Kisan Credit Card", "Soil Health Card", "Crop Insurance"].map(d => (
+                  <span key={d} style={{ fontSize: 10, padding: "3px 8px", background: "rgba(16,185,129,0.1)", color: "var(--approve)", borderRadius: 6 }}>{d}</span>
+                ))}
               </div>
             </div>
 

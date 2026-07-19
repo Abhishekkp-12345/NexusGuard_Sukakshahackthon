@@ -12,11 +12,12 @@ import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Toolti
 
 interface Props {
   seed: number;
+  applicantType?: "corporate" | "salaried" | "farmer";
 }
 
 type ModelTab = "cibil" | "banking" | "financial" | "industry" | "gst";
 
-export default function CreditRiskEngine({ seed }: Props) {
+export default function CreditRiskEngine({ seed, applicantType = "corporate" }: Props) {
   const [activeTab, setActiveTab] = useState<ModelTab>("cibil");
 
   // Load scores based on case seed
@@ -26,7 +27,19 @@ export default function CreditRiskEngine({ seed }: Props) {
   const [industry] = useState(() => generateIndustryScore(seed));
   const [gst] = useState(() => generateGSTScore(seed));
 
-  const modelTabs = [
+  const modelTabs = applicantType === "salaried" ? [
+    { value: "cibil", label: "CIBIL Consumer", score: cibil.consumerScore, rating: cibil.consumerRiskLabel, icon: Award, color: "#3b82f6" },
+    { value: "banking", label: "Salary Stability", score: banking.behaviourScore, rating: banking.behaviourRating, icon: BarChart3, color: "#10b981" },
+    { value: "financial", label: "Monthly Savings", score: financial.financialHealthScore, rating: financial.healthRating, icon: FileText, color: "#ec4899" },
+    { value: "industry", label: "Employment Tenure", score: industry.industryRiskScore, rating: industry.riskRating, icon: TrendingUp, color: "#f59e0b" },
+    { value: "gst", label: "Job Credit History", score: gst.gstHealthScore, rating: gst.healthLabel, icon: Percent, color: "#22d3ee" }
+  ] : applicantType === "farmer" ? [
+    { value: "cibil", label: "KCC Limit Eligibility", score: cibil.consumerScore > 700 ? 94 : 64, rating: "Compliant", icon: Award, color: "#3b82f6" },
+    { value: "banking", label: "Land Productivity", score: banking.behaviourScore, rating: "Strong", icon: BarChart3, color: "#10b981" },
+    { value: "financial", label: "Climate & Monsoon", score: financial.financialHealthScore, rating: "Moderate", icon: FileText, color: "#ec4899" },
+    { value: "industry", label: "Soil Fertility", score: industry.industryRiskScore, rating: "Optimal", icon: TrendingUp, color: "#f59e0b" },
+    { value: "gst", label: "Seasonal Harvest Log", score: gst.gstHealthScore, rating: "Consistent", icon: Percent, color: "#22d3ee" }
+  ] : [
     { value: "cibil", label: "CIBIL Intelligence", score: cibil.consumerScore > 700 ? 92 : 54, rating: cibil.overallCreditRisk, icon: Award, color: "#3b82f6" },
     { value: "banking", label: "Banking Behaviour", score: banking.behaviourScore, rating: banking.behaviourRating, icon: BarChart3, color: "#10b981" },
     { value: "financial", label: "Financial Health", score: financial.financialHealthScore, rating: financial.healthRating, icon: FileText, color: "#ec4899" },

@@ -5,10 +5,11 @@ import { generateFraudAnalysis } from "../api/mockData";
 
 interface Props {
   seed: number;
+  applicantType?: "corporate" | "salaried" | "farmer";
 }
 
-export default function FraudEngine({ seed }: Props) {
-  const [data] = useState(() => generateFraudAnalysis(seed));
+export default function FraudEngine({ seed, applicantType = "corporate" }: Props) {
+  const [data] = useState(() => generateFraudAnalysis(seed, applicantType));
   const gaugeColor = data.fraudScore < 20 ? "var(--approve)" : data.fraudScore < 45 ? "var(--hold)" : "var(--reject)";
 
   return (

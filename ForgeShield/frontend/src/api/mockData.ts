@@ -337,13 +337,92 @@ export interface FraudCheck {
   detail: string;
 }
 
-export function generateFraudAnalysis(seed: number): FraudAnalysis {
+export function generateFraudAnalysis(seed: number, applicantType: "corporate" | "salaried" | "farmer" = "corporate"): FraudAnalysis {
   const score = Math.round(rand(5, 75, seed));
   const cat: FraudAnalysis["fraudCategory"] = score < 20 ? "CLEAN" : score < 40 ? "SUSPICIOUS" : score < 65 ? "HIGH RISK" : "CRITICAL";
+  const risk = score < 20 ? "LOW" : score < 40 ? "MODERATE" : score < 65 ? "HIGH" : "CRITICAL";
+
+  if (applicantType === "salaried") {
+    return {
+      fraudScore: score,
+      fraudCategory: cat,
+      riskLevel: risk as any,
+      checks: [
+        { name: "Identity Fraud Check",        passed: score < 35, confidence: Math.round(rand(70, 99, seed+1)), detail: score < 35 ? "Identity documents are consistent across all submissions." : "Name mismatch detected between PAN and Aadhaar." },
+        { name: "Synthetic Identity Detection",passed: score < 40, confidence: Math.round(rand(75, 98, seed+2)), detail: score < 40 ? "No synthetic identity patterns detected." : "Unusual combination of identity attributes flagged." },
+        { name: "Payslip Tampering Detection", passed: score < 50, confidence: Math.round(rand(65, 95, seed+3)), detail: score < 50 ? "Payslip fonts and structures match standard templates." : "Modified numbers or font replacement detected in Net Pay." },
+        { name: "Structured Cash Deposits",    passed: score < 45, confidence: Math.round(rand(70, 97, seed+4)), detail: score < 45 ? "Normal deposit patterns matching salary credits." : "Cash structuring and micro-deposits observed in bank statements." },
+        { name: "Employer Registry Validation",passed: score < 55, confidence: Math.round(rand(68, 96, seed+5)), detail: score < 55 ? "Employer verified as active in EPFO/MCA databases." : "Employer registry shows inactive status or not found." },
+        { name: "Multiple Active Loans Check", passed: score < 30, confidence: Math.round(rand(80, 99, seed+6)), detail: score < 30 ? "No duplicate personal loan filings in network." : "Applicant has applied at 3 other institutions in last 30 days." },
+        { name: "Workplace Tenure Match",      passed: score < 60, confidence: Math.round(rand(65, 93, seed+7)), detail: score < 60 ? "Employment tenure matches EPFO contribution history." : "Tenure discrepancies between resume and EPFO logs." },
+        { name: "Bank Account Holder Match",   passed: score < 35, confidence: Math.round(rand(75, 99, seed+8)), detail: score < 35 ? "Salary account holder name matches Aadhaar." : "Discrepancy in beneficiary account holder name." },
+        { name: "Shell Employer Flag",         passed: score < 40, confidence: Math.round(rand(72, 98, seed+9)), detail: score < 40 ? "Employer is a reputable registered firm." : "Employer flagged as high-risk shell enterprise." },
+        { name: "Financial Credit Stacking",   passed: score < 45, confidence: Math.round(rand(70, 96, seed+10)), detail: score < 45 ? "Aggregate debt burden matches bureau files." : "Undisclosed active digital credit apps observed in bank credits." },
+        { name: "Address Proof Verification",  passed: score < 50, confidence: Math.round(rand(68, 95, seed+11)), detail: score < 50 ? "Utility bill addresses match Aadhaar records." : "Utility bill registered name does not match applicant." },
+      ],
+      aiExplanation: score < 20
+        ? `Fraud Score is ${score}/100 (Low Risk). All worker identity documents are consistent. EPFO log verifies active employment at the declared employer. Bank statement confirms monthly salary deposits matching payslip figures.`
+        : score < 40
+        ? `Fraud Score is ${score}/100 (Moderate Risk). Minor inconsistencies in residential utility address. Workplace EPFO history shows active contributions but minor tenure variance. Suggest verification of job status.`
+        : `Fraud Score is ${score}/100 (High Risk). Multiple red flags detected: Net Salary figures on payslip show pixel modification, and undisclosed active digital credit deposits were found in bank credits. Job registry lookup failed.`,
+      topRiskFactors: score > 30 ? [
+        "Salary slip tampering detected (modified fonts)",
+        "Undisclosed digital credit stacking observed",
+        "EPFO workplace registry lookup failed",
+        "Utility address mismatch with Aadhaar records",
+      ] : ["No significant risk factors detected"],
+      topPositiveFactors: [
+        "EPFO account is active",
+        "Salary credits are consistent month-on-month",
+        "No duplicate personal loan applications in network",
+        "CIBIL credit history length exceeds 3 years",
+      ],
+    };
+  }
+
+  if (applicantType === "farmer") {
+    return {
+      fraudScore: score,
+      fraudCategory: cat,
+      riskLevel: risk as any,
+      checks: [
+        { name: "Identity Fraud Check",        passed: score < 35, confidence: Math.round(rand(70, 99, seed+1)), detail: score < 35 ? "Identity details match standard KYC registers." : "Name mismatch observed between KCC register and PAN." },
+        { name: "Synthetic Farmer Check",      passed: score < 40, confidence: Math.round(rand(75, 98, seed+2)), detail: score < 40 ? "Farmer details match local landholding database." : "Aadhaar registry matches land size, but age/gender discrepancies exist." },
+        { name: "Land RTC Deed Authenticity",  passed: score < 50, confidence: Math.round(rand(65, 95, seed+3)), detail: score < 50 ? "RTC / Pahani document matches government land registers." : "Modified survey number or owner names detected in PDF metadata." },
+        { name: "Double Pledging Check",       passed: score < 45, confidence: Math.round(rand(70, 97, seed+4)), detail: score < 45 ? "Survey numbers are clear of existing mortgages." : "Survey number matches property pledged in another active loan." },
+        { name: "Village Revenue Seal Check",  passed: score < 55, confidence: Math.round(rand(68, 96, seed+5)), detail: score < 55 ? "Government officer seals verified via OCR." : "Forged seal detected with abnormal pixel geometry." },
+        { name: "Land Survey Verification",    passed: score < 30, confidence: Math.round(rand(80, 99, seed+6)), detail: score < 30 ? "Survey boundaries match government land records." : "Survey numbers overlap with neighboring village properties." },
+        { name: "Crop Productivity Match",     passed: score < 60, confidence: Math.round(rand(65, 93, seed+7)), detail: score < 60 ? "Yield claims match regional averages for the crop." : "Claimed crop productivity exceeds local soil capabilities by 80%." },
+        { name: "Kisan Credit Card Validation",passed: score < 35, confidence: Math.round(rand(75, 99, seed+8)), detail: score < 35 ? "KCC card number is valid and issuer seal verified." : "KCC card issuer seal is invalid or card has expired." },
+        { name: "Soil Health Card Match",      passed: score < 40, confidence: Math.round(rand(72, 98, seed+9)), detail: score < 40 ? "Soil Health Card ID matches local lab registry." : "Soil card ID not found in laboratory database." },
+        { name: "Rainfall Vulnerability Check",passed: score < 45, confidence: Math.round(rand(70, 96, seed+10)), detail: score < 45 ? "Rainfall patterns within regional climate standards." : "Drought warnings or severe rainfall deficits in the land region." },
+        { name: "Seasonal Cash flow Inflows",  passed: score < 50, confidence: Math.round(rand(68, 95, seed+11)), detail: score < 50 ? "Passbook deposits match harvest crop market dates." : "Large unexplained deposits outside harvest cycles." },
+      ],
+      aiExplanation: score < 20
+        ? `Fraud Score is ${score}/100 (Low Risk). RTC land deeds match Government Pahani registers. Survey numbers are clean with no double pledging. Seasonal deposits align with crop harvest timelines. Soil card is authentic.`
+        : score < 40
+        ? `Fraud Score is ${score}/100 (Moderate Risk). Minor RTC deed metadata warnings. Survey boundaries match but show minor overlapping lines. KCC status verified active. Recommend local revenue officer check.`
+        : `Fraud Score is ${score}/100 (High Risk). Double pledging detected: survey numbers are pledged in another active crop loan. Crop yield claims exceed local soil nutrient parameters by 80%. RTC deed show seal tampering.`,
+      topRiskFactors: score > 30 ? [
+        "Double pledging flagged (active mortgage in other bank)",
+        "Crop yield claim exceeds land capability by 80%",
+        "RTC land deed seal tampering detected",
+        "RTC survey numbers mismatch with land registry",
+      ] : ["No significant risk factors detected"],
+      topPositiveFactors: [
+        "KCC limit is within regional scale of finance guidelines",
+        "Soil Health Card ID verified in soil laboratory database",
+        "Aadhaar details match Landowner registry",
+        "No duplicate land survey applications in network",
+      ],
+    };
+  }
+
+  // DEFAULT CORPORATE
   return {
     fraudScore: score,
     fraudCategory: cat,
-    riskLevel: score < 20 ? "LOW" : score < 40 ? "MODERATE" : score < 65 ? "HIGH" : "CRITICAL",
+    riskLevel: risk as any,
     checks: [
       { name: "Identity Fraud Check",        passed: score < 35, confidence: Math.round(rand(70, 99, seed+1)), detail: score < 35 ? "Identity documents are consistent across all submissions." : "Name mismatch detected between PAN and Aadhaar." },
       { name: "Synthetic Identity Detection",passed: score < 40, confidence: Math.round(rand(75, 98, seed+2)), detail: score < 40 ? "No synthetic identity patterns detected." : "Unusual combination of identity attributes flagged." },
@@ -403,6 +482,10 @@ export function generateDocIntegrity(docType: string, seed: number): DocumentInt
     financial_statement: ["Revenue Consistency","Profit Manipulation Check","Auditor Signature Verification","Financial Ratio Analysis","Hidden Liability Detection","Accounting Standards Check","Duplicate Entry Detection"],
     land_record: ["Ownership Verification","Mutation History Analysis","Encumbrance Status","Registration Detail Check","Duplicate Ownership Detection","Boundary Consistency","Legal Dispute Check"],
     legal_document: ["Stamp Duty Verification","Signature Authenticity","Page Completeness","Clause Editing Detection","Metadata Consistency","Document Version Check","Tampered Section Detection"],
+    kcc: ["KCC Number Format","Card Issuer Verification","Land Acreage Match","Promoter Signature Check","Validity Date Verification","Tamper Detection"],
+    soil_health: ["Soil Health ID Check","Testing Laboratory Seal","Nutrient Level Match","Farming Suitability Verification","Signature Authentication"],
+    crop_insurance: ["Policy Coverage Match","Survey Number Verification","Inspection Officer Seal","Damaged Acreage Check","Tamper Proofing Check"],
+    labor_certificate: ["Certificate Format Validation","Issuer Authority Logo","Active Worker Registry Verification","Labor Class Match","Photoshop Tampering Scan"],
   };
 
   const checkNames = checksMap[docType] || checksMap["bank_statement"];
@@ -515,7 +598,7 @@ export interface AIFinalDecision {
   improvements: string[];
 }
 
-export function generateFinalDecision(seed: number): AIFinalDecision {
+export function generateFinalDecision(seed: number, applicantType: "corporate" | "salaried" | "farmer" = "corporate"): AIFinalDecision {
   const trust = Math.round(rand(38, 95, seed));
   const pd = Math.round(rand(5, 72, seed + 1));
   const docAuth = Math.round(rand(55, 98, seed + 2));
@@ -529,6 +612,81 @@ export function generateFinalDecision(seed: number): AIFinalDecision {
   const risk: AIFinalDecision["riskLevel"] = pd < 20 ? "VERY_LOW" : pd < 35 ? "LOW" : pd < 50 ? "MODERATE" : pd < 65 ? "HIGH" : "CRITICAL";
   const rec: AIFinalDecision["recommendation"] = pd < 25 ? "APPROVE" : pd < 40 ? "APPROVE_WITH_CONDITIONS" : pd < 60 ? "MANUAL_REVIEW" : "REJECT";
 
+  const suggestedAmount = rec === "APPROVE" || rec === "APPROVE_WITH_CONDITIONS" ? Math.round(rand(50, 500, seed + 9)) : 0;
+  const suggestedRate = parseFloat((rand(8.5, 18.5, seed + 10)).toFixed(2));
+  const tenure = Math.round(rand(24, 120, seed + 11));
+
+  if (applicantType === "salaried") {
+    return {
+      documentAuthenticityScore: docAuth,
+      identityConsistencyScore: consistency,
+      fraudScore: fraud,
+      financialHealthScore: financial,
+      bankingBehaviourScore: banking,
+      gstHealthScore: gst,
+      industryRiskScore: industry,
+      probabilityOfDefault: pd,
+      trustScore: trust,
+      riskLevel: risk,
+      recommendation: rec,
+      suggestedLoanAmount: suggestedAmount,
+      suggestedInterestRate: suggestedRate,
+      requiredCollateral: pd < 30 ? "Employer salary credit mandate" : "Guarantor personal guarantee required",
+      recommendedTenure: tenure,
+      aiExplanation: `Probability of Default is ${pd}% based on a worker Trust Score of ${trust}/100. Aadhaar and PAN matching is successful at ${consistency}%. Bank statements verify stable monthly salary credits with no bounce history. Non-salary credit volume is minor.`,
+      positiveFactors: [
+        docAuth > 80 ? "Payslips and workplace ID cards passed authenticity scans" : "Primary KYC verified",
+        "Stable monthly salary deposits observed in statement credits",
+        "Active workplace EPFO registration status confirmed",
+        "CIBIL Consumer credit history is positive",
+      ],
+      riskFactors: pd > 35 ? [
+        "Elevated default risk due to higher requested amount relative to salary",
+        "Recent digital personal credit inquiries observed in last 90 days",
+      ] : ["No significant individual risk factors identified"],
+      improvements: [
+        "Provide latest Form 16 / Income Tax Returns",
+        "Provide personal guarantee from a co-applicant with independent income",
+      ],
+    };
+  }
+
+  if (applicantType === "farmer") {
+    return {
+      documentAuthenticityScore: docAuth,
+      identityConsistencyScore: consistency,
+      fraudScore: fraud,
+      financialHealthScore: financial,
+      bankingBehaviourScore: banking,
+      gstHealthScore: gst,
+      industryRiskScore: industry,
+      probabilityOfDefault: pd,
+      trustScore: trust,
+      riskLevel: risk,
+      recommendation: rec,
+      suggestedLoanAmount: suggestedAmount,
+      suggestedInterestRate: suggestedRate,
+      requiredCollateral: pd < 30 ? "RTC Land Mortgage (LTV 60%)" : "RTC Land Mortgage + Crop Insurance assignment",
+      recommendedTenure: tenure,
+      aiExplanation: `Probability of Default is ${pd}% based on a farming landowner Trust Score of ${trust}/100. RTC landownership deeds correspond to local survey boundaries. Soil card nutrient levels support crop cultivation, and seasonal harvests match passbook deposits.`,
+      positiveFactors: [
+        "RTC land deed verified in government land records",
+        "Valid Kisan Credit Card (KCC) issuer card verified",
+        "Soil fertility card verified with matching agricultural land location",
+        "Seasonal harvest crop sales match passbook credit timelines",
+      ],
+      riskFactors: pd > 35 ? [
+        "Taluk warning: regional taluk has moderate rainfall deficit forecasts",
+        "Slight crop yield claims over-reporting relative to regional average",
+      ] : ["No significant agricultural risk factors identified"],
+      improvements: [
+        "Submit active crop insurance policy documentation",
+        "Submit local village officer cultivation certificate",
+      ],
+    };
+  }
+
+  // DEFAULT CORPORATE
   return {
     documentAuthenticityScore: docAuth,
     identityConsistencyScore: consistency,
@@ -541,11 +699,11 @@ export function generateFinalDecision(seed: number): AIFinalDecision {
     trustScore: trust,
     riskLevel: risk,
     recommendation: rec,
-    suggestedLoanAmount: rec === "APPROVE" || rec === "APPROVE_WITH_CONDITIONS" ? Math.round(rand(50, 500, seed + 9)) : 0,
-    suggestedInterestRate: parseFloat((rand(8.5, 18.5, seed + 10)).toFixed(2)),
-    requiredCollateral: pd < 30 ? "Property collateral (LTV 70%)" : pd < 50 ? "Property + FD collateral (LTV 60%)" : "Enhanced collateral + guarantee required",
-    recommendedTenure: Math.round(rand(24, 120, seed + 11)),
-    aiExplanation: `Probability of Default is ${pd}% because the applicant has ${trust > 70 ? "a strong" : "a moderate"} Trust Score of ${trust}/100. Document authenticity is ${docAuth > 80 ? "excellent" : "adequate"} at ${docAuth}%. ${fraud < 30 ? "No significant fraud indicators were detected." : "Some fraud indicators require attention."} Financial health score of ${financial} indicates ${financial > 70 ? "healthy" : "moderate"} business fundamentals with ${pd < 35 ? "manageable" : "elevated"} leverage. GST compliance at ${gst}% ${gst > 80 ? "supports" : "partially supports"} the reported turnover.`,
+    suggestedLoanAmount: suggestedAmount,
+    suggestedInterestRate: suggestedRate,
+    requiredCollateral: pd < 30 ? "Property collateral (LTV 70%)" : "Property + FD collateral (LTV 60%)",
+    recommendedTenure: tenure,
+    aiExplanation: `Probability of Default is ${pd}% because the applicant has a Trust Score of ${trust}/100. Document authenticity is ${docAuth}%. Financial health score of ${financial} indicates standard business ratios. GST filing matches reported turnovers.`,
     positiveFactors: [
       docAuth > 80 ? "All documents passed AI authenticity verification" : "Primary documents verified",
       consistency > 75 ? "Strong identity consistency across all documents" : "Adequate identity consistency",
@@ -562,7 +720,6 @@ export function generateFinalDecision(seed: number): AIFinalDecision {
       "Provide additional 6 months of bank statements",
       pd > 40 ? "Reduce loan amount by 20% to improve DSCR" : "Ensure collateral documentation is complete",
       fraud > 25 ? "Clarify vendor relationships with supporting invoices" : "Submit CA-certified financial statements",
-      "Provide personal guarantee from promoter",
     ],
   };
 }

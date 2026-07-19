@@ -58,8 +58,6 @@ function ScoreRing({ score, label, color, size = 120 }: { score: number; label: 
   );
 }
 
-
-
 // ── Document Integrity Card ──────────────────────────────────────────
 function DocIntegrityCard({ docType, seed }: { docType: string; seed: number }) {
   const [data] = useState(() => generateDocIntegrity(docType, seed));
@@ -274,6 +272,7 @@ export default function CaseReport({ caseId, onBack }: Props) {
   const [caseData, setCaseData] = useState<Case | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [details, setDetails] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "integrity" | "consistency" | "fraud" | "risk" | "timeline" | "reports" | "simulation">("overview");
 
   // Determine a stable numeric seed for the case ID string to generate consistent mock data
@@ -284,6 +283,12 @@ export default function CaseReport({ caseId, onBack }: Props) {
     try {
       const c = await casesApi.get(caseId);
       setCaseData(c);
+
+      // Load extended local details if present
+      const localData = localStorage.getItem(`case_details_${caseId}`);
+      if (localData) {
+        setDetails(JSON.parse(localData));
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -326,6 +331,13 @@ export default function CaseReport({ caseId, onBack }: Props) {
   };
   const vColor = verdictColors[verdict || ""] || "var(--text-muted)";
 
+  // Resolve dynamic document verification lists based on Applicant Type
+  const docIntegrityList = details?.applicant_type === "farmer"
+    ? ["pan", "aadhaar", "kcc", "soil_health", "crop_insurance", "land_record"]
+    : details?.applicant_type === "salaried"
+    ? ["pan", "aadhaar", "salary_slip", "labor_certificate", "bank_statement"]
+    : ["pan", "aadhaar", "gst", "bank_statement", "financial_statement", "land_record", "legal_document"];
+
   return (
     <div>
       {/* Header */}
@@ -335,7 +347,16 @@ export default function CaseReport({ caseId, onBack }: Props) {
             <ArrowLeft size={15} /> Back
           </button>
           <div>
-            <h1 className="page-title" style={{ fontSize: 20, margin: 0 }}>{caseData.applicant_name}</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <h1 className="page-title" style={{ fontSize: 20, margin: 0 }}>{caseData.applicant_name}</h1>
+              {details?.applicant_type && (
+                <span className="verdict-badge approve" style={{ fontSize: 10, padding: "2px 8px", textTransform: "uppercase", fontWeight: 700 }}>
+                  {details.applicant_type === "farmer" && "🌾 Farmer / Landowner"}
+                  {details.applicant_type === "salaried" && "👷 Worker / Salaried"}
+                  {details.applicant_type === "corporate" && "🏢 Corporate / SME"}
+                </span>
+              )}
+            </div>
             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, fontFamily: "var(--font-mono)" }}>
               {caseId} · {caseData.loan_type} · ₹{(caseData.loan_amount / 100000).toFixed(1)}L · {caseData.branch}
             </div>
@@ -353,6 +374,104 @@ export default function CaseReport({ caseId, onBack }: Props) {
           )}
         </div>
       </div>
+
+      {/* Profile specific information sheet */}
+      {details && (
+        <div className="card" style={{ marginBottom: 24, padding: "16px 20px" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--indigo-light)", textTransform: "uppercase", display: "block", marginBottom: 12 }}>
+            Applicant Profile Specifications
+          </span>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+            {details.applicant_type === "farmer" && (
+              <>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Cultivated Land Area</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{details.land_area_acres} Acres</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Survey Numbers</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.survey_numbers}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>RTC / Pahani ID</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.land_rtc_pahani}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Crop Cultivated</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{details.crop_type}</div>
+                </div>
+                {details.kcc_number && (
+                  <div>
+                    <span style={{ fontSize: 10, color: "var(--text-muted)" }}>KCC Card Number</span>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.kcc_number}</div>
+                  </div>
+                )}
+                {details.soil_health_id && (
+                  <div>
+                    <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Soil Card ID</span>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.soil_health_id}</div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {details.applicant_type === "salaried" && (
+              <>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Employer / Company</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{details.employer_name}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Job Title</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{details.job_title}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Workplace tenure</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{details.years_at_job} Years</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Net Monthly Salary</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>₹{parseFloat(details.monthly_salary).toLocaleString()}</div>
+                </div>
+                {details.cin && (
+                  <div>
+                    <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Worker Registry ID</span>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.cin}</div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {details.applicant_type === "corporate" && (
+              <>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Company CIN</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.cin || "—"}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>GSTIN</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2, fontFamily: "monospace" }}>{details.gst_number || "—"}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Annual Turnover</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>₹{details.annual_turnover} Lakhs</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Promoter Name</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{details.applicant_name}</div>
+                </div>
+              </>
+            )}
+
+            <div>
+              <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Location / Address</span>
+              <div style={{ fontSize: 12, fontWeight: 600, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={details.registered_address}>
+                {details.registered_address || "—"}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Verdict banner */}
       {verdict && (
@@ -460,7 +579,7 @@ export default function CaseReport({ caseId, onBack }: Props) {
                 </div>
 
                 {/* Final Underwriting Decision */}
-                <AIDecision seed={seedVal} />
+                <AIDecision seed={seedVal} applicantType={details?.applicant_type || "corporate"} />
               </div>
             )}
 
@@ -468,8 +587,10 @@ export default function CaseReport({ caseId, onBack }: Props) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 24, alignItems: "flex-start" }}>
                 {/* Left checklist of documents */}
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text-secondary)" }}>Verifying Document Integrity (7 Categories)</span>
-                  {["pan", "aadhaar", "gst", "bank_statement", "financial_statement", "land_record", "legal_document"].map((doc) => (
+                  <span style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text-secondary)" }}>
+                    Verifying Document Integrity ({docIntegrityList.length} Categories)
+                  </span>
+                  {docIntegrityList.map((doc) => (
                     <DocIntegrityCard key={doc} docType={doc} seed={seedVal} />
                   ))}
                 </div>
@@ -486,15 +607,15 @@ export default function CaseReport({ caseId, onBack }: Props) {
             )}
 
             {activeTab === "fraud" && (
-              <FraudEngine seed={seedVal} />
+              <FraudEngine seed={seedVal} applicantType={details?.applicant_type || "corporate"} />
             )}
 
             {activeTab === "risk" && (
-              <CreditRiskEngine seed={seedVal} />
+              <CreditRiskEngine seed={seedVal} applicantType={details?.applicant_type || "corporate"} />
             )}
 
             {activeTab === "simulation" && (
-              <WhatIfSimulator initialAmount={caseData.loan_amount} />
+              <WhatIfSimulator initialAmount={caseData.loan_amount} applicantType={details?.applicant_type || "corporate"} />
             )}
 
             {activeTab === "timeline" && (

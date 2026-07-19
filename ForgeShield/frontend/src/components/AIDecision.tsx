@@ -4,10 +4,11 @@ import { generateFinalDecision } from "../api/mockData";
 
 interface Props {
   seed: number;
+  applicantType?: "corporate" | "salaried" | "farmer";
 }
 
-export default function AIDecision({ seed }: Props) {
-  const [data] = useState(() => generateFinalDecision(seed));
+export default function AIDecision({ seed, applicantType = "corporate" }: Props) {
+  const [data] = useState(() => generateFinalDecision(seed, applicantType));
 
   const ratingColor = data.recommendation === "APPROVE" 
     ? "var(--approve)" 
