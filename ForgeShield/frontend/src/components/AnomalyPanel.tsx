@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, CheckCircle } from "lucide-react";
 import { generateAnomalies } from "../api/mockData";
@@ -6,10 +6,15 @@ import { generateAnomalies } from "../api/mockData";
 interface Props {
   seed: number;
   filename: string;
+  verdict?: string;
 }
 
-export default function AnomalyPanel({ seed, filename }: Props) {
-  const [anomalies] = useState(() => generateAnomalies(seed));
+export default function AnomalyPanel({ seed, filename, verdict }: Props) {
+  const [anomalies, setAnomalies] = useState(() => generateAnomalies(seed, verdict));
+
+  useEffect(() => {
+    setAnomalies(generateAnomalies(seed, verdict));
+  }, [seed, verdict]);
   const detectedCount = anomalies.filter((a) => a.detected).length;
 
   return (

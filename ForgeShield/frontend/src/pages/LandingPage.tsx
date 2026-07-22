@@ -216,12 +216,29 @@ function HowItWorksStep({ step, title, desc, icon: Icon, color, isLast }: {
 export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPageProps) {
   const [scrolled, setScrolled] = useState(false);
   const [heroVisible, setHeroVisible] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0);
+
+  const cyclingWords = [
+    "in 90 Seconds",
+    "with 7 AI Layers",
+    "Completely Offline",
+    "with Zero Errors",
+    "Before It Costs You"
+  ];
 
   useEffect(() => {
     setTimeout(() => setHeroVisible(true), 100);
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    const cycleId = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % cyclingWords.length);
+    }, 2200);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearInterval(cycleId);
+    };
   }, []);
 
   const layers = [
@@ -229,70 +246,91 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
       number: "1",
       icon: FileSearch,
       color: "#6366f1",
-      title: "Visual & Digital Forensics",
-      description: "Deep inspection of every document's digital DNA — detecting even microscopic signs of tampering in both soft copies and scanned hard copies.",
+      title: "Format & Syntax",
+      description: "Performs low-level file analysis to detect anomalies in document layout, syntax structure, and signature validation.",
       features: [
-        "PDF Metadata analysis: CreationDate vs ModDate gap detection",
-        "Producer software check (Foxit, SmallPDF, Canva, Photoshop = RED FLAG)",
-        "Font family inconsistency detection across pages",
-        "JPEG Error Level Analysis (ELA) for scanned forgeries",
-        "Visual heatmap generation for tampered pixel regions",
+        "PDF file version & update layers check",
+        "Metadata creation vs modification discrepancy scan",
+        "Embedded JavaScript & hidden form fields scan",
+        "Invalid signature registry flags",
       ],
     },
     {
       number: "2",
-      icon: Layers,
+      icon: Cpu,
       color: "#22d3ee",
-      title: "Cross-Document Semantics",
-      description: "Validates that data points across all submitted documents tell the same story. Flags income inflation, mismatched identities, and stale documents.",
+      title: "Computational Math",
+      description: "Verifies the mathematical calculations inside financial documents like salary slips, bank statements, and tax returns.",
       features: [
-        "Income consistency: Salary Slip ↔ Bank Credits ↔ ITR",
-        "Chronological timeline & DOB conflict detection",
-        "Balance arithmetic verification on bank statements",
-        "Land valuation vs. market stamp duty rate check",
-        "Identity token matching (name across all docs)",
-      ],
-    },
-    {
-      number: "2.5",
-      icon: Database,
-      color: "#f59e0b",
-      title: "GSTIN Verification",
-      description: "India-exclusive layer that verifies the GSTIN of self-employed applicants against the GST registry, detecting ghost firms and fabricated employment.",
-      features: [
-        "GSTIN format validation (state code + PAN + entity type)",
-        "Live registry status: Active / Cancelled / Suspended",
-        "Ghost firm detection: registered <6 months before loan",
-        "Declared income vs. GST annual turnover ratio check",
-        "Applicant name vs. GST legal name matching",
+        "Gross total income arithmetic checks",
+        "Deduction limit validation (e.g. Section 80C caps)",
+        "Tax payable calculation matching with old/new regimes",
+        "Arithmetic balance sheet column matching",
       ],
     },
     {
       number: "3",
-      icon: Network,
-      color: "#10b981",
-      title: "Relationship Graph Engine",
-      description: "Maps all entities from all documents into a persistent knowledge graph, revealing coordinated fraud networks invisible to per-application checks.",
+      icon: Database,
+      color: "#f59e0b",
+      title: "Bank Cross-Reference",
+      description: "Directly validates declared income and cash flows against actual bank account statements.",
       features: [
-        "Double pledging: same asset survey no. across cases",
-        "Circular guarantor chains: A→B→C→A detection",
-        "Shell company signal: employer = applicant address",
-        "Cross-case entity linking via NetworkX",
-        "Visual interactive graph for underwriters",
+        "Salary credit verification against payroll dates",
+        "Declared income vs bank deposits variance checks",
+        "Unexplained large cash inflows detection",
+        "TDS deposit consistency verification",
       ],
     },
     {
       number: "4",
-      icon: Brain,
-      color: "#ec4899",
-      title: "AI Risk Engine & Verdict",
-      description: "Synthesizes findings from all layers into a weighted overall risk score and a plain-English recommendation, powered by a local Ollama LLM — zero cloud dependency.",
+      icon: TrendingUp,
+      color: "#10b981",
+      title: "Behavior & Trends",
+      description: "Uses statistical models to check cash flow patterns, leverage ratio risks, and seasonal deposit trends.",
       features: [
-        "Multi-factor weighted risk scoring (Authenticity + Consistency + Graph)",
-        "APPROVE / HOLD / REJECT verdict with confidence %",
-        "Local Ollama Gemma LLM for narrative recommendation",
-        "100% offline — RBI data privacy compliant",
-        "Auto-generated PDF forensic report with ELA heatmaps",
+        "Historical cash balance volatility monitoring",
+        "Deduction-to-income ratio checks (> 40% threshold)",
+        "EMI-to-income debt leverage warnings",
+        "Seasonal harvest cycle credits matching for farmers",
+      ],
+    },
+    {
+      number: "5",
+      icon: Layers,
+      color: "#ec4899",
+      title: "Statistical Anomalies (Benford)",
+      description: "Uses Benford's Law and first-digit analysis to mathematically check if document numbers have been manually fabricated.",
+      features: [
+        "First-digit frequencies Chi-Square test (threshold: 20.09)",
+        "Unnatural round-number concentration scans",
+        "Repeated transaction amount duplication alerts",
+        "Template forgery digit profiling",
+      ],
+    },
+    {
+      number: "6",
+      icon: Brain,
+      color: "#f97316",
+      title: "Semantic Keyword NLP",
+      description: "Extracts textual contents and scans for key indicators of manipulation and templates.",
+      features: [
+        "Checks presence of mandatory regulatory clauses",
+        "Altered font spacing and size discrepancy flags",
+        "Scans for watermark keywords (e.g., 'sample', 'test', 'specimen')",
+        "OCR character baseline vertical alignment verification",
+      ],
+    },
+    {
+      number: "7",
+      icon: Network,
+      color: "#8b5cf6",
+      title: "Identity Consistency",
+      description: "Cross-checks identity fields (PAN, Aadhaar, DOB, Father's Name) across all submitted documents and registries.",
+      features: [
+        "Biometric face similarity comparisons (Haar Cascade detection)",
+        "Father's name syntax alignment check (C/O, S/O regex)",
+        "Cross-document PAN & Aadhaar character-by-character checks",
+        "State GSTIN registry legal name matches",
       ],
     },
   ];
@@ -537,11 +575,11 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
 
           {/* Main Title */}
           <h1 style={{
-            fontSize: "clamp(52px, 8vw, 96px)",
+            fontSize: "clamp(52px, 8vw, 84px)",
             fontWeight: 900,
             lineHeight: 1.05,
             letterSpacing: "-3px",
-            marginBottom: 24,
+            marginBottom: 20,
           }}>
             <span style={{ color: "var(--text-primary)" }}>Forge</span>
             <span style={{
@@ -553,6 +591,53 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
             <span style={{ color: "var(--text-primary)" }}> AI</span>
           </h1>
 
+          {/* Animated Cycling Word Headline */}
+          <h2 style={{
+            fontSize: "clamp(24px, 4.5vw, 36px)",
+            fontWeight: 700,
+            color: "var(--text-primary)",
+            marginBottom: 24,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 10,
+            flexWrap: "wrap",
+            letterSpacing: "-0.5px",
+          }}>
+            Detect Loan Fraud{" "}
+            <span style={{
+              position: "relative",
+              display: "inline-block",
+              height: "1.2em",
+              width: "280px",
+              textAlign: "left",
+              overflow: "hidden",
+              verticalAlign: "bottom",
+            }}>
+              {cyclingWords.map((word, idx) => (
+                <span
+                  key={idx}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    background: "linear-gradient(135deg, #f59e0b, #f97316)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    fontWeight: 900,
+                    opacity: wordIndex === idx ? 1 : 0,
+                    transform: wordIndex === idx ? "translateY(0)" : wordIndex > idx ? "translateY(-40px)" : "translateY(40px)",
+                    transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  {word}
+                </span>
+              ))}
+            </span>
+          </h2>
+
           {/* Subtitle */}
           <p style={{
             fontSize: "clamp(18px, 2.5vw, 22px)",
@@ -562,7 +647,7 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
             margin: "0 auto 18px",
             fontWeight: 400,
           }}>
-            India's most advanced <strong style={{ color: "#6366f1", fontWeight: 700 }}>5-layer document forensic intelligence platform</strong> built specifically for Canara Bank's loan underwriting operations.
+            India's most advanced <strong style={{ color: "#6366f1", fontWeight: 700 }}>7-layer document forensic intelligence platform</strong> built specifically for Canara Bank's loan underwriting operations.
           </p>
 
           <p style={{
@@ -571,7 +656,7 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
             marginBottom: 44,
             lineHeight: 1.7,
           }}>
-            Detects altered ITRs, fabricated salary slips, mule accounts, and coordinated fraud networks — in under 30 seconds.
+            Five collaborative AI agents detect altered ITRs, fabricated salary slips, template reuse, and circular fraud rings — completely offline in under 90 seconds.
           </p>
 
           {/* CTA Buttons */}
@@ -688,6 +773,118 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
             {stats.map((s, i) => (
               <StatCard key={s.label} {...s} delay={i * 100} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5-AGENT PIPELINE SECTION ───────────────────────────── */}
+      <section id="agents" style={{
+        padding: "100px 60px",
+        background: "rgba(10, 15, 30, 0.4)",
+        borderBottom: "1px solid var(--border-subtle)",
+        position: "relative",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 60 }}>
+            <div style={{
+              fontSize: 12, fontWeight: 700, color: "#6366f1",
+              textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 16,
+            }}>
+              Autonomous Collaboration
+            </div>
+            <h2 style={{ fontSize: 38, fontWeight: 900, marginBottom: 16, color: "var(--text-primary)" }}>
+              The 5-Agent <span style={{ color: "#6366f1" }}>Collaborative Pipeline</span>
+            </h2>
+            <p style={{ fontSize: 16, color: "var(--text-secondary)", maxWidth: 680, margin: "0 auto", lineHeight: 1.7 }}>
+              Five specialized AI agents orchestrate the forensic pipeline autonomously, ensuring comprehensive fraud and compliance checks.
+            </p>
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 20,
+            position: "relative",
+          }}>
+            {[
+              {
+                num: "1",
+                name: "Classifier Agent",
+                role: "Identify Documents",
+                desc: "OCR classifications instantly categorize files as PAN, Aadhaar, ITR, bank statements, or salary slips.",
+                icon: FileSearch,
+                color: "#6366f1",
+              },
+              {
+                num: "2",
+                name: "Forensic Agent",
+                role: "Pixel & Math Scans",
+                desc: "Executes ELA pixel forensics, Benford's Law analysis, and numeric entropy checks.",
+                icon: Cpu,
+                color: "#22d3ee",
+              },
+              {
+                num: "3",
+                name: "CrossRef Agent",
+                role: "Cross-Validate Entities",
+                desc: "Matches PANs, names, DOBs, and addresses across all docs and live registries.",
+                icon: Network,
+                color: "#f59e0b",
+              },
+              {
+                num: "4",
+                name: "Compliance Agent",
+                role: "Check Regulatory Fit",
+                desc: "Validates files against PMLA, KYC guidelines, and DPDP Act to ensure RBI compliance.",
+                icon: Shield,
+                color: "#10b981",
+              },
+              {
+                num: "5",
+                name: "Decision Agent",
+                role: "Risk & Verdict Scoring",
+                desc: "Applies floor caps, aggregates penalty score, and creates court-ready recommendation.",
+                icon: Brain,
+                color: "#ec4899",
+              },
+            ].map((agent, index) => {
+              const Icon = agent.icon;
+              return (
+                <div
+                  key={index}
+                  className="card"
+                  style={{
+                    padding: 24,
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: 16,
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12,
+                    textAlign: "left"
+                  }}
+                >
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: `${agent.color}15`,
+                    border: `1px solid ${agent.color}30`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Icon size={20} color={agent.color} />
+                  </div>
+                  <div>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
+                      AGENT {agent.num} · {agent.role}
+                    </span>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, marginTop: 4, color: "var(--text-primary)" }}>{agent.name}</h3>
+                  </div>
+                  <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
+                    {agent.desc}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

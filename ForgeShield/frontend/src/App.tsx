@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Plus, BarChart3,
-  Shield, Network, MapPin, Sun, Moon, LogOut, User,
+  Shield, MapPin, Sun, Moon, LogOut, User,
   ShieldAlert, AlertTriangle, Clock, RefreshCw, Lock
 } from "lucide-react";
 import "./index.css";
@@ -383,23 +383,6 @@ export default function App() {
                 borderRadius: 4, background: "#ef444415", color: "#ef4444"
               }}>RO</span>
             )}
-          </button>
-
-          <button
-            onClick={() => navigate({ name: "graph" })}
-            style={{
-              width: "100%", display: "flex", alignItems: "center", gap: "12px",
-              padding: "10px 12px", borderRadius: "8px", border: "none",
-              cursor: "pointer", fontSize: "14px",
-              fontWeight: isActive("graph") ? 600 : 400,
-              marginBottom: "4px",
-              background: isActive("graph") ? "rgba(99,102,241,0.12)" : "transparent",
-              color: isActive("graph") ? "var(--indigo-light)" : "var(--text-secondary)",
-              borderLeft: isActive("graph") ? "2px solid var(--indigo)" : "2px solid transparent",
-            }}
-          >
-            <Network size={18} />
-            Relationship Graph
           </button>
 
           <button

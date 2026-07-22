@@ -293,7 +293,7 @@ export default function GeoIntelligence() {
                   <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                     Top Fraud Signals
                   </div>
-                  {selected.top_fraud_types.map((ft, i) => (
+                  {selected.top_fraud_types.map((ft: { type: string; count: number }, i: number) => (
                     <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--border-subtle)", fontSize: 12 }}>
                       <span style={{ color: "var(--text-secondary)" }}>{ft.type.replace(/_/g, " ")}</span>
                       <span style={{ fontWeight: 700, color: "var(--reject)" }}>{ft.count}×</span>

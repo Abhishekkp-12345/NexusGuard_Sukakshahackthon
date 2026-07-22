@@ -24,6 +24,8 @@ class CaseCreate(BaseModel):
     loan_type: str = "Home Loan"
     loan_amount: float
     branch: str = "Bengaluru Main"
+    applicant_type: str | None = None
+    declared_details: dict | None = None
 
 
 class VerdictUpdate(BaseModel):
@@ -52,6 +54,8 @@ async def create_case(payload: CaseCreate, request: Request):
         "loan_type": payload.loan_type,
         "loan_amount": payload.loan_amount,
         "branch": payload.branch,
+        "applicant_type": payload.applicant_type or "corporate",
+        "declared_details": payload.declared_details or {},
         "status": "PENDING",
         "verdict": None,
         "created_at": datetime.utcnow().isoformat(),

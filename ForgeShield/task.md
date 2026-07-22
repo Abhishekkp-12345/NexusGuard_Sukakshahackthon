@@ -1,0 +1,8 @@
+- `[ ]` Task 1: Create face_verifier.py (Haar Cascade detection + HSV correlation comparison)
+- `[ ]` Task 2: Create tamper_detector.py (JPEG compression, noise inconsistency, ORB clone matching, text alignment offsets, digital signature validation, bounding box contour ELA visualization)
+- `[ ]` Task 3: Modify ocr_extractor.py to support Father's name extraction for Aadhaar and Driving License, and handle low confidence warnings
+- `[ ]` Task 4: Modify semantic_checker.py to compare Father's Name and Face Similarity, and enforce strict score penalties
+- `[ ]` Task 5: Modify risk_scorer.py to enforce the capped 30% score limit and REJECT on critical mismatches or edits
+- `[ ]` Task 6: Modify routers/forensics.py to orchestrate the face and tamper verification layers
+- `[ ]` Task 7: Update frontend DocumentIntegrityViewer.tsx to render real findings, ELA heatmap/bounding box images, and face comparisons
+- `[ ]` Task 8: Update test_verification_pipeline.py to assert new forensics scenarios and run verification tests

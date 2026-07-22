@@ -27,7 +27,7 @@ export default function GraphView() {
 
         c.forEach(caseItem => {
           if (caseItem.analysis?.graph_data) {
-            caseItem.analysis.graph_data.nodes.forEach(n => {
+            caseItem.analysis.graph_data.nodes.forEach((n: any) => {
               if (!allNodes.has(n.id)) {
                 allNodes.set(n.id, { ...n });
               }
@@ -82,7 +82,7 @@ export default function GraphView() {
   // Load fraud rings
   useEffect(() => {
     intelligenceApi.fraudRings()
-      .then(data => setFraudRings(data.fraud_rings))
+      .then((data: any) => setFraudRings(data.fraud_rings))
       .catch(console.error)
       .finally(() => setRingsLoading(false));
   }, []);
@@ -345,7 +345,7 @@ export default function GraphView() {
                             {ring.description}
                           </div>
                           <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 4 }}>LINKED CASES</div>
-                          {ring.cases.slice(0, 3).map(c => (
+                          {ring.cases.slice(0, 3).map((c: any) => (
                             <div key={c.case_id} style={{ fontSize: 11, display: "flex", justifyContent: "space-between", padding: "3px 0" }}>
                               <span className="text-mono" style={{ color: "var(--text-primary)" }}>{c.case_id}</span>
                               <span style={{ color: "var(--text-muted)" }}>{c.applicant_name}</span>

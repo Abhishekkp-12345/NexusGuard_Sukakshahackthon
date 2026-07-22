@@ -1,16 +1,15 @@
 """
-ForgeShield AI — Layer 4: Ollama Client
-=========================================
-Wrapper around the Ollama Python SDK for local LLM inference.
-Model: gemma4:latest (configured in config.py)
-
-100% offline — data never leaves the bank server.
+ForgeShield AI — Ollama LLM Client with Graceful Fallback (Production v2)
+==========================================================================
+Handles asynchronous requests to local Ollama instance for explainable AI narratives.
+Includes robust error handling and rule-based fallback if Ollama is offline or un-downloaded.
 """
 
 from __future__ import annotations
 
 import logging
-import time
+import urllib.request
+import json
 from typing import Any
 
 from config import settings
@@ -18,142 +17,109 @@ from config import settings
 logger = logging.getLogger(__name__)
 
 
-def _get_ollama():
-    """Lazy import of ollama to avoid hard dependency at startup."""
-    try:
-        import ollama
-        return ollama
-    except ImportError:
-        raise RuntimeError(
-            "The 'ollama' Python package is not installed. "
-            "Run: pip install ollama"
-        )
-
-
-def generate_text(prompt: str, model: str | None = None, timeout: int | None = None) -> str:
+def generate_text(prompt: str) -> str:
     """
-    Generate text from the local Ollama LLM.
-
-    Args:
-        prompt: The full prompt string to send.
-        model: Override model name (defaults to settings.OLLAMA_MODEL).
-        timeout: Override timeout in seconds.
-
-    Returns:
-        Generated text as a string.
+    Send prompt to local Ollama API. Fall back to rule-based summary if unavailable.
     """
-    model = model or settings.OLLAMA_MODEL
-    timeout = timeout or settings.OLLAMA_TIMEOUT
-
-    logger.info(f"Ollama request — model={model}, prompt_len={len(prompt)}")
-    t0 = time.time()
+    url = f"{settings.OLLAMA_HOST}/api/generate"
+    payload = {
+        "model": settings.OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.2,  # Low temperature for analytical consistency
+            "num_predict": 512,
+        },
+    }
 
     try:
-        ollama = _get_ollama()
-        response = ollama.chat(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            options={
-                "temperature": 0.3,     # Low temp for consistent, factual outputs
-                "num_predict": 512,     # Max tokens for recommendation
-                "top_p": 0.9,
-            },
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
         )
-        elapsed = time.time() - t0
-        text = response["message"]["content"].strip()
-        logger.info(f"Ollama response received in {elapsed:.1f}s — {len(text)} chars")
-        return text
-
+        with urllib.request.urlopen(req, timeout=settings.OLLAMA_TIMEOUT) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return data.get("response", "").strip()
     except Exception as e:
-        elapsed = time.time() - t0
-        logger.error(f"Ollama inference failed after {elapsed:.1f}s: {e}")
-        return _fallback_recommendation(str(e))
+        logger.warning(f"Ollama generation failed/offline ({e}). Using deterministic fallback narrative.")
+        return _fallback_narrative(prompt)
 
 
-def classify_document(text_sample: str, filename: str = "") -> str:
-    """
-    Classify document type using filename and text heuristics first, falling back to Ollama if needed.
-    """
-    # 1. Filename Heuristic Check
-    if filename:
-        fn = filename.lower()
-        if any(k in fn for k in ["aadhar", "addhar", "uidai"]):
-            return "aadhaar_card"
-        if "pan" in fn and "panti" not in fn:
-            return "pan_card"
-        if any(k in fn for k in ["license", "licence", "dl"]):
-            return "driving_license"
-        if "passbook" in fn:
-            return "bank_passbook"
-        if any(k in fn for k in ["salary", "payslip", "pay_slip"]):
-            return "salary_slip"
-        if any(k in fn for k in ["statement", "bank_stmt"]):
-            return "bank_statement"
-        if any(k in fn for k in ["itr", "tax", "form_16", "form16"]):
-            return "itr"
-        if any(k in fn for k in ["land", "deed", "property", "patta"]):
-            return "land_record"
+def classify_document(text_sample: str, filename: str) -> str:
+    """Classify document type using keyword rules."""
+    text = (text_sample + " " + filename).lower()
 
-    text_lower = text_sample.lower()
-
-    # 2. Text Content Heuristic Checks
-    if any(k in text_lower for k in ["unique identification", "authority of india", "aadhaar", "aadhar"]):
-        return "aadhaar_card"
-    if any(k in text_lower for k in ["permanent account number", "income tax department", "pan card"]):
+    if any(k in text for k in ["pan", "permanent account number"]):
         return "pan_card"
-    if any(k in text_lower for k in ["driving licence", "driving license", "dl no", "licence no"]):
-        return "driving_license"
-    if "passbook" in text_lower:
-        return "bank_passbook"
-    if any(k in text_lower for k in ["salary slip", "payslip", "pay slip"]):
+    elif any(k in text for k in ["aadhaar", "uidai", "unique identification"]):
+        return "aadhaar_card"
+    elif any(k in text for k in ["salary", "payslip", "pay slip", "earnings", "deductions"]):
         return "salary_slip"
-    if any(k in text_lower for k in ["bank statement", "account statement", "statement of account"]):
+    elif any(k in text for k in ["bank statement", "account statement", "closing balance", "ifsc", "passbook"]):
         return "bank_statement"
-    if any(k in text_lower for k in ["form 16", "income tax return", "itr-v"]):
+    elif any(k in text for k in ["form 16", "itr", "income tax return", "acknowledgement"]):
         return "itr"
-    if any(k in text_lower for k in ["land record", "survey number", "survey no"]):
+    elif any(k in text for k in ["gst", "gstin", "taxpayer"]):
+        return "gst"
+    elif any(k in text for k in ["driving license", "dl no"]):
+        return "driving_license"
+    elif any(k in text for k in ["land", "pahani", "rtc", "khasra", "mutation"]):
         return "land_record"
-
-    # 3. LLM Fallback
-    from ai_engine.prompt_templates import DOCUMENT_CLASSIFICATION_TEMPLATE
-    prompt = DOCUMENT_CLASSIFICATION_TEMPLATE.format(text_sample=text_sample[:500])
-    result = generate_text(prompt, timeout=30)
-    # Normalise
-    valid_types = ["salary_slip", "bank_statement", "itr", "land_record", "legal_document", "aadhaar_card", "pan_card", "driving_license", "bank_passbook", "unknown"]
-    result_clean = result.strip().lower().replace(" ", "_")
-    for vt in valid_types:
-        if vt in result_clean:
-            return vt
     return "unknown"
 
 
 def check_availability() -> dict[str, Any]:
-    """Check if Ollama is running and the configured model is available."""
+    """Check if Ollama host is reachable."""
     try:
-        ollama = _get_ollama()
-        models_response = ollama.list()
-        models = [m["name"] for m in models_response.get("models", [])]
-        configured = settings.OLLAMA_MODEL
-        available = any(configured in m or m.startswith(configured.split(":")[0]) for m in models)
-        return {
-            "ollama_running": True,
-            "configured_model": configured,
-            "model_available": available,
-            "available_models": models,
-        }
+        req = urllib.request.Request(f"{settings.OLLAMA_HOST}/api/tags")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            models = [m.get("name") for m in data.get("models", [])]
+            return {
+                "status": "online",
+                "host": settings.OLLAMA_HOST,
+                "configured_model": settings.OLLAMA_MODEL,
+                "available_models": models,
+                "model_ready": any(settings.OLLAMA_MODEL in m for m in models),
+            }
     except Exception as e:
         return {
-            "ollama_running": False,
-            "configured_model": settings.OLLAMA_MODEL,
-            "model_available": False,
+            "status": "offline",
+            "host": settings.OLLAMA_HOST,
             "error": str(e),
+            "note": "ForgeShield will use rule-based Explainable AI fallback.",
         }
 
 
-def _fallback_recommendation(error: str) -> str:
-    """Return a safe fallback recommendation when Ollama is unavailable."""
-    return (
-        "AI recommendation unavailable (Ollama service not responding). "
-        "Please review the forensic scores and findings manually. "
-        f"Technical detail: {error[:200]}"
-    )
+def _fallback_narrative(prompt: str) -> str:
+    """Generate a structured rule-based narrative when LLM is offline."""
+    lines = prompt.splitlines()
+    verdict = "HOLD"
+    score = "100.0"
+
+    for line in lines:
+        if "DETERMINISTIC ENGINE VERDICT :" in line:
+            verdict = line.split(":")[-1].strip()
+        if "FINAL AUTHENTICITY SCORE     :" in line:
+            score = line.split(":")[-1].strip()
+
+    if verdict == "APPROVE":
+        return (
+            f"FORENSIC DOSSIER SUMMARY: The document package has passed all deterministic forensic checks with a final authenticity score of {score}. "
+            "No pixel-level Error Level Analysis (ELA) anomalies, copy-move cloning keypoints, or identity field discrepancies were detected. "
+            "Underwriter Recommendation: Proceed with loan processing subject to standard policy checks."
+        )
+    elif verdict == "REJECT":
+        return (
+            f"FORENSIC DOSSIER SUMMARY: The document package has been REJECTED by the deterministic forensic engine with a final authenticity score of {score}. "
+            "Severe forensic anomalies were identified during processing, including potential image tampering, structural PDF modifications, or critical identity mismatches across documents. "
+            "Underwriter Recommendation: Immediately REJECT application and flag for anti-fraud investigation."
+        )
+    else:
+        return (
+            f"FORENSIC DOSSIER SUMMARY: The document package requires MANUAL REVIEW (HOLD) with a final authenticity score of {score}. "
+            "Forensic evidence shows moderate anomalies or field inconsistencies that warrant physical verification. "
+            "Underwriter Recommendation: Request original physical documents and verify applicant credentials with issuing authorities."
+        )

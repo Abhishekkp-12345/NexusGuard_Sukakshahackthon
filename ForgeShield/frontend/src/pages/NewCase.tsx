@@ -141,6 +141,11 @@ export default function NewCase({ onCaseCreated }: Props) {
         loan_type: form.loan_type,
         loan_amount: parseFloat(form.loan_amount),
         branch: form.branch,
+        applicant_type: applicantType,
+        declared_details: {
+          ...form,
+          directors: directors.filter(Boolean),
+        },
       });
 
       const fullDetails = {

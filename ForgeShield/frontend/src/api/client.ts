@@ -1,5 +1,5 @@
 /**
- * ForgeShield AI — API Client
+ * ForgeShield AI — API Client (Production v2)
  * All axios calls to the FastAPI backend.
  */
 
@@ -9,7 +9,7 @@ const BASE_URL = "http://localhost:8000/api";
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 180_000, // 3 minutes for Ollama
+  timeout: 180_000, // 3 minutes for Ollama/heavy processing
 });
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -36,44 +36,43 @@ export interface Finding {
   severity: "HIGH" | "MEDIUM" | "LOW" | "INFO";
   detail: string;
   document?: string;
-  sources?: Record<string, number>;
-  deviation_pct?: number;
+  confidence?: number;
+  region_count?: number;
 }
 
-export interface AnalysisResult {
-  case_id: string;
-  analyzed_at: string;
-  elapsed_ms: number;
-  applicant_name: string;
-  loan_amount: number;
-  loan_type: string;
-  branch: string;
-  authenticity_score: number;
-  consistency_score: number;
-  relationship_risk_score: number;
-  overall_score: number;
-  verdict: "APPROVE" | "HOLD" | "REJECT";
-  verdict_color: string;
-  confidence: "HIGH" | "MEDIUM" | "LOW";
-  score_breakdown: {
-    authenticity: { score: number; weight: number; contribution: number };
-    consistency: { score: number; weight: number; contribution: number };
-    relationship: { risk_score: number; safety_score: number; weight: number; contribution: number };
-  };
-  all_findings: Finding[];
-  high_severity_count: number;
-  medium_severity_count: number;
-  ai_recommendation: string;
-  document_reports: DocumentReport[];
-  graph_data: GraphData;
-  income_analysis: Record<string, unknown>;
-  gst_verification?: GSTVerificationResult;
-  timeline?: {
-    date: string;
-    label: string;
-    type: string;
-    filename: string;
-  }[];
+export interface RegionAnnotation {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  confidence: number;
+  method: string;
+  label: string;
+  x_rel: number;
+  y_rel: number;
+  w_rel: number;
+  h_rel: number;
+}
+
+export interface ManipulationRegion {
+  document: string;
+  label: string;
+  method: string;
+  confidence: number;
+  coordinates: { x: number; y: number; w: number; h: number };
+}
+
+export interface TamperResult {
+  tampered: boolean;
+  tamper_score: number;
+  tamper_penalty: number;
+  findings: Finding[];
+  tamper_visualization?: string | null;
+  region_annotations: RegionAnnotation[];
+  detector_results?: Record<string, any>;
+  noise_inconsistency: number;
+  clone_detected: boolean;
+  text_alignment_clean: boolean;
 }
 
 export interface DocumentReport {
@@ -90,34 +89,40 @@ export interface DocumentReport {
     authenticity_score: number;
     flags: string[];
     findings: Finding[];
-    metadata: {
-      title?: string;
-      author?: string;
-      creator?: string;
-      producer?: string;
-      creation_date?: string;
-      mod_date?: string;
-      num_pages?: number;
-      fonts?: string[];
-    };
+    metadata: Record<string, any>;
   };
-  extracted_fields: Record<string, unknown>;
+  tamper_result?: TamperResult;
+  extracted_fields: Record<string, any>;
 }
 
-export interface GraphData {
-  nodes: {
-    id: string;
-    label: string;
-    type: string;
-    color: string;
-    data: Record<string, unknown>;
-  }[];
-  links: {
-    source: string;
-    target: string;
-    label: string;
-    case_id?: string;
-  }[];
+export interface TrustScoreAudit {
+  base_score: number;
+  deductions: Array<{ category: string; reason: string; penalty: number }>;
+  total_penalty: number;
+  final_score: number;
+  verdict: string;
+  verdict_reason: string;
+}
+
+export interface MatrixEntry {
+  field: string;
+  sourceA: string;
+  valueA: string;
+  sourceB: string;
+  valueB: string;
+  match: boolean;
+  similarity?: number;
+}
+
+export interface IdentityVerificationResult {
+  critical_identity_mismatch: boolean;
+  identity_penalty: number;
+  matched_fields: MatrixEntry[];
+  mismatched_fields: MatrixEntry[];
+  field_comparison_matrix: MatrixEntry[];
+  findings: Finding[];
+  identity_summary: string;
+  sources_compared: string[];
 }
 
 export interface CaseStats {
@@ -130,12 +135,10 @@ export interface CaseStats {
   fraud_detection_rate: number;
 }
 
-// ── Intelligence Types ─────────────────────────────────────────────────
-
 export interface GSTVerificationResult {
   gstin: string;
   valid_format: boolean;
-  status: "ACTIVE" | "CANCELLED" | "SUSPENDED" | "NOT_FOUND" | "API_UNAVAILABLE" | "INVALID_FORMAT";
+  status: string;
   legal_name: string | null;
   trade_name: string | null;
   state: string | null;
@@ -149,7 +152,7 @@ export interface GSTVerificationResult {
 
 export interface FraudRing {
   ring_id: string;
-  ring_type: "SHARED_EMPLOYER" | "LOAN_STACKING" | "SHARED_ADDRESS";
+  ring_type: string;
   ring_type_label: string;
   shared_entity: string;
   description: string;
@@ -192,21 +195,64 @@ export interface GeoHeatmapResponse {
   generated_at: string;
 }
 
+export interface AnalysisResult {
+  case_id: string;
+  analyzed_at: string;
+  elapsed_ms: number;
+  applicant_name: string;
+  loan_amount: number;
+  loan_type: string;
+  branch: string;
+  authenticity_score: number;
+  consistency_score: number;
+  identity_score: number;
+  financial_score: number;
+  ocr_confidence: number;
+  relationship_risk_score: number;
+  overall_score: number;
+  verdict: "APPROVE" | "HOLD" | "REJECT";
+  verdict_color: string;
+  confidence: "HIGH" | "MEDIUM" | "LOW";
+  score_breakdown: Record<string, any>;
+  trust_score_audit?: TrustScoreAudit;
+  all_findings: Finding[];
+  high_severity_count: number;
+  medium_severity_count: number;
+  manipulation_summary?: ManipulationRegion[];
+  identity_verification?: IdentityVerificationResult;
+  tamper_detection?: {
+    any_tampered: boolean;
+    total_tamper_penalty: number;
+    clone_detected: boolean;
+    tamper_visualizations: Array<{
+      filename: string;
+      visualization_b64: string;
+      region_annotations: RegionAnnotation[];
+      tamper_score: number;
+    }>;
+  };
+  ai_recommendation: string;
+  document_reports: DocumentReport[];
+  graph_data: any;
+  consistency_matrix?: any[];
+  compliance_violations?: any[];
+  timeline?: Array<{
+    date: string;
+    label: string;
+    type: string;
+    filename: string;
+  }>;
+}
+
 // ── API Functions ──────────────────────────────────────────────────────
 
 export const casesApi = {
   list: () => api.get<Case[]>("/cases/").then((r) => r.data),
   get: (id: string) => api.get<Case>(`/cases/${id}`).then((r) => r.data),
-  create: (data: {
-    applicant_name: string;
-    applicant_pan?: string;
-    loan_type: string;
-    loan_amount: number;
-    branch: string;
-  }) => api.post<Case>("/cases/", data).then((r) => r.data),
+  create: (data: any) => api.post<Case>("/cases/", data).then((r) => r.data),
   updateVerdict: (id: string, verdict: string, notes?: string) =>
     api.patch<Case>(`/cases/${id}/verdict`, { verdict, notes }).then((r) => r.data),
-  stats: () => api.get<CaseStats>("/cases/stats/summary").then((r) => r.data),
+  stats: () => api.get("/cases/stats/summary").then((r) => r.data),
 };
 
 export const forensicsApi = {
@@ -220,8 +266,7 @@ export const forensicsApi = {
       })
       .then((r) => r.data);
   },
-  ollamaStatus: () =>
-    api.get("/forensics/ollama-status").then((r) => r.data),
+  ollamaStatus: () => api.get("/forensics/ollama-status").then((r) => r.data),
 };
 
 export const reportsApi = {

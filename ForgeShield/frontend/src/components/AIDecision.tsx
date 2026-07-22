@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
 import { generateFinalDecision } from "../api/mockData";
 
 interface Props {
   seed: number;
   applicantType?: "corporate" | "salaried" | "farmer";
+  verdict?: string;
+  overallScore?: number;
 }
 
-export default function AIDecision({ seed, applicantType = "corporate" }: Props) {
-  const [data] = useState(() => generateFinalDecision(seed, applicantType));
+export default function AIDecision({ seed, applicantType = "corporate", verdict, overallScore }: Props) {
+  const [data, setData] = useState(() => generateFinalDecision(seed, applicantType, verdict, overallScore));
+
+  useEffect(() => {
+    setData(generateFinalDecision(seed, applicantType, verdict, overallScore));
+  }, [seed, applicantType, verdict, overallScore]);
 
   const ratingColor = data.recommendation === "APPROVE" 
     ? "var(--approve)" 

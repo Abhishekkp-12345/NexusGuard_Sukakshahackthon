@@ -31,9 +31,12 @@ class Settings(BaseSettings):
     OLLAMA_TIMEOUT: int = 120  # seconds
 
     # ── Risk Score Weights (must sum to 1.0) ─────────────────────────
-    WEIGHT_AUTHENTICITY: float = 0.35
-    WEIGHT_CONSISTENCY: float = 0.40
-    WEIGHT_RELATIONSHIP: float = 0.25
+    WEIGHT_AUTHENTICITY: float = 0.20
+    WEIGHT_CONSISTENCY: float = 0.20
+    WEIGHT_IDENTITY: float = 0.25
+    WEIGHT_FINANCIAL: float = 0.15
+    WEIGHT_RELATIONSHIP: float = 0.10
+    WEIGHT_OCR: float = 0.10
 
     # ── Verdict Thresholds ────────────────────────────────────────────
     THRESHOLD_APPROVE: float = 75.0   # overall >= this → APPROVE

@@ -78,7 +78,13 @@ app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
 app.include_router(intelligence.router, prefix="/api/intelligence", tags=["Intelligence"])
 
 
-# ── Health check ──────────────────────────────────────────────────────
+# ── Root & Health check ───────────────────────────────────────────────
+@app.get("/", include_in_schema=False)
+async def root():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/docs")
+
+
 @app.get("/api/health", tags=["Health"])
 async def health():
     return {

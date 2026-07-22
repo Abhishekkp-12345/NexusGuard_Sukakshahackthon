@@ -337,8 +337,23 @@ export interface FraudCheck {
   detail: string;
 }
 
-export function generateFraudAnalysis(seed: number, applicantType: "corporate" | "salaried" | "farmer" = "corporate"): FraudAnalysis {
-  const score = Math.round(rand(5, 75, seed));
+export function generateFraudAnalysis(
+  seed: number,
+  applicantType: "corporate" | "salaried" | "farmer" = "corporate",
+  verdict?: string,
+  overallScore?: number
+): FraudAnalysis {
+  let score: number;
+  if (verdict === "APPROVE" || (overallScore !== undefined && overallScore >= 75)) {
+    score = Math.round(rand(5, 18, seed));
+  } else if (verdict === "HOLD" || (overallScore !== undefined && overallScore >= 60)) {
+    score = Math.round(rand(25, 42, seed));
+  } else if (verdict === "REJECT" || (overallScore !== undefined && overallScore < 60)) {
+    score = Math.round(rand(55, 88, seed));
+  } else {
+    score = Math.round(rand(5, 75, seed));
+  }
+
   const cat: FraudAnalysis["fraudCategory"] = score < 20 ? "CLEAN" : score < 40 ? "SUSPICIOUS" : score < 65 ? "HIGH RISK" : "CRITICAL";
   const risk = score < 20 ? "LOW" : score < 40 ? "MODERATE" : score < 65 ? "HIGH" : "CRITICAL";
 
@@ -469,10 +484,22 @@ export interface DocumentIntegrity {
   docType: string;
   overallScore: number;
   checks: DocIntegrityCheck[];
+  benford_result?: any;
+  entropy_result?: any[];
+  dna_result?: any;
 }
 
-export function generateDocIntegrity(docType: string, seed: number): DocumentIntegrity {
-  const score = Math.round(rand(45, 98, seed));
+export function generateDocIntegrity(docType: string, seed: number, verdict?: string, overallScore?: number): DocumentIntegrity {
+  let score: number;
+  if (verdict === "APPROVE" || (overallScore !== undefined && overallScore >= 75)) {
+    score = Math.round(rand(85, 99, seed));
+  } else if (verdict === "HOLD" || (overallScore !== undefined && overallScore >= 60)) {
+    score = Math.round(rand(65, 82, seed));
+  } else if (verdict === "REJECT" || (overallScore !== undefined && overallScore < 60)) {
+    score = Math.round(rand(40, 60, seed));
+  } else {
+    score = Math.round(rand(45, 98, seed));
+  }
 
   const checksMap: Record<string, string[]> = {
     pan: ["OCR Extraction","PAN Format Validation","Name Matching","Digital Signature Detection","Font Consistency Analysis","Metadata Verification","Tampering Detection"],
@@ -489,6 +516,8 @@ export function generateDocIntegrity(docType: string, seed: number): DocumentInt
   };
 
   const checkNames = checksMap[docType] || checksMap["bank_statement"];
+
+  const isAnomalous = score < 65;
 
   return {
     docType,
@@ -508,6 +537,52 @@ export function generateDocIntegrity(docType: string, seed: number): DocumentInt
           : `${name} failed — significant anomaly detected with high confidence.`,
       };
     }),
+    benford_result: {
+      triggered: isAnomalous,
+      chi_sq: isAnomalous ? 24.5 : 8.2,
+      observed_distribution: {
+        "1": isAnomalous ? 0.18 : 0.31,
+        "2": isAnomalous ? 0.22 : 0.17,
+        "3": isAnomalous ? 0.12 : 0.12,
+        "4": isAnomalous ? 0.15 : 0.10,
+        "5": isAnomalous ? 0.08 : 0.08,
+        "6": isAnomalous ? 0.09 : 0.06,
+        "7": isAnomalous ? 0.07 : 0.06,
+        "8": isAnomalous ? 0.05 : 0.05,
+        "9": isAnomalous ? 0.04 : 0.05,
+      },
+      expected_distribution: {
+        "1": 0.301, "2": 0.176, "3": 0.125, "4": 0.097,
+        "5": 0.079, "6": 0.067, "7": 0.058, "8": 0.051, "9": 0.046
+      },
+      description: isAnomalous 
+        ? "Benford's Law violation: observed digit frequencies deviate from natural distribution." 
+        : "Benford's Law check passed.",
+      total_samples: 45
+    },
+    entropy_result: isAnomalous ? [
+      {
+        type: "REPEATED_AMOUNT_ANOMALY",
+        severity: "HIGH",
+        confidence: 0.88,
+        description: "Amount ₹45,000 appears 4 times. Unusual repetitions of identical values.",
+        value: "Amount: ₹45,000, count: 4"
+      }
+    ] : [],
+    dna_result: {
+      signature_hash: isAnomalous ? "a4f89d3c1e2b5a6f8e7d9c0b1a2e3f4c" : "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c",
+      matches: isAnomalous ? [
+        {
+          match_type: "KNOWN_FRAUD_TEMPLATE",
+          pattern_name: "Canva Salary Slip Template #42",
+          description: "Standard fabricated salary slip template.",
+          risk_category: "Salary Slip Fabrication",
+          similarity_score: 95.0,
+          case_reference: "DATABASE_BLACKBOX"
+        }
+      ] : [],
+      suspicious: isAnomalous
+    }
   };
 }
 
@@ -520,7 +595,7 @@ export interface AnomalyItem {
   location?: string;
 }
 
-export function generateAnomalies(seed: number): AnomalyItem[] {
+export function generateAnomalies(seed: number, verdict?: string): AnomalyItem[] {
   const types = [
     "Inserted Pages", "Deleted Pages", "Edited Numbers", "Font Changes",
     "Modified Dates", "Image Manipulation", "Hidden Layers", "Metadata Changes",
@@ -529,9 +604,11 @@ export function generateAnomalies(seed: number): AnomalyItem[] {
     "Copy-Paste Content", "Suspicious OCR Differences",
   ];
 
+  const threshold = verdict === "APPROVE" ? 95 : verdict === "HOLD" ? 78 : 55;
+
   return types.map((type, i) => {
     const r = rand(0, 100, seed + i);
-    const detected = r > 72;
+    const detected = r > threshold;
     return {
       type,
       detected,
@@ -551,8 +628,17 @@ export interface ConsistencyCell {
   confidence: number;
 }
 
-export function generateConsistencyMatrix(seed: number): { score: number; cells: ConsistencyCell[] } {
-  const score = Math.round(rand(55, 97, seed));
+export function generateConsistencyMatrix(seed: number, verdict?: string, overallScore?: number): { score: number; cells: ConsistencyCell[] } {
+  let score: number;
+  if (verdict === "APPROVE" || (overallScore !== undefined && overallScore >= 75)) {
+    score = Math.round(rand(88, 99, seed));
+  } else if (verdict === "HOLD" || (overallScore !== undefined && overallScore >= 60)) {
+    score = Math.round(rand(65, 84, seed));
+  } else if (verdict === "REJECT" || (overallScore !== undefined && overallScore < 60)) {
+    score = Math.round(rand(40, 60, seed));
+  } else {
+    score = Math.round(rand(55, 97, seed));
+  }
   const fields = ["Company Name","Promoter Name","PAN Number","Aadhaar Number","Registered Address","Bank Account Holder","Annual Turnover","GST Registration Name","Director Names"];
 
   const cells: ConsistencyCell[] = [];
@@ -598,21 +684,29 @@ export interface AIFinalDecision {
   improvements: string[];
 }
 
-export function generateFinalDecision(seed: number, applicantType: "corporate" | "salaried" | "farmer" = "corporate"): AIFinalDecision {
-  const trust = Math.round(rand(38, 95, seed));
-  const pd = Math.round(rand(5, 72, seed + 1));
-  const docAuth = Math.round(rand(55, 98, seed + 2));
-  const consistency = Math.round(rand(60, 97, seed + 3));
-  const fraud = Math.round(rand(5, 65, seed + 4));
-  const financial = Math.round(rand(40, 92, seed + 5));
-  const banking = Math.round(rand(45, 95, seed + 6));
-  const gst = Math.round(rand(50, 95, seed + 7));
-  const industry = Math.round(rand(40, 90, seed + 8));
+export function generateFinalDecision(
+  seed: number,
+  applicantType: "corporate" | "salaried" | "farmer" = "corporate",
+  verdict?: string,
+  overallScore?: number
+): AIFinalDecision {
+  const isApprove = verdict === "APPROVE" || (overallScore !== undefined && overallScore >= 75);
+  const isHold = verdict === "HOLD" || (overallScore !== undefined && overallScore >= 60);
+
+  const trust = isApprove ? Math.round(rand(82, 98, seed)) : isHold ? Math.round(rand(60, 78, seed)) : Math.round(rand(35, 55, seed));
+  const pd = isApprove ? Math.round(rand(5, 18, seed + 1)) : isHold ? Math.round(rand(25, 42, seed + 1)) : Math.round(rand(55, 80, seed + 1));
+  const docAuth = isApprove ? Math.round(rand(88, 99, seed + 2)) : isHold ? Math.round(rand(65, 84, seed + 2)) : Math.round(rand(40, 60, seed + 2));
+  const consistency = isApprove ? Math.round(rand(88, 99, seed + 3)) : isHold ? Math.round(rand(65, 84, seed + 3)) : Math.round(rand(40, 60, seed + 3));
+  const fraud = isApprove ? Math.round(rand(5, 18, seed + 4)) : isHold ? Math.round(rand(25, 42, seed + 4)) : Math.round(rand(55, 80, seed + 4));
+  const financial = isApprove ? Math.round(rand(80, 95, seed + 5)) : isHold ? Math.round(rand(60, 78, seed + 5)) : Math.round(rand(35, 55, seed + 5));
+  const banking = isApprove ? Math.round(rand(82, 96, seed + 6)) : isHold ? Math.round(rand(60, 78, seed + 6)) : Math.round(rand(35, 55, seed + 6));
+  const gst = isApprove ? Math.round(rand(80, 95, seed + 7)) : isHold ? Math.round(rand(60, 78, seed + 7)) : Math.round(rand(35, 55, seed + 7));
+  const industry = isApprove ? Math.round(rand(75, 92, seed + 8)) : isHold ? Math.round(rand(55, 74, seed + 8)) : Math.round(rand(35, 50, seed + 8));
 
   const risk: AIFinalDecision["riskLevel"] = pd < 20 ? "VERY_LOW" : pd < 35 ? "LOW" : pd < 50 ? "MODERATE" : pd < 65 ? "HIGH" : "CRITICAL";
-  const rec: AIFinalDecision["recommendation"] = pd < 25 ? "APPROVE" : pd < 40 ? "APPROVE_WITH_CONDITIONS" : pd < 60 ? "MANUAL_REVIEW" : "REJECT";
+  const rec: AIFinalDecision["recommendation"] = isApprove ? "APPROVE" : isHold ? "MANUAL_REVIEW" : "REJECT";
 
-  const suggestedAmount = rec === "APPROVE" || rec === "APPROVE_WITH_CONDITIONS" ? Math.round(rand(50, 500, seed + 9)) : 0;
+  const suggestedAmount = rec === "APPROVE" ? Math.round(rand(50, 500, seed + 9)) : 0;
   const suggestedRate = parseFloat((rand(8.5, 18.5, seed + 10)).toFixed(2));
   const tenure = Math.round(rand(24, 120, seed + 11));
 

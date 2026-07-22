@@ -73,6 +73,7 @@ def extract_bank_statement_fields(ocr_fields: dict[str, Any]) -> dict[str, Any]:
         "statement_to": statement_to,
         "account_numbers": ocr_fields.get("account_numbers", []),
         "ifsc_codes": ocr_fields.get("ifsc_codes", []),
+        "account_holder_name": ocr_fields.get("owner_name"),
         "transactions": [],  # Populated if tabular data is available
     }
 
