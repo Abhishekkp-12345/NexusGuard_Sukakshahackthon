@@ -64,7 +64,12 @@ export default function GeoIntelligence() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      load();
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
 
   const stateMap = new Map(states.map(s => [s.state, s]));
 

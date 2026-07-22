@@ -166,6 +166,16 @@ def compute_overall_risk(
             "penalty": max(0.0, round(raw_score - 29.0, 2)),
         })
 
+    elif tamper_penalty > 0:
+        adjusted_score = min(adjusted_score, 40.0)
+        verdict_override = "REJECT" if tamper_penalty >= 20.0 else "HOLD"
+        floor_applied = f"DOCUMENT TAMPERING DETECTED — Hard-capped score at 40 ({verdict_override})"
+        deductions.append({
+            "category": "HARD_CAP",
+            "reason": f"Tampering Detected Override: Hard-capped score at 40 ({verdict_override})",
+            "penalty": max(0.0, round(raw_score - 40.0, 2)),
+        })
+
     elif clone_detected:
         adjusted_score = min(adjusted_score, 40.0)
         floor_applied = "COPY-MOVE FORGERY DETECTED — Hard-capped score at 40"

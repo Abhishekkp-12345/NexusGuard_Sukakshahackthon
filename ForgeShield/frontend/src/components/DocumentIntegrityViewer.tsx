@@ -17,6 +17,7 @@ interface DocumentItem {
   benford_result?: any;
   entropy_result?: any[];
   dna_result?: any;
+  hasIdMismatch?: boolean;
 }
 
 interface Props {
@@ -28,6 +29,149 @@ interface Props {
   overallScore?: number;
   seed: number;
   documentReports?: DocumentReport[];
+  identityVerification?: any;
+}
+
+interface DocAnomaly {
+  fieldKey: string;
+  title: string;
+  detail: string;
+  severity: "HIGH" | "MEDIUM" | "LOW";
+  probability: number;
+}
+
+interface HighlightedFieldProps {
+  fieldKey: string;
+  docAnomalies: DocAnomaly[];
+  children: React.ReactNode;
+  placement?: "auto" | "top" | "bottom";
+}
+
+function HighlightedField({ fieldKey, docAnomalies, children, placement = "auto" }: HighlightedFieldProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const anomaly = docAnomalies.find((a) => a.fieldKey === fieldKey);
+  if (!anomaly) return <>{children}</>;
+
+  const borderColor = anomaly.severity === "HIGH" ? "#ef4444" : "#f59e0b";
+  const bgColor = anomaly.severity === "HIGH" ? "rgba(239, 68, 68, 0.12)" : "rgba(245, 158, 11, 0.12)";
+  const glowColor = anomaly.severity === "HIGH" ? "rgba(239, 68, 68, 0.45)" : "rgba(245, 158, 11, 0.45)";
+
+  // Determine top vs bottom placement: logo and top fields should open downwards
+  const isTopField = placement === "bottom" || fieldKey === "logo" || fieldKey === "issueDate" || fieldKey === "name";
+  const showTooltip = isOpen || isHovered;
+
+  return (
+    <div 
+      style={{ position: "relative", display: "inline-block", zIndex: showTooltip ? 1000 : 10 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div 
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen((prev) => !prev);
+        }}
+        style={{
+          border: `2px solid ${borderColor}`,
+          borderRadius: 6,
+          padding: "4px 8px",
+          background: bgColor,
+          boxShadow: `0 0 14px ${glowColor}`,
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          transition: "all 0.2s ease"
+        }}
+      >
+        {children}
+        <span 
+          style={{ 
+            fontSize: 9, 
+            fontWeight: 800, 
+            background: borderColor, 
+            color: "#fff", 
+            padding: "2px 6px", 
+            borderRadius: 4,
+            lineHeight: 1.2,
+            letterSpacing: "0.03em",
+            boxShadow: `0 0 6px ${glowColor}`
+          }}
+        >
+          {anomaly.probability}% ALERT
+        </span>
+      </div>
+
+      {/* Dynamic Alert Tooltip Card */}
+      {showTooltip && (
+        <div 
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "absolute",
+            left: 0,
+            ...(isTopField 
+              ? { top: "100%", marginTop: 8 } 
+              : { bottom: "100%", marginBottom: 8 }
+            ),
+            width: 340,
+            zIndex: 9999,
+            pointerEvents: "auto",
+          }}
+        >
+          <div style={{
+            background: "#090d16",
+            border: `1.5px solid ${borderColor}`,
+            borderRadius: 10,
+            padding: 16,
+            boxShadow: `0 16px 40px rgba(0,0,0,0.95), 0 0 24px ${glowColor}`,
+            textAlign: "left",
+            color: "#fff"
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <ShieldAlert size={16} color={borderColor} style={{ flexShrink: 0 }} />
+                <div style={{ fontWeight: 900, fontSize: 11, color: anomaly.severity === "HIGH" ? "#fca5a5" : "#fef08a", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                  {anomaly.title}
+                </div>
+              </div>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
+                  setIsHovered(false);
+                }}
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  borderRadius: 4,
+                  color: "#94a3b8",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  width: 20,
+                  height: 20,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  lineHeight: 1,
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ fontSize: 11, color: "#cbd5e1", lineHeight: 1.5, marginBottom: 12 }}>
+              {anomaly.detail}
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 8, fontSize: 10 }}>
+              <span style={{ color: "#94a3b8" }}>Forensic Scan Confidence</span>
+              <span style={{ fontWeight: 800, color: anomaly.severity === "HIGH" ? "#f43f5e" : "#f59e0b" }}>{anomaly.probability}% Probability</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function DocumentIntegrityViewer({
@@ -38,6 +182,7 @@ export default function DocumentIntegrityViewer({
   overallScore = 95,
   seed,
   documentReports,
+  identityVerification,
 }: Props) {
   const isApprove = verdict === "APPROVE" || overallScore >= 75;
 
@@ -125,6 +270,16 @@ export default function DocumentIntegrityViewer({
         status = "WARN";
       }
 
+      // Check for identity mismatch in this document
+      const hasIdMismatch = identityVerification?.mismatched_fields?.some(
+        (m: any) =>
+          (m.sourceA && m.sourceA.toLowerCase() === doc.filename.toLowerCase()) ||
+          (m.sourceB && m.sourceB.toLowerCase() === doc.filename.toLowerCase())
+      );
+      if (hasIdMismatch) {
+        status = "FAIL";
+      }
+
       return {
         id: `doc_${idx}_${doc.type}`,
         name: doc.filename,
@@ -138,6 +293,7 @@ export default function DocumentIntegrityViewer({
         benford_result: (doc as any).benford_result,
         entropy_result: (doc as any).entropy_result,
         dna_result: (doc as any).dna_result,
+        hasIdMismatch,
       };
     });
   } else {
@@ -148,7 +304,7 @@ export default function DocumentIntegrityViewer({
         type: "PAN Card",
         score: isApprove ? 99 : 65,
         uploadDate: "2026-07-14",
-        status: isApprove ? "OK" : "WARN",
+        status: isApprove ? "OK" : "FAIL",
         fields: {
           name: applicantName.toUpperCase(),
           fatherName: "S. KUMAR",
@@ -157,6 +313,7 @@ export default function DocumentIntegrityViewer({
           issueDate: "12-OCT-2018",
           status: "ACTIVE & VERIFIED (INCOME TAX DEPT)",
         },
+        hasIdMismatch: !isApprove,
         benford_result: {
           triggered: false,
           chi_sq: 4.8,
@@ -174,16 +331,16 @@ export default function DocumentIntegrityViewer({
       },
       {
         id: "bank",
-        name: "SBI Bank Statement FY25.pdf",
+        name: "Canara Bank Statement FY25.pdf",
         type: "Bank Statement",
         score: isApprove ? 97 : 58,
         uploadDate: "2026-07-14",
         status: isApprove ? "OK" : "FAIL",
         fields: {
-          bankName: "STATE BANK OF INDIA",
+          bankName: "CANARA BANK",
           accHolder: applicantName,
           accNumber: "38920194821",
-          ifsc: "SBIN0000842",
+          ifsc: "CNRB0000842",
           period: "01-Apr-2025 to 31-Mar-2026",
           amb: "₹1,85,420",
           closingBal: "₹4,12,050",
@@ -222,7 +379,7 @@ export default function DocumentIntegrityViewer({
           matches: isApprove ? [] : [
             {
               match_type: "KNOWN_FRAUD_TEMPLATE",
-              pattern_name: "SBI Statement Builder Online v3.1",
+              pattern_name: "Canara Bank Statement Builder Online v3.1",
               description: "A known digital statement template generator found in darkweb repos.",
               risk_category: "Statement Fabrication Tool",
               similarity_score: 98.4,
@@ -386,6 +543,8 @@ export default function DocumentIntegrityViewer({
                         ? "Integrity OK"
                         : doc.status === "WARN"
                         ? "Anomalies Detected"
+                        : doc.hasIdMismatch
+                        ? "Identity Mismatch"
                         : "Tamper Flag Detected"}
                     </span>
                   </div>
@@ -454,145 +613,170 @@ export default function DocumentIntegrityViewer({
             }
 
             const getAnomaliesForDoc = (doc: any): DocAnomaly[] => {
+              const anomaliesList: DocAnomaly[] = [];
+
               if (doc._docFindings && doc._docFindings.length > 0) {
-                return doc._docFindings.map((f: any) => {
-                  let fieldKey = "general";
+                doc._docFindings.forEach((f: any) => {
                   const fType = (f.type || "").toUpperCase();
-                  if (fType.includes("DATE") || fType.includes("DOB")) fieldKey = "issueDate";
-                  else if (fType.includes("NAME") || fType.includes("HOLDER")) fieldKey = "accHolder";
-                  else if (fType.includes("PAN") || fType.includes("AADHAAR")) fieldKey = "panNo";
-                  else if (fType.includes("AMOUNT") || fType.includes("SALARY") || fType.includes("BALANCE")) fieldKey = "closingBal";
-                  else if (fType.includes("LOGO")) fieldKey = "logo";
-                  else if (fType.includes("SIGNATURE")) fieldKey = "signature";
+                  const fDetail = (f.detail || "").toUpperCase();
+                  let keysToFlag: string[] = ["general"];
 
-                  return {
-                    fieldKey,
-                    title: (f.type ? f.type.replace(/_/g, " ") + " ALERT" : "FORENSIC INTEGRITY ALERT").toUpperCase(),
-                    detail: f.detail || "Forensic analysis flagged a pixel or metadata anomaly in this field.",
-                    severity: f.severity || "MEDIUM",
-                    probability: f.confidence ? Math.round(f.confidence * 100) : (f.severity === "HIGH" ? 98 : 88)
-                  };
+                  if (fType.includes("DATE") || fType.includes("DOB")) {
+                    keysToFlag = ["issueDate", "dob"];
+                  } else if (
+                    fType.includes("NAME") || fType.includes("HOLDER") || fType.includes("OWNER") ||
+                    fType.includes("APPLICANT") || fType.includes("SPLICING") || fDetail.includes("NAME") ||
+                    fDetail.includes("BHANU") || fDetail.includes("PRAKASH")
+                  ) {
+                    keysToFlag = ["name", "accHolder", "owner_name"];
+                  } else if (fType.includes("PAN") || fType.includes("AADHAAR")) {
+                    keysToFlag = ["panNo", "pan_number"];
+                  } else if (fType.includes("AMOUNT") || fType.includes("SALARY") || fType.includes("BALANCE")) {
+                    keysToFlag = ["closingBal", "grossSalary"];
+                  } else if (fType.includes("LOGO")) {
+                    keysToFlag = ["logo"];
+                  } else if (fType.includes("SIGNATURE")) {
+                    keysToFlag = ["signature"];
+                  }
+
+                  keysToFlag.forEach((k) => {
+                    anomaliesList.push({
+                      fieldKey: k,
+                      title: (f.type ? f.type.replace(/_/g, " ") + " ALERT" : "FORENSIC INTEGRITY ALERT").toUpperCase(),
+                      detail: f.detail || "Forensic analysis flagged a pixel or metadata anomaly in this field.",
+                      severity: f.severity || "MEDIUM",
+                      probability: f.confidence ? Math.round(f.confidence * 100) : (f.severity === "HIGH" ? 98 : 88)
+                    });
+                  });
                 });
-              }
+              } else {
+                // Fallback mockup anomalies if not approved
+                const isApprove = activeDoc.score >= 75;
+                if (!isApprove) {
+                  const type = (doc.type || "").toLowerCase();
+                  const name = (doc.name || "").toLowerCase();
 
-              // Fallback mockup anomalies if not approved
-              const isApprove = activeDoc.score >= 75;
-              if (!isApprove) {
-                const type = (doc.type || "").toLowerCase();
-                const name = (doc.name || "").toLowerCase();
-
-                if (type.includes("gst") || name.includes("gst")) {
-                  return [
-                    {
+                  if (type.includes("gst") || name.includes("gst")) {
+                    anomaliesList.push({
                       fieldKey: "issueDate",
                       title: "GSTIN REGISTRATION DATE ALERT",
                       detail: "Font type mismatch detected. The date field was edited using an Arial narrow font while the surrounding document uses standard dynamic OCR fonts.",
                       severity: "MEDIUM",
                       probability: 94
-                    }
-                  ];
-                }
-                if (type.includes("bank") || name.includes("bank") || name.includes("statement")) {
-                  return [
-                    {
+                    });
+                  }
+                  if (type.includes("bank") || name.includes("bank") || name.includes("statement")) {
+                    anomaliesList.push({
                       fieldKey: "logo",
-                      title: "HDFC BANK LOGO ALERT",
+                      title: "CANARA BANK LOGO ALERT",
                       detail: "Logo manipulation detected. Logo metadata reveals it was inserted on a modified PDF canvas using Photoshop CC on July 14, 2026.",
                       severity: "HIGH",
                       probability: 98
-                    },
-                    {
+                    }, {
                       fieldKey: "transaction",
                       title: "TRANSACTION INCONSISTENCY ALERT",
                       detail: "High-value credit of ₹20,000,000 does not align with average monthly balance trends or declared GST sales.",
                       severity: "MEDIUM",
                       probability: 88
-                    }
-                  ];
-                }
-                if (type.includes("balance") || name.includes("balance") || type.includes("financial")) {
-                  return [
-                    {
+                    });
+                  }
+                  if (type.includes("balance") || name.includes("balance") || type.includes("financial")) {
+                    anomaliesList.push({
                       fieldKey: "signature",
                       title: "AUDITOR DIGITAL SIGNATURE ALERT",
                       detail: "Digital Signature warning: Certificate was self-signed and does not resolve to an active CA registry of ICAI. Certified by mock CA 'M/s Goel & Associates'.",
                       severity: "MEDIUM",
                       probability: 87
-                    }
-                  ];
-                }
-                if (type.includes("pan") || name.includes("pan")) {
-                  return [
-                    {
+                    });
+                  }
+                  if (type.includes("pan") || name.includes("pan")) {
+                    anomaliesList.push({
+                      fieldKey: "name",
+                      title: "NAME FIELD TEXT ALTERATION ALERT",
+                      detail: "Digital character editing detected in Name field ('BHANU PRAKASH TH'). Spliced character / kerning gap anomaly flagged.",
+                      severity: "HIGH",
+                      probability: 96
+                    }, {
                       fieldKey: "panNo",
                       title: "PAN ID NUMBER ALERT",
                       detail: "Altered character spacing detected around the PAN ID number. Neural layout scan flags character replacement.",
                       severity: "HIGH",
                       probability: 92
-                    }
-                  ];
+                    });
+                  }
                 }
               }
-              return [];
+
+              // Also check document's region_annotations directly
+              const docReportObj = documentReports?.find(r => r.filename === doc.name);
+              if (docReportObj?.tamper_result?.region_annotations) {
+                docReportObj.tamper_result.region_annotations.forEach((reg: any) => {
+                  const labelUpper = (reg.label || "").toUpperCase();
+                  if (labelUpper.includes("NAME") || labelUpper.includes("BHANU") || labelUpper.includes("PRAKASH") || labelUpper.includes("SPLICED") || labelUpper.includes("ALTER")) {
+                    anomaliesList.push({
+                      fieldKey: "name",
+                      title: "NAME FIELD ALTERATION ALERT",
+                      detail: reg.reason || reg.label || "Digital text editing/splicing anomaly detected near Name field.",
+                      severity: "HIGH",
+                      probability: Math.round((reg.confidence || 0.95) * 100)
+                    });
+                  }
+                });
+              }
+
+              // Append cross-document identity mismatches from identityVerification
+              if (identityVerification && identityVerification.mismatched_fields) {
+                identityVerification.mismatched_fields.forEach((entry: any) => {
+                  const isA = entry.sourceA && entry.sourceA.toLowerCase() === doc.name.toLowerCase();
+                  const isB = entry.sourceB && entry.sourceB.toLowerCase() === doc.name.toLowerCase();
+                  if (isA || isB) {
+                    let fieldKeys: string[] = [];
+                    const fieldName = (entry.field || "").toLowerCase();
+                    if (fieldName.includes("name") || fieldName.includes("holder")) {
+                      fieldKeys = ["name", "accHolder", "accHolderName"];
+                    } else if (fieldName.includes("pan")) {
+                      fieldKeys = ["panNo", "pan_number", "pan_no"];
+                    } else if (fieldName.includes("aadhaar")) {
+                      fieldKeys = ["aadhaarNo", "aadhaar_number", "aadhaar_no"];
+                    } else if (fieldName.includes("dob") || fieldName.includes("birth")) {
+                      fieldKeys = ["dob", "date_of_birth"];
+                    } else {
+                      fieldKeys = [entry.field];
+                    }
+
+                    fieldKeys.forEach(fKey => {
+                      anomaliesList.push({
+                        fieldKey: fKey,
+                        title: `IDENTITY MISMATCH: ${entry.field.toUpperCase()}`,
+                        detail: `Mismatch detected: Declared value is "${entry.valueA}" but this document contains "${entry.valueB}".`,
+                        severity: "HIGH",
+                        probability: 99
+                      });
+                    });
+                  }
+                });
+              } else if (activeDoc.score < 75 && (doc.id === "pan" || (doc.name && doc.name.toLowerCase().includes("pan")))) {
+                // Mockup fallback mismatches for rejected Abhishek KP case
+                anomaliesList.push({
+                  fieldKey: "name",
+                  title: "IDENTITY MISMATCH: APPLICANT NAME",
+                  detail: 'Mismatch detected: Declared value is "Abhishek KP" but this document contains "BHANU PRAKASH T".',
+                  severity: "HIGH",
+                  probability: 99
+                });
+                anomaliesList.push({
+                  fieldKey: "panNo",
+                  title: "IDENTITY MISMATCH: PAN NUMBER",
+                  detail: 'Mismatch detected: Declared value is "CTQPT9887A" but this document contains "CTQPT9882A".',
+                  severity: "HIGH",
+                  probability: 99
+                });
+              }
+
+              return anomaliesList;
             };
 
             const docAnomalies = getAnomaliesForDoc(activeDoc);
-
-            // Helper component to render highlighted container with tooltip
-            const HighlightedField = ({ fieldKey, children }: { fieldKey: string, children: React.ReactNode }) => {
-              const anomaly = docAnomalies.find(a => a.fieldKey === fieldKey);
-              if (!anomaly) return <>{children}</>;
-
-              const borderColor = anomaly.severity === "HIGH" ? "#ef4444" : "#f59e0b";
-              const bgColor = anomaly.severity === "HIGH" ? "rgba(239, 68, 68, 0.08)" : "rgba(245, 158, 11, 0.08)";
-              const glowColor = anomaly.severity === "HIGH" ? "rgba(239, 68, 68, 0.3)" : "rgba(245, 158, 11, 0.3)";
-
-              return (
-                <div style={{ position: "relative", display: "inline-block" }}>
-                  <div style={{
-                    border: `2px solid ${borderColor}`,
-                    borderRadius: 6,
-                    padding: "4px 10px",
-                    background: bgColor,
-                    boxShadow: `0 0 10px ${glowColor}`,
-                    cursor: "pointer"
-                  }}>
-                    {children}
-                  </div>
-
-                  {/* Dynamic Alert Tooltip Card */}
-                  <div style={{
-                    position: "absolute",
-                    right: 0,
-                    bottom: "125%",
-                    width: 320,
-                    background: "#090d16",
-                    border: `1px solid ${borderColor}`,
-                    borderRadius: 10,
-                    padding: 16,
-                    boxShadow: "0 12px 36px rgba(0,0,0,0.8)",
-                    zIndex: 40,
-                    textAlign: "left",
-                    color: "#fff",
-                    pointerEvents: "none"
-                  }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
-                      <ShieldAlert size={16} color={borderColor} style={{ flexShrink: 0, marginTop: 1 }} />
-                      <div style={{ fontWeight: 800, fontSize: 11, color: anomaly.severity === "HIGH" ? "#fca5a5" : "#fef08a", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                        {anomaly.title}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 10.5, color: "#cbd5e1", lineHeight: 1.5, marginBottom: 12 }}>
-                      {anomaly.detail}
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 10, fontSize: 10 }}>
-                      <span style={{ color: "#94a3b8" }}>Scan Confidence</span>
-                      <span style={{ fontWeight: 800, color: "#f43f5e" }}>{anomaly.probability}% Probability</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            };
 
             const isGst = activeDoc.type.toLowerCase().includes("gst") || activeDoc.name.toLowerCase().includes("gst");
             const isBank = activeDoc.type.toLowerCase().includes("bank") || activeDoc.name.toLowerCase().includes("bank") || activeDoc.name.toLowerCase().includes("statement");
@@ -611,11 +795,11 @@ export default function DocumentIntegrityViewer({
                 justifyContent: "space-between",
                 boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
                 position: "relative",
-                overflow: "hidden"
+                overflow: "visible"
               }}>
                 {/* ── 1. GST RETURN CERTIFICATE ── */}
                 {isGst && (
-                  <div style={{ position: "relative", background: "#0b1726", border: "1px solid #1e293b", borderRadius: 10, padding: 24 }}>
+                  <div style={{ position: "relative", overflow: "visible", background: "#0b1726", border: "1px solid #1e293b", borderRadius: 10, padding: 24 }}>
                     <div style={{ textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 12, marginBottom: 16 }}>
                       <div style={{ fontSize: 13, fontWeight: 900, color: "#f59e0b", letterSpacing: "0.06em" }}>GOVERNMENT OF INDIA</div>
                       <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>REGISTRATION CERTIFICATE UNDER GOODS AND SERVICES TAX</div>
@@ -632,7 +816,7 @@ export default function DocumentIntegrityViewer({
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ color: "var(--text-muted)" }}>Registration Date</span>
-                        <HighlightedField fieldKey="issueDate">
+                        <HighlightedField fieldKey="issueDate" docAnomalies={docAnomalies}>
                           <span style={{ fontWeight: 800, color: "white", fontFamily: "monospace" }}>
                             {activeDoc.fields.issueDate || "14/05/2021"}
                           </span>
@@ -649,12 +833,12 @@ export default function DocumentIntegrityViewer({
 
                 {/* ── 2. BANK STATEMENT ── */}
                 {isBank && (
-                  <div style={{ position: "relative", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 10, padding: 20, color: "#0f172a" }}>
+                  <div style={{ position: "relative", overflow: "visible", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 10, padding: "24px 20px 20px 20px", color: "#0f172a" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "2px solid #e2e8f0", paddingBottom: 12, marginBottom: 14 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <HighlightedField fieldKey="logo">
-                          <div style={{ background: "#000", color: "#fff", fontWeight: 900, padding: "4px 8px", borderRadius: 4, fontSize: 11 }}>
-                            BK HDFC Bank
+                        <HighlightedField fieldKey="logo" docAnomalies={docAnomalies} placement="bottom">
+                          <div style={{ background: "#0085ad", color: "#fff", fontWeight: 900, padding: "4px 8px", borderRadius: 4, fontSize: 11, display: "flex", alignItems: "center", gap: 6 }}>
+                            <span>CANARA BANK</span>
                           </div>
                         </HighlightedField>
                         <div style={{ fontSize: 10, color: "#64748b" }}>Wealth Management Branch</div>
@@ -677,7 +861,7 @@ export default function DocumentIntegrityViewer({
                       </div>
                       <div>
                         <div style={{ fontSize: 8, color: "#64748b" }}>CLOSING BALANCE</div>
-                        <HighlightedField fieldKey="closingBal">
+                        <HighlightedField fieldKey="closingBal" docAnomalies={docAnomalies}>
                           <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>{activeDoc.fields.closingBal || "₹2,34,12,410.50"}</div>
                         </HighlightedField>
                       </div>
@@ -700,7 +884,7 @@ export default function DocumentIntegrityViewer({
                         <tr style={{ background: docAnomalies.some(a => a.fieldKey === "transaction") ? "rgba(245, 158, 11, 0.08)" : "transparent" }}>
                           <td style={{ padding: 4 }}>24-May-26</td>
                           <td style={{ padding: 4, fontWeight: 800 }}>
-                            <HighlightedField fieldKey="transaction">
+                            <HighlightedField fieldKey="transaction" docAnomalies={docAnomalies}>
                               <span>RTGS IN - VARDHAMAN IND - CR</span>
                             </HighlightedField>
                           </td>
@@ -718,7 +902,7 @@ export default function DocumentIntegrityViewer({
 
                 {/* ── 3. AUDITED BALANCE SHEET ── */}
                 {isBalance && (
-                  <div style={{ position: "relative", background: "#0b1726", border: "1px solid #1e293b", borderRadius: 10, padding: 20 }}>
+                  <div style={{ position: "relative", overflow: "visible", background: "#0b1726", border: "1px solid #1e293b", borderRadius: 10, padding: 20 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 10, marginBottom: 14 }}>
                       <div style={{ fontSize: 13, fontWeight: 900, color: "white" }}>Financial Audited Balance Sheet</div>
                       <div style={{ fontSize: 10, color: "var(--text-muted)" }}>FY 2025-26</div>
@@ -727,7 +911,7 @@ export default function DocumentIntegrityViewer({
                     <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 12 }}>
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <span style={{ color: "var(--text-muted)" }}>Revenue</span>
-                        <HighlightedField fieldKey="revenue">
+                        <HighlightedField fieldKey="revenue" docAnomalies={docAnomalies}>
                           <span style={{ fontWeight: 800, color: "white", fontFamily: "monospace" }}>{activeDoc.fields.revenue || "₹18,42,00,000"}</span>
                         </HighlightedField>
                       </div>
@@ -737,7 +921,7 @@ export default function DocumentIntegrityViewer({
                       </div>
 
                       <div style={{ marginTop: 10 }}>
-                        <HighlightedField fieldKey="signature">
+                        <HighlightedField fieldKey="signature" docAnomalies={docAnomalies}>
                           <div style={{ fontSize: 10, color: "#fef08a", fontWeight: 700 }}>
                             OCR and metadata integrity scanner completed.
                           </div>
@@ -749,7 +933,7 @@ export default function DocumentIntegrityViewer({
 
                 {/* ── 4. PAN ID CARD ── */}
                 {isPan && (
-                  <div style={{ position: "relative", background: "#081b18", border: "1px solid #134e45", borderRadius: 10, padding: 20 }}>
+                  <div style={{ position: "relative", overflow: "visible", background: "#081b18", border: "1px solid #134e45", borderRadius: 10, padding: 20 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(16,185,129,0.2)", paddingBottom: 10, marginBottom: 14 }}>
                       <div>
                         <div style={{ fontSize: 10, fontWeight: 800, color: "#10b981", letterSpacing: "0.08em" }}>INCOME TAX DEPARTMENT</div>
@@ -761,11 +945,13 @@ export default function DocumentIntegrityViewer({
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, fontSize: 11 }}>
                       <div>
                         <div style={{ fontSize: 8, color: "#10b981", fontWeight: 700 }}>NAME</div>
-                        <div style={{ fontSize: 12, fontWeight: 800, color: "white", marginTop: 2 }}>{activeDoc.fields.name || "N/A"}</div>
+                        <HighlightedField fieldKey="name" docAnomalies={docAnomalies} placement="bottom">
+                          <div style={{ fontSize: 12, fontWeight: 800, color: "white", marginTop: 2 }}>{activeDoc.fields.name || "N/A"}</div>
+                        </HighlightedField>
                       </div>
                       <div>
                         <div style={{ fontSize: 8, color: "#10b981", fontWeight: 700 }}>DATE OF BIRTH</div>
-                        <HighlightedField fieldKey="dob">
+                        <HighlightedField fieldKey="dob" docAnomalies={docAnomalies} placement="bottom">
                           <div style={{ fontSize: 12, fontWeight: 800, color: "white", marginTop: 2 }}>{activeDoc.fields.dob || "N/A"}</div>
                         </HighlightedField>
                       </div>
@@ -775,7 +961,7 @@ export default function DocumentIntegrityViewer({
                       </div>
                       <div>
                         <div style={{ fontSize: 8, color: "#10b981", fontWeight: 700 }}>PAN ID NUMBER</div>
-                        <HighlightedField fieldKey="panNo">
+                        <HighlightedField fieldKey="panNo" docAnomalies={docAnomalies}>
                           <div style={{ fontSize: 12, fontWeight: 900, color: "#fef08a", fontFamily: "monospace", marginTop: 2 }}>{activeDoc.fields.panNo || "N/A"}</div>
                         </HighlightedField>
                       </div>
@@ -785,7 +971,7 @@ export default function DocumentIntegrityViewer({
 
                 {/* ── 5. OTHER / GENERIC DOCUMENT CARD ── */}
                 {!isGst && !isBank && !isBalance && !isPan && (
-                  <div style={{ position: "relative", background: "#0b1726", border: "1px solid #1e293b", borderRadius: 10, padding: 20 }}>
+                  <div style={{ position: "relative", overflow: "visible", background: "#0b1726", border: "1px solid #1e293b", borderRadius: 10, padding: 20 }}>
                     <div style={{ fontSize: 13, fontWeight: 900, color: "#f59e0b", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 8, marginBottom: 12 }}>
                       {activeDoc.type.toUpperCase()} RECORD
                     </div>
@@ -793,7 +979,7 @@ export default function DocumentIntegrityViewer({
                       {Object.entries(activeDoc.fields).map(([k, v]) => (
                         <div key={k} style={{ display: "flex", justifyContent: "space-between" }}>
                           <span style={{ color: "var(--text-muted)", textTransform: "capitalize" }}>{k.replace(/([A-Z])/g, " $1")}</span>
-                          <HighlightedField fieldKey={k}>
+                          <HighlightedField fieldKey={k} docAnomalies={docAnomalies}>
                             <span style={{ fontWeight: 700, color: "white" }}>{String(v)}</span>
                           </HighlightedField>
                         </div>

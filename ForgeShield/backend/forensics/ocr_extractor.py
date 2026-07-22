@@ -67,8 +67,8 @@ AMOUNT_PATTERN = re.compile(
 )
 
 DATE_PATTERN = re.compile(
-    r"\b(\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|\d{4}[-/]\d{2}[-/]\d{2}|"
-    r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*[\s,]+\d{4})\b",
+    r"\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b|\b\d{4}[-/]\d{2}[-/]\d{2}\b|"
+    r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*[\s,]+\d{4}\b",
     re.IGNORECASE,
 )
 
@@ -116,12 +116,53 @@ def extract_text_from_image(image_path: Path, doc_name: str = "") -> dict[str, A
 
 def extract_text_from_pdf(pdf_path: Path, doc_name: str = "") -> dict[str, Any]:
     """
-    Extract digital text from PDF. If digital text is empty/scanned, render pages to images and run OCR.
+    Extract text from PDF. Renders page 0 as a PNG image to obtain word-level
+    bounding boxes for forensic region localization and tamper visualization.
     """
     text_content = ""
     word_boxes = []
     ocr_confidence = 100.0
+    ocr_data = None
+    rendered_path = None
 
+    # Render page 0 using PyMuPDF (fitz)
+    try:
+        import fitz
+        doc = fitz.open(str(pdf_path))
+        if len(doc) > 0:
+            page = doc[0]
+            pix = page.get_pixmap(dpi=150)
+            rendered_path = pdf_path.with_suffix(".page0.png")
+            pix.save(str(rendered_path))
+
+            img = Image.open(rendered_path).convert("RGB")
+            raw_ocr_text = pytesseract.image_to_string(img)
+            ocr_data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+            word_boxes = _extract_word_boxes(ocr_data)
+            ocr_confidence = _compute_avg_confidence(ocr_data)
+            insertion_anomalies = _detect_text_insertion_anomalies(word_boxes)
+
+            # Try digital text extraction first
+            for p in doc:
+                t = p.get_text()
+                if t:
+                    text_content += t + "\n"
+
+            final_text = text_content if len(text_content.strip()) > 30 else raw_ocr_text
+
+            return {
+                "text": final_text,
+                "ocr_data": ocr_data,
+                "word_boxes": word_boxes,
+                "ocr_confidence": ocr_confidence,
+                "insertion_anomalies": insertion_anomalies,
+                "is_digital_pdf": len(text_content.strip()) > 30,
+                "rendered_image_path": rendered_path,
+            }
+    except Exception as e:
+        logger.warning(f"PyMuPDF page rendering / OCR failed for {doc_name}: {e}")
+
+    # Fallback digital text extraction using pypdf
     try:
         import pypdf
         reader = pypdf.PdfReader(str(pdf_path))
@@ -129,76 +170,17 @@ def extract_text_from_pdf(pdf_path: Path, doc_name: str = "") -> dict[str, Any]:
             t = page.extract_text()
             if t:
                 text_content += t + "\n"
-
-        # If text is substantial, we have a digital PDF
-        if len(text_content.strip()) > 50:
-            return {
-                "text": text_content,
-                "ocr_data": None,
-                "word_boxes": [],
-                "ocr_confidence": 98.0,
-                "insertion_anomalies": [],
-                "is_digital_pdf": True,
-            }
     except Exception as e:
-        logger.debug(f"pypdf extraction failed, falling back: {e}")
-
-    # Fallback: Convert first page to image if possible or use pdfminer
-    try:
-        from pdfminer.high_level import extract_text
-        pm_text = extract_text(str(pdf_path))
-        if len(pm_text.strip()) > 30:
-            return {
-                "text": pm_text,
-                "ocr_data": None,
-                "word_boxes": [],
-                "ocr_confidence": 95.0,
-                "insertion_anomalies": [],
-                "is_digital_pdf": True,
-            }
-    except Exception as e:
-        logger.debug(f"pdfminer extraction failed: {e}")
-
-    # Fallback: Convert first page to image using PyMuPDF and run OCR
-    try:
-        import fitz
-        import io
-        from PIL import Image
-        
-        doc = fitz.open(str(pdf_path))
-        if len(doc) > 0:
-            page = doc[0]
-            pix = page.get_pixmap(dpi=150)
-            img_data = pix.tobytes("png")
-            img = Image.open(io.BytesIO(img_data)).convert("RGB")
-            
-            raw_text = pytesseract.image_to_string(img)
-            ocr_data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
-            
-            word_boxes = _extract_word_boxes(ocr_data)
-            ocr_confidence = _compute_avg_confidence(ocr_data)
-            insertion_anomalies = _detect_text_insertion_anomalies(word_boxes)
-            
-            if len(raw_text.strip()) > 10:
-                logger.info(f"Successfully extracted OCR text from scanned PDF using PyMuPDF: {len(raw_text)} chars")
-                return {
-                    "text": raw_text,
-                    "ocr_data": ocr_data,
-                    "word_boxes": word_boxes,
-                    "ocr_confidence": ocr_confidence,
-                    "insertion_anomalies": insertion_anomalies,
-                    "is_digital_pdf": False,
-                }
-    except Exception as e:
-        logger.warning(f"PyMuPDF scanned PDF OCR fallback failed: {e}")
+        logger.debug(f"pypdf fallback failed: {e}")
 
     return {
         "text": text_content,
-        "ocr_data": None,
-        "word_boxes": [],
+        "ocr_data": ocr_data,
+        "word_boxes": word_boxes,
         "ocr_confidence": 75.0,
         "insertion_anomalies": [],
         "is_digital_pdf": False,
+        "rendered_image_path": rendered_path,
     }
 
 
@@ -250,7 +232,7 @@ def extract_key_fields(raw_text: str, doc_type: str, ocr_data: dict | None = Non
         fields["ifsc_code"] = ifscs[0]
 
     # Extract Name heuristics
-    _extract_names(lines, fields)
+    _extract_names(lines, fields, doc_type)
 
     # Extract Income / Amount heuristics
     _extract_amounts(raw_text, fields)
@@ -260,6 +242,8 @@ def extract_key_fields(raw_text: str, doc_type: str, ocr_data: dict | None = Non
     if dates:
         fields["dates_found"] = dates[:5]
         fields["doc_date"] = dates[0]
+        fields["dob"] = dates[0]
+        fields["date_of_birth"] = dates[0]
 
     return fields
 
@@ -320,7 +304,9 @@ def _detect_text_insertion_anomalies(word_boxes: list[dict]) -> list[dict]:
     return anomalies
 
 
-def _extract_names(lines: list[str], fields: dict):
+def _extract_names(lines: list[str], fields: dict, doc_type: str = "unknown"):
+    # 1. Standard keyword-based name extraction
+    found_keyword_name = False
     for i, line in enumerate(lines[:15]):
         line_upper = line.upper()
         if any(kw in line_upper for kw in ["NAME", "ACCOUNT HOLDER", "EMPLOYEE NAME", "APPLICANT"]):
@@ -329,16 +315,102 @@ def _extract_names(lines: list[str], fields: dict):
                 name_val = parts[1].strip()
                 fields["owner_name"] = name_val
                 fields["account_holder_name"] = name_val
+                found_keyword_name = True
                 break
             elif i + 1 < len(lines):
                 fields["owner_name"] = lines[i + 1].strip()
                 fields["account_holder_name"] = lines[i + 1].strip()
+                found_keyword_name = True
                 break
 
         if "S/O" in line_upper or "D/O" in line_upper or "W/O" in line_upper or "FATHER" in line_upper:
             parts = line.split(":", 1)
-            if len(parts) > 1:
+            if len(parts) > 1 and len(parts[1].strip()) >= 3:
                 fields["father_name"] = parts[1].strip()
+
+    # 2. Aadhaar-specific name extraction (Aadhaar cards lack a "Name:" label prefix)
+    if not found_keyword_name and doc_type in ("aadhaar_card", "aadhaar"):
+        # Heuristic A: Look after "To" block
+        found_to = False
+        for idx, line in enumerate(lines[:15]):
+            if line.strip().lower() == "to":
+                found_to = True
+                # Scan next few lines for Title-case or UPPERCASE English names
+                for j in range(idx + 1, min(idx + 5, len(lines))):
+                    candidate = lines[j].strip()
+                    if re.match(r"^[A-Z][a-z]+(\s+[A-Z][a-z]*)+$", candidate) or re.match(r"^[A-Z\s\.]+$", candidate):
+                        if len(candidate) >= 3 and not any(w in candidate.lower() for w in ["to", "enrolment", "unique", "authority", "india", "government"]):
+                            fields["owner_name"] = candidate
+                            fields["account_holder_name"] = candidate
+                            found_keyword_name = True
+                            break
+                break
+
+        # Heuristic B: Scan above Date of Birth (DOB) line if "To" wasn't found or name wasn't extracted
+        if not found_keyword_name:
+            for idx, line in enumerate(lines):
+                if any(kw in line.upper() for kw in ["DOB", "YEAR OF BIRTH", "DATE OF BIRTH"]):
+                    for j in range(max(0, idx - 2), idx):
+                        candidate = lines[j].strip()
+                        if re.match(r"^[A-Z][a-z]+(\s+[A-Z][a-z]*)+$", candidate) or re.match(r"^[A-Z\s\.]+$", candidate):
+                            if len(candidate) >= 3 and not any(w in candidate.lower() for w in ["to", "enrolment", "unique", "authority", "india", "government", "male", "female"]):
+                                fields["owner_name"] = candidate
+                                fields["account_holder_name"] = candidate
+                                found_keyword_name = True
+                                break
+                    if found_keyword_name:
+                        break
+
+    # 3. PAN Card specific field extraction
+    is_pan = (
+        doc_type in ("pan_card", "pan")
+        or any("INCOME TAX" in l.upper() or "PERMANENT ACCOUNT" in l.upper() for l in lines[:10])
+    )
+    if is_pan:
+        for idx, line in enumerate(lines):
+            line_up = line.upper()
+
+            # Name extraction on PAN Card
+            if not fields.get("owner_name"):
+                if "NAME" in line_up or "नाम" in line:
+                    if not any(k in line_up for k in ["FATHER", "MOTHER", "DEPARTMENT", "CARD", "ACCOUNT"]):
+                        parts = line.split(":", 1)
+                        if len(parts) > 1 and len(parts[1].strip()) >= 3:
+                            fields["owner_name"] = parts[1].strip()
+                            fields["account_holder_name"] = parts[1].strip()
+                        else:
+                            for j in range(idx + 1, min(idx + 3, len(lines))):
+                                candidate = lines[j].strip()
+                                if re.match(r"^[A-Z\s\.]+$", candidate) and len(candidate) >= 3:
+                                    if not any(w in candidate.upper() for w in ["INCOME", "TAX", "GOVT", "INDIA", "PERMANENT", "FATHER", "DATE"]):
+                                        fields["owner_name"] = candidate
+                                        fields["account_holder_name"] = candidate
+                                        break
+
+            # Father's Name extraction on PAN Card
+            if not fields.get("father_name"):
+                if "FATHER" in line_up or "पिता" in line or "S/O" in line_up:
+                    parts = line.split(":", 1)
+                    if len(parts) > 1 and len(parts[1].strip()) >= 3:
+                        fields["father_name"] = parts[1].strip()
+                    else:
+                        for j in range(idx + 1, min(idx + 3, len(lines))):
+                            candidate = lines[j].strip()
+                            if re.match(r"^[A-Z\s\.]+$", candidate) and len(candidate) >= 3:
+                                if not any(w in candidate.upper() for w in ["INCOME", "TAX", "GOVT", "INDIA", "PERMANENT", "DATE", "BIRTH"]):
+                                    fields["father_name"] = candidate
+                                    break
+
+            # DOB extraction on PAN Card
+            if not fields.get("dob") or not fields.get("date_of_birth"):
+                if any(kw in line_up for kw in ["DOB", "DATE OF BIRTH", "BIRTH", "तारीख", "जन्म"]):
+                    m = DATE_PATTERN.search(line)
+                    if not m and idx + 1 < len(lines):
+                        m = DATE_PATTERN.search(lines[idx + 1])
+                    if m:
+                        fields["dob"] = m.group(0)
+                        fields["date_of_birth"] = m.group(0)
+                        fields["doc_date"] = m.group(0)
 
 
 def _extract_amounts(raw_text: str, fields: dict):

@@ -125,6 +125,36 @@ def verify_identity_fields(
                         "docB": rec["filename"],
                     })
 
+    # Cross-document Name Comparison (detect mismatches between different uploaded documents)
+    name_sources = [(rec["filename"], rec["name"]) for rec in extracted_records if rec["name"]]
+    if len(name_sources) >= 2:
+        for i in range(len(name_sources)):
+            for j in range(i + 1, len(name_sources)):
+                srcA, nameA = name_sources[i]
+                srcB, nameB = name_sources[j]
+                is_match, sim = _compare_names(nameA, nameB)
+                if not is_match:
+                    matrix_entry = {
+                        "field": "Applicant Name",
+                        "sourceA": srcA,
+                        "valueA": nameA,
+                        "sourceB": srcB,
+                        "valueB": nameB,
+                        "match": False,
+                        "similarity": sim,
+                    }
+                    comparison_matrix.append(matrix_entry)
+                    mismatched_fields.append(matrix_entry)
+                    critical_mismatch = True
+                    total_penalty += PENALTY_NAME_MISMATCH
+                    findings.append({
+                        "type": "CRITICAL_NAME_MISMATCH",
+                        "severity": "HIGH",
+                        "detail": f"Name mismatch between documents: '{nameA}' ({srcA}) vs '{nameB}' ({srcB}).",
+                        "docA": srcA,
+                        "docB": srcB,
+                    })
+
     # ── 2. Cross-Document PAN Comparison ─────────────────────────────
     pan_sources = []
     if declared_pan:
@@ -164,10 +194,23 @@ def verify_identity_fields(
                     })
 
     # ── 3. Cross-Document Aadhaar Comparison ─────────────────────────
-    aadhaar_sources = [
-        (rec["filename"], rec["aadhaar"])
-        for rec in extracted_records if rec["aadhaar"]
-    ]
+    declared_details = case_data.get("declared_details") or {}
+    declared_aadhaar = (
+        declared_details.get("aadhaar_promoter")
+        or declared_details.get("aadhaar_number")
+        or declared_details.get("aadhaar")
+        or declared_details.get("aadhaar_no")
+        or ""
+    )
+    cleaned_declared_aadhaar = _clean_aadhaar(declared_aadhaar)
+
+    aadhaar_sources = []
+    if cleaned_declared_aadhaar:
+        aadhaar_sources.append(("Declared Application", cleaned_declared_aadhaar))
+    for rec in extracted_records:
+        if rec["aadhaar"]:
+            aadhaar_sources.append((rec["filename"], rec["aadhaar"]))
+
     if len(aadhaar_sources) >= 2:
         for i in range(len(aadhaar_sources)):
             for j in range(i + 1, len(aadhaar_sources)):
@@ -295,17 +338,31 @@ def _compare_names(n1: str, n2: str) -> tuple[bool, float]:
     if not c1 or not c2:
         return False, 0.0
 
-    words1 = set(w for w in c1.split() if len(w) >= 2)
-    words2 = set(w for w in c2.split() if len(w) >= 2)
+    if c1 == c2:
+        return True, 100.0
 
-    if not words1 or not words2:
-        return (c1 in c2 or c2 in c1), 100.0 if (c1 in c2 or c2 in c1) else 0.0
+    tokens1 = [w for w in c1.split() if w]
+    tokens2 = [w for w in c2.split() if w]
 
-    inter = words1.intersection(words2)
-    union = words1.union(words2)
-    similarity = (len(inter) / max(len(words1), len(words2))) * 100.0
+    set1 = set(tokens1)
+    set2 = set(tokens2)
 
-    is_match = similarity >= NAME_MATCH_THRESHOLD or len(inter) >= min(len(words1), len(words2))
+    if set1 == set2:
+        return True, 100.0
+
+    inter = set1.intersection(set2)
+    max_len = max(len(tokens1), len(tokens2))
+    similarity = (len(inter) / max_len) * 100.0 if max_len else 0.0
+
+    diff1 = set1 - set2
+    diff2 = set2 - set1
+
+    # If both sides have conflicting non-matching tokens (e.g. 't' vs 'th'), explicit mismatch
+    if diff1 and diff2:
+        return False, round(similarity, 2)
+
+    # Require high similarity (>= 80%) for minor initial subset variations
+    is_match = similarity >= 80.0
     return is_match, round(similarity, 2)
 
 
@@ -327,7 +384,7 @@ def _clean_aadhaar(val: Any) -> str | None:
     if not val:
         return None
     digits = re.sub(r"\D", "", str(val))
-    return digits if len(digits) == 12 else None
+    return digits if len(digits) >= 8 else None
 
 
 def _clean_date(val: Any) -> str | None:

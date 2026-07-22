@@ -607,6 +607,7 @@ export default function CaseReport({ caseId, onBack }: Props) {
                 overallScore={analysis?.overall_score}
                 seed={seedVal}
                 documentReports={analysis?.document_reports}
+                identityVerification={analysis?.identity_verification}
               />
             )}
 

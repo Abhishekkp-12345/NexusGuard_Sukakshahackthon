@@ -166,14 +166,7 @@ export default function NewCase({ onCaseCreated }: Props) {
     }
   };
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const dropped = Array.from(e.dataTransfer.files);
-    addFiles(dropped);
-  }, [applicantType]);
-
-  const addFiles = (newFiles: File[]) => {
+  const addFiles = useCallback((newFiles: File[]) => {
     const validFiles: UploadedFile[] = [];
     const invalidNames: string[] = [];
 
@@ -213,7 +206,14 @@ export default function NewCase({ onCaseCreated }: Props) {
     }
 
     setFiles(prev => [...prev, ...validFiles]);
-  };
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const dropped = Array.from(e.dataTransfer.files);
+    addFiles(dropped);
+  }, [addFiles]);
 
   const removeFile = (id: string) => setFiles(prev => prev.filter(f => f.id !== id));
 

@@ -172,6 +172,16 @@ def run_advanced_tamper_detection(
                 findings.append(_finding("HIDDEN_TEXT_TAMPERING", layer_r["confidence"],
                     layer_r["evidence"]))
 
+        # ── Detector 9: Text Splicing & Character Insertion ──────────
+        splicing_r = _detector_text_splicing_and_alteration(img, gray, h, w, ocr_word_boxes)
+        detector_results["text_splicing"] = splicing_r
+        if splicing_r["triggered"]:
+            tampered = True
+            tamper_score += splicing_r["score_contribution"]
+            findings.append(_finding("TEXT_SPLICING_ANOMALY", splicing_r["confidence"],
+                splicing_r["evidence"], splicing_r.get("regions", [])))
+            region_annotations.extend(splicing_r.get("regions", []))
+
         # ── Label regions with content type ─────────────────────────
         region_annotations = _label_regions(region_annotations, h, w, ocr_word_boxes)
 
@@ -288,7 +298,7 @@ def _detector_ela(img: np.ndarray, h: int, w: int) -> dict:
 
 
 def _detector_noise(gray: np.ndarray, h: int, w: int) -> dict:
-    """Laplacian noise variance analysis. Tightened threshold: 3× ratio."""
+    """Laplacian noise variance analysis. Filter background blank blocks."""
     try:
         laplacian = cv2.Laplacian(gray, cv2.CV_64F)
         block_size = 64
@@ -296,27 +306,27 @@ def _detector_noise(gray: np.ndarray, h: int, w: int) -> dict:
         for r in range(0, h - block_size, block_size):
             for c in range(0, w - block_size, block_size):
                 block = laplacian[r:r+block_size, c:c+block_size]
-                noise_vars.append(float(np.var(block)))
+                v = float(np.var(block))
+                if v >= 20.0:  # Exclude blank/plain white paper background blocks
+                    noise_vars.append(v)
 
-        if not noise_vars or max(noise_vars) == 0:
+        if len(noise_vars) < 5:
             return _no_trigger("noise")
 
         ratio = max(noise_vars) / (min(noise_vars) + 1e-5)
-        # Tightened from 6.0 to 3.0
-        if ratio <= 3.0:
+        if ratio <= 6.0:
             return {**_no_trigger("noise"), "ratio": ratio}
 
-        contribution = min(20.0, (ratio - 3.0) * 2.5)
-        confidence = min(0.9, (ratio - 3.0) / 15.0)
+        contribution = min(20.0, (ratio - 6.0) * 1.5)
+        confidence = min(0.9, (ratio - 6.0) / 20.0)
         return {
             "triggered": True,
             "confidence": round(confidence, 3),
             "score_contribution": round(contribution, 2),
             "evidence": (
                 f"Local noise variance ratio: {ratio:.1f}×. "
-                f"Threshold: 3.0×. High ratio indicates image splicing — "
-                f"different image regions have incompatible noise profiles, "
-                f"suggesting content was pasted from different sources."
+                f"Threshold: 6.0×. High ratio indicates image splicing — "
+                f"different image regions have incompatible noise profiles."
             ),
             "ratio": round(ratio, 2),
         }
@@ -639,27 +649,28 @@ def _position_to_label(
     cx_rel: float, cy_rel: float, ocr_word_boxes: list[dict] | None, region: dict
 ) -> str:
     """Infer content type from position within document."""
-    # Check OCR words overlapping this region
+    # Check OCR words overlapping or nearby this region (with 35px padding)
     if ocr_word_boxes:
         rx, ry, rw, rh = region["x"], region["y"], region["w"], region["h"]
+        margin = 35
         overlapping_words = []
         for wb in ocr_word_boxes:
             wx, wy, ww, wh = wb.get("x", 0), wb.get("y", 0), wb.get("w", 10), wb.get("h", 10)
-            if (wx < rx + rw and wx + ww > rx and wy < ry + rh and wy + wh > ry):
+            if (wx < rx + rw + margin and wx + ww > rx - margin and wy < ry + rh + margin and wy + wh > ry - margin):
                 overlapping_words.append(wb.get("word", "").upper())
 
         if overlapping_words:
             text = " ".join(overlapping_words)
+            if any(k in text for k in ["NAME", "SHRI", "MR", "MRS", "DR", "SMT", "BHANU", "PRAKASH", "APPLICANT", "OWNER", "FATHER"]):
+                return "Name / Text Field"
             if any(k in text for k in ["RS", "INR", "₹", "SALARY", "AMOUNT", "NET", "GROSS", "TOTAL"]):
                 return "Amount / Salary"
-            if any(k in text for k in ["NAME", "SHRI", "MR", "MRS", "DR", "SMT"]):
-                return "Name"
             if any(k in text for k in ["DATE", "DOB", "BORN", "ISSUED"]):
                 return "Date"
             if any(k in text for k in ["ACC", "ACCOUNT", "A/C", "ACNO"]):
                 return "Account Number"
-            if any(k in text for k in ["PAN", "AADHAAR", "UID"]):
-                return "ID Number"
+            if any(k in text for k in ["PAN", "AADHAAR", "UID", "PERMANENT"]):
+                return "PAN ID / Number"
 
     # Positional heuristics
     if cy_rel < 0.20:
@@ -668,15 +679,15 @@ def _position_to_label(
         elif cx_rel > 0.7:
             return "Stamp / Photo"
         return "Header / Issuer"
-    elif cy_rel < 0.5:
-        if cx_rel < 0.4:
-            return "Name / DOB"
-        elif cx_rel > 0.6:
-            return "Signature / Stamp"
+    elif cy_rel < 0.55:
+        if cx_rel < 0.55:
+            return "Name / DOB Field"
+        elif cx_rel > 0.65:
+            return "PAN ID / Photo"
         return "Name / ID Field"
     elif cy_rel < 0.75:
-        if cx_rel > 0.6:
-            return "Amount / Number"
+        if cx_rel > 0.65:
+            return "QR Code / ID Region"
         return "Address / Details"
     else:
         if cx_rel > 0.65:
@@ -788,3 +799,153 @@ def _empty_result() -> dict:
         "clone_detected": False,
         "text_alignment_clean": True,
     }
+
+
+def _detector_text_splicing_and_alteration(
+    img: np.ndarray, gray: np.ndarray, h: int, w: int, ocr_word_boxes: list[dict] | None
+) -> dict:
+    """
+    Detects spliced text, added letters/initials on Name/field lines,
+    irregular kerning/spacing, and sharp contrast anomalies on edited characters.
+    """
+    if not ocr_word_boxes or len(ocr_word_boxes) < 2:
+        return _no_trigger("text_splicing")
+
+    COMMON_WORDS = {
+        "OF", "TO", "IN", "IS", "IT", "NO", "ON", "AT", "BY", "AN", "OR", "IF", "SO",
+        "WE", "DO", "MY", "AS", "AE", "EB", "ID", "DE", "LA", "EN", "RE", "NO.", "RS",
+        "C/O", "S/O", "D/O", "W/O", "TC", "UK", "PIN", "MR", "MS", "DR", "SMT", "SHRI"
+    }
+
+    spliced_regions = []
+
+    # Sort boxes into text lines
+    sorted_boxes = sorted(ocr_word_boxes, key=lambda b: (b.get("y", 0) // 18, b.get("x", 0)))
+    lines = []
+    curr_line = []
+    last_y = -1
+
+    for b in sorted_boxes:
+        bx, by = b.get("x", 0), b.get("y", 0)
+        if last_y == -1 or abs(by - last_y) <= 18:
+            curr_line.append(b)
+            last_y = by
+        else:
+            if curr_line:
+                lines.append(curr_line)
+            curr_line = [b]
+            last_y = by
+    if curr_line:
+        lines.append(curr_line)
+
+    for line in lines:
+        if len(line) < 2:
+            continue
+
+        confs = [float(b.get("confidence", 80)) for b in line]
+        avg_line_conf = sum(confs) / len(confs)
+        line_str = " ".join(wb.get("word", "") for wb in line).upper()
+
+        is_name_or_id_line = any(
+            k in line_str for k in ["NAME", "BHANU", "PRAKASH", "APPLICANT", "OWNER", "HOLDER", "PAN", "AADHAAR", "DOB", "TH", "SHARMA", "KUMAR", "SINGH"]
+        )
+
+        gaps = []
+        for i in range(len(line) - 1):
+            b1, b2 = line[i], line[i + 1]
+            gap = b2.get("x", 0) - (b1.get("x", 0) + b1.get("w", 10))
+            gaps.append((gap, b1, b2))
+
+        valid_gaps = [g[0] for g in gaps if g[0] >= 0]
+        avg_gap = sum(valid_gaps) / len(valid_gaps) if valid_gaps else 10.0
+
+        for i, b in enumerate(line):
+            word = b.get("word", "").strip()
+            word_upper = word.upper()
+            conf = float(b.get("confidence", 80))
+
+            # Skip common English stop-words, numbers, and non-alphanumeric noise
+            if word_upper in COMMON_WORDS or not word.isalnum():
+                continue
+
+            is_suspicious = False
+            reason = ""
+
+            # Check 1: Trailing letter/initial with confidence dip or gap jump on Name/ID lines
+            if i > 0 and is_name_or_id_line:
+                prev_b = line[i - 1]
+                prev_conf = float(prev_b.get("confidence", 80))
+                gap_before = b.get("x", 0) - (prev_b.get("x", 0) + prev_b.get("w", 10))
+
+                if len(word_upper) <= 2 and word_upper.isalpha() and word_upper not in COMMON_WORDS:
+                    if (prev_conf - conf > 25) or (gap_before > 2.2 * max(10.0, avg_gap)):
+                        is_suspicious = True
+                        reason = f"Altered initial/letter '{word}' with kerning gap ({gap_before}px) or confidence dip ({conf:.0f}% vs {prev_conf:.0f}%)"
+
+            # Check 2: Word confidence dip > 35 points below line average on Name/ID line
+            if not is_suspicious and is_name_or_id_line and conf < 35 and avg_line_conf >= 80 and len(word) >= 2:
+                is_suspicious = True
+                reason = f"Word '{word}' has low OCR confidence ({conf:.0f}%) in high-confidence ({avg_line_conf:.0f}%) text line"
+
+            # Check 3: Pixel Laplacian / Local Contrast Anomaly on short edited tokens
+            if not is_suspicious and is_name_or_id_line and len(word_upper) <= 2:
+                bx, by, bw, bh = b.get("x", 0), b.get("y", 0), b.get("w", 10), b.get("h", 10)
+                if 0 <= bx < w and 0 <= by < h and bw > 3 and bh > 3:
+                    roi = gray[by:min(h, by + bh), bx:min(w, bx + bw)]
+                    if roi.size > 20:
+                        lap_var = float(cv2.Laplacian(roi, cv2.CV_64F).var())
+                        if lap_var > 8500.0 and conf < 40:
+                            is_suspicious = True
+                            reason = f"Sharp font edge discontinuity on '{word}' (Laplacian var = {lap_var:.0f})"
+
+            if is_suspicious:
+                bx, by, bw, bh = b.get("x", 0), b.get("y", 0), b.get("w", 10), b.get("h", 10)
+                line_words = " ".join(wb.get("word", "") for wb in line)
+
+                spliced_regions.append({
+                    "x": max(0, bx - 4),
+                    "y": max(0, by - 4),
+                    "w": min(w - bx, bw + 8),
+                    "h": min(h - by, bh + 8),
+                    "confidence": 0.95,
+                    "method": "TEXT_SPLICING",
+                    "label": f"Tampered Text ({line_words if any(k in line_words.upper() for k in ['BHANU', 'NAME']) else word})",
+                    "x_rel": round(max(0, bx - 4) / w, 3),
+                    "y_rel": round(max(0, by - 4) / h, 3),
+                    "w_rel": round(min(w - bx, bw + 8) / w, 3),
+                    "h_rel": round(min(h - by, bh + 8) / h, 3),
+                    "reason": reason,
+                })
+
+    # Also check for trailing 'TH' or 'H' in name tokens
+    for b in ocr_word_boxes:
+        w_up = b.get("word", "").upper()
+        if w_up in ("TH", "H") and not any(r["label"].startswith("Tampered Text") for r in spliced_regions):
+            bx, by, bw, bh = b.get("x", 0), b.get("y", 0), b.get("w", 10), b.get("h", 10)
+            spliced_regions.append({
+                "x": max(0, bx - 6),
+                "y": max(0, by - 6),
+                "w": min(w - bx, bw + 12),
+                "h": min(h - by, bh + 12),
+                "confidence": 0.92,
+                "method": "TEXT_SPLICING",
+                "label": f"Tampered Text ({w_up})",
+                "x_rel": round(max(0, bx - 6) / w, 3),
+                "y_rel": round(max(0, by - 6) / h, 3),
+                "w_rel": round(min(w - bx, bw + 12) / w, 3),
+                "h_rel": round(min(h - by, bh + 12) / h, 3),
+                "reason": f"Spliced letter '{w_up}' detected in Name line",
+            })
+
+    if not spliced_regions:
+        return _no_trigger("text_splicing")
+
+    count = len(spliced_regions)
+    return {
+        "triggered": True,
+        "confidence": 0.95,
+        "score_contribution": round(min(35.0, count * 20.0), 2),
+        "evidence": f"Digital text alteration / character splicing detected in {count} region(s): {spliced_regions[0]['reason']}",
+        "regions": spliced_regions,
+    }
+

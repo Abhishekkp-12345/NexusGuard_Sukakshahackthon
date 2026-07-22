@@ -41,23 +41,52 @@ function CountUp({ target, suffix = "", duration = 2000 }: { target: number; suf
 }
 
 /* ── Floating Particles ────────────────────────────────────────── */
+interface Particle {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+  opacity: number;
+  duration: number;
+  delay: number;
+}
+
 function Particles() {
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setParticles(
+        Array.from({ length: 30 }).map(() => ({
+          width: Math.random() * 4 + 1,
+          height: Math.random() * 4 + 1,
+          left: Math.random() * 100,
+          top: Math.random() * 100,
+          opacity: Math.random() * 0.6 + 0.1,
+          duration: Math.random() * 8 + 6,
+          delay: Math.random() * 5,
+        }))
+      );
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
+
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
-      {Array.from({ length: 30 }).map((_, i) => (
+      {particles.map((p, i) => (
         <div
           key={i}
           style={{
             position: "absolute",
-            width: `${Math.random() * 4 + 1}px`,
-            height: `${Math.random() * 4 + 1}px`,
+            width: `${p.width}px`,
+            height: `${p.height}px`,
             borderRadius: "50%",
             background: i % 3 === 0 ? "#6366f1" : i % 3 === 1 ? "#22d3ee" : "#f59e0b",
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            opacity: Math.random() * 0.6 + 0.1,
-            animation: `float-particle ${Math.random() * 8 + 6}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            opacity: p.opacity,
+            animation: `float-particle ${p.duration}s ease-in-out infinite`,
+            animationDelay: `${p.delay}s`,
           }}
         />
       ))}
@@ -210,6 +239,14 @@ function HowItWorksStep({ step, title, desc, icon: Icon, color, isLast }: {
   );
 }
 
+const CYCLING_WORDS = [
+  "in 90 Seconds",
+  "with 7 AI Layers",
+  "Completely Offline",
+  "with Zero Errors",
+  "Before It Costs You"
+];
+
 /* ══════════════════════════════════════════════════════════════════
    MAIN LANDING PAGE
    ══════════════════════════════════════════════════════════════════ */
@@ -218,21 +255,13 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
   const [heroVisible, setHeroVisible] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
 
-  const cyclingWords = [
-    "in 90 Seconds",
-    "with 7 AI Layers",
-    "Completely Offline",
-    "with Zero Errors",
-    "Before It Costs You"
-  ];
-
   useEffect(() => {
     setTimeout(() => setHeroVisible(true), 100);
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handleScroll);
     
     const cycleId = setInterval(() => {
-      setWordIndex((prev) => (prev + 1) % cyclingWords.length);
+      setWordIndex((prev) => (prev + 1) % CYCLING_WORDS.length);
     }, 2200);
 
     return () => {
@@ -614,7 +643,7 @@ export default function LandingPage({ onEnter, theme, onToggleTheme }: LandingPa
               overflow: "hidden",
               verticalAlign: "bottom",
             }}>
-              {cyclingWords.map((word, idx) => (
+              {CYCLING_WORDS.map((word, idx) => (
                 <span
                   key={idx}
                   style={{

@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import {
   Shield, Plus, FileText, RefreshCw, AlertTriangle, CheckCircle, XCircle,
-  Clock, TrendingUp, DollarSign, Award, Search, Bell
+  Clock, TrendingUp, DollarSign, Award, Search, Bell, Trash2
 } from "lucide-react";
 import { casesApi, type Case } from "../api/client";
 import {
@@ -69,7 +69,7 @@ function StatCard({ label, value, sub, color, icon: Icon }: {
   );
 }
 
-function CaseRow({ c, onOpen }: { c: Case; onOpen: () => void }) {
+function CaseRow({ c, onOpen, onDelete }: { c: Case; onOpen: () => void; onDelete: () => void }) {
   const verdict = c.verdict || "pending";
   const analysis = c.analysis;
 
@@ -80,7 +80,7 @@ function CaseRow({ c, onOpen }: { c: Case; onOpen: () => void }) {
       animate={{ opacity: 1 }}
       whileHover={{ borderColor: "var(--border-default)" }}
       onClick={onOpen}
-      style={{ cursor: "pointer", marginBottom: 10, padding: "16px 20px" }}
+      style={{ cursor: "pointer", marginBottom: 10, padding: "16px 54px 16px 20px", position: "relative" }}
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -115,7 +115,7 @@ function CaseRow({ c, onOpen }: { c: Case; onOpen: () => void }) {
           </div>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>₹{(c.loan_amount / 100000).toFixed(1)} Lakhs</div>
             <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>Requested</div>
@@ -125,9 +125,48 @@ function CaseRow({ c, onOpen }: { c: Case; onOpen: () => void }) {
           </div>
         </div>
       </div>
+
+      {/* Delete button pinned to top-right of card */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          if (window.confirm(`Delete case for "${c.applicant_name}"? This cannot be undone.`)) {
+            onDelete();
+          }
+        }}
+        title="Delete case"
+        style={{
+          position: "absolute",
+          right: 12,
+          top: "50%",
+          transform: "translateY(-50%)",
+          background: "rgba(239, 68, 68, 0.12)",
+          border: "1px solid rgba(239, 68, 68, 0.35)",
+          borderRadius: 8,
+          width: 32,
+          height: 32,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          zIndex: 5,
+          transition: "all 0.15s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(239, 68, 68, 0.3)";
+          e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.6)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(239, 68, 68, 0.12)";
+          e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.35)";
+        }}
+      >
+        <Trash2 size={14} color="#ef4444" />
+      </button>
     </motion.div>
   );
 }
+
 
 export default function Dashboard({ onOpenCase, onNewCase }: Props) {
   const [cases, setCases] = useState<Case[]>([]);
@@ -147,7 +186,12 @@ export default function Dashboard({ onOpenCase, onNewCase }: Props) {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      load();
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
 
   // Filter and search
   const filtered = cases.filter(c => {
@@ -454,7 +498,19 @@ export default function Dashboard({ onOpenCase, onNewCase }: Props) {
           ) : (
             <div>
               {filtered.map((c) => (
-                <CaseRow key={c.case_id} c={c} onOpen={() => onOpenCase(c.case_id)} />
+                <CaseRow
+                  key={c.case_id}
+                  c={c}
+                  onOpen={() => onOpenCase(c.case_id)}
+                  onDelete={async () => {
+                    try {
+                      await casesApi.delete(c.case_id);
+                      setCases(prev => prev.filter(x => x.case_id !== c.case_id));
+                    } catch (e) {
+                      console.error("Failed to delete case:", e);
+                    }
+                  }}
+                />
               ))}
             </div>
           )}

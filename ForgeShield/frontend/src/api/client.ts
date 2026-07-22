@@ -252,6 +252,7 @@ export const casesApi = {
   create: (data: any) => api.post<Case>("/cases/", data).then((r) => r.data),
   updateVerdict: (id: string, verdict: string, notes?: string) =>
     api.patch<Case>(`/cases/${id}/verdict`, { verdict, notes }).then((r) => r.data),
+  delete: (id: string) => api.delete(`/cases/${id}`),
   stats: () => api.get("/cases/stats/summary").then((r) => r.data),
 };
 

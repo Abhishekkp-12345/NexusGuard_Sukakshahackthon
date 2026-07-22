@@ -141,7 +141,9 @@ export default function LoginPage({ onAuthenticated, theme, onToggleTheme }: Log
   useEffect(() => {
     if (step !== "otp") return;
     const computeSecs = () => 60 - (Math.floor(Date.now() / 1000) % 60);
-    setOtpSecondsLeft(computeSecs());
+    const initId = setTimeout(() => {
+      setOtpSecondsLeft(computeSecs());
+    }, 0);
     const id = setInterval(() => {
       const secs = computeSecs();
       setOtpSecondsLeft(secs);
@@ -149,14 +151,20 @@ export default function LoginPage({ onAuthenticated, theme, onToggleTheme }: Log
         setLiveOTP(generateOTP(pendingUserId));
       }
     }, 1000);
-    return () => clearInterval(id);
+    return () => {
+      clearTimeout(initId);
+      clearInterval(id);
+    };
   }, [step, pendingUserId]);
 
   /* Trigger OTP */
   useEffect(() => {
     if (step === "otp" && pendingUserId) {
-      setLiveOTP(generateOTP(pendingUserId));
-      setTimeout(() => otpRef.current?.focus(), 100);
+      const initId = setTimeout(() => {
+        setLiveOTP(generateOTP(pendingUserId));
+        otpRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(initId);
     }
   }, [step, pendingUserId]);
 
